@@ -1,0 +1,594 @@
+:root {
+    --offset-cubeControl: 140px;
+    --tabHeight: 70px
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+html,
+body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+button,
+textarea {
+    margin: 0!important;
+    padding: 0!important;
+}
+
+select,
+input {
+    margin: 0!important;
+    padding: 0 0 5px 0!important;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-success {
+    margin: 0 5px!important;
+    padding: 5px!important
+}
+
+.btn-level {
+    color: #e2d9d9;
+    margin: 0 10px!important;
+}
+
+.btn-pin {
+    margin: 0 5px!important;
+    width: 40px!important;
+}
+
+
+/* general */
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.card-menu {
+    padding: 2px;
+    margin: 0 5px;
+    display: inline-flex;
+    flex-direction: row;
+}
+
+.card-body {
+    padding: 0px;
+}
+
+
+/* View */
+
+.mainView {
+    width: 100%;
+    height: calc(100vh - (var(--tabHeight)));
+    position: absolute;
+    left: 0;
+    top: var(--tabHeight);
+    outline: none;
+}
+
+.cubeView {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    top: 0;
+    right: 0;
+    z-index: 999;
+}
+
+.cubeViewHome {
+    position: absolute;
+    width: 20px;
+    top: 0;
+    left: -20px;
+}
+
+.cubeViewSetting {
+    position: absolute;
+    width: 20px;
+    bottom: 0;
+    left: -20px;
+}
+
+.cubeToggleCamera {
+    position: absolute;
+    width: 20px;
+    bottom: 0;
+    left: -20px;
+}
+
+.mainView canvas,
+.cubeView canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.nav.nav-tabs {
+    margin-bottom: 0!important;
+    height: 25px!important;
+}
+
+.nav-item button {
+    padding: 5px!important;
+    margin: 0 2px!important;
+    text-align: center;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    min-width: 80px;
+    background-color: rgb(190, 185, 154)!important;
+    color: rgb(10, 17, 18)!important;
+    border-radius: 5px!important;
+}
+
+.nav-link.active {
+    background-color: rgb(79, 169, 239)!important;
+    color: rgb(235, 241, 230)!important;
+    font-weight: 700;
+}
+
+.tab-content {
+    height: 45px!important;
+    border: 1px solid #7f8080;
+}
+
+.fade.tab-pane {
+    height: 100%;
+    align-items: center;
+    padding: 2px 0;
+}
+
+
+/* Menu */
+
+.menuItemBtn {
+    padding: 4px!important;
+    margin: 2px!important;
+}
+
+.menuItemBtn-active,
+.menuItemBtn:hover {
+    background: #aaaaa9!important
+}
+
+.menuItemBtn img {
+    width: 18px;
+    height: 18px
+}
+
+
+/* Model Browser */
+
+.modelBrowserQuantities,
+.modelBrowserContent {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 70vh;
+    padding: 0;
+}
+
+.modelBrowserContent {
+    background: rgb(58, 52, 52);
+}
+
+.modelBrowser {
+    position: fixed;
+    z-index: 10;
+}
+
+.modelBrowser .card-header {
+    cursor: move;
+}
+
+.modelBrowserTitle {
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: 700;
+}
+
+.modelCategory {
+    width: 300px;
+}
+
+.modelType {
+    width: 100%;
+}
+
+.btn.eyes,
+.btn.showObjectItem,
+.btn.objectItem {
+    font-size: 12px;
+    text-align: left;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    margin: 5px 0!important;
+    padding: 5px!important;
+    color: white;
+}
+
+.btn.showObjectItem,
+.btn.objectItem {
+    width: 150px;
+}
+
+.objectFilter {
+    cursor: pointer;
+}
+
+.objectItem:hover,
+.showObjectItem:hover {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 2s ease infinite;
+    color: white;
+}
+
+.connectMember {
+    width: 100%!important;
+    max-width: 500px!important;
+}
+
+
+/* Chart */
+
+.chartContent {
+    width: 450px;
+    height: 450px;
+}
+
+.chartContent canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.form-select {
+    padding: 0 5px!important
+}
+
+
+/* mouseRight */
+
+.mouseRight {
+    position: absolute;
+    background: rgb(37, 35, 35);
+}
+
+.mouseRight-filter {
+    background: rgb(37, 35, 35);
+    position: absolute;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.comment {
+    position: absolute;
+    display: none;
+    top: 20%;
+    left: 20%;
+    padding: 1px;
+}
+
+.comment .form-control {
+    width: 200px;
+}
+
+.comment-header {
+    padding: 2px 0!important;
+}
+
+.btn-comment {
+    padding: 2px!important;
+}
+
+.mouseRight-filter .card-body,
+.mouseRight .card-body {
+    padding: 5px 0 !important;
+    max-width: 200px;
+    min-width: 150px;
+}
+
+.mouseRight-filter .btn,
+.mouseRight .btn {
+    width: 100%;
+    color: white;
+    margin: 5px 0;
+    text-align: left;
+}
+
+.mouseRight-filter .btn:hover,
+.mouseRight .btn:hover {
+    background: rgb(175, 171, 171);
+    color: rgb(37, 35, 35);
+}
+
+.mouseRight-filter {
+    left: 100%;
+    top: 0
+}
+
+
+/* v2 */
+
+.side-menu {
+    z-index: 1;
+    position: fixed;
+    height: 100vh;
+}
+
+
+/* PROPERTY */
+
+.property {
+    width: 100%;
+    /* height: 100%; */
+    border-radius: 0!important;
+    margin: 0 !important;
+    padding: 0!important;
+}
+
+.property .property-item {
+    width: 100%;
+    height: 50%;
+    border: 1px solid #7f8080;
+    max-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.property-title,
+.property-group-title {
+    background: rgb(192, 189, 189);
+    padding: 2px;
+    margin-bottom: 2px;
+}
+
+.property-select-type {
+    width: 100%;
+    height: 50px;
+    margin: 0!important;
+    padding: 0!important;
+}
+
+.property-group .table-responsive,
+.property-group table {
+    margin: 0!important;
+    padding: 0!important;
+}
+
+.propBody tr td {
+    padding: 2px!important;
+}
+
+.paraName {
+    margin: 0!important;
+    padding: 0!important;
+    align-items: left;
+    justify-content: center;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    width: 80px;
+    min-width: 80px;
+}
+
+.propBody tr td select,
+.propBody tr td button,
+.propBody tr td input {
+    margin: 0!important;
+    padding: 0!important;
+    font-size: 12px!important;
+    line-height: 12px!important;
+    /* width: 100%; */
+}
+
+.propertyContent {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: auto;
+    max-width: 500px;
+    max-height: 600px;
+    padding: 2px;
+}
+
+.propertyContent-tool {
+    margin: 2px 0!important;
+    padding: 2px 0!important;
+    border: black dashed 1px;
+}
+
+.titlePN {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: bold;
+}
+
+
+/* multiselect */
+
+.multiSelect {
+    position: fixed;
+    border: 1px dashed black;
+    z-index: 10;
+    background: transparent;
+}
+
+
+/* explore */
+
+.explore {
+    position: absolute;
+    top: -30px;
+    width: 150px;
+}
+
+.floorPlane {
+    position: absolute;
+    width: 150px;
+}
+
+
+/* Filter */
+
+.filter td {
+    padding: 0px!important;
+    line-height: 30px!important;
+    font-weight: 700;
+    align-items: center;
+}
+
+.filter tr th:nth-child(1),
+.filter tr th:nth-child(2),
+.filter tr th:nth-child(3) {
+    width: 100px;
+}
+
+.filter tr th:nth-child(4) {
+    width: 50px;
+}
+
+.filterItemName {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    max-width: 70px;
+    margin: 0 5px;
+}
+
+.filterName {
+    width: 40%;
+    padding-left: 5px!important;
+    margin: 0 5px!important;
+}
+
+.filterSwitch {
+    height: 100%!important;
+    display: flex;
+    flex-direction: column;
+}
+
+.filterSwitch button {
+    margin-left: 0!important;
+    margin-right: 0!important;
+    margin-top: 100%!important;
+    margin-bottom: 100%!important;
+}
+
+
+/* .filter td input,
+.filter td select {
+    height: 30px;
+    margin: 0!important;
+    padding: 0 5px !important
+} */
+
+.listFilterItem {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100px;
+    min-height: 120px;
+    max-height: 800px;
+}
+
+.expressIDFilter {
+    text-align: center;
+    width: 100%;
+    color: blue;
+    padding: 2px 0 !important;
+    cursor: pointer;
+}
+
+.filterStorage {
+    cursor: pointer;
+}
+
+.filterStorage:hover,
+.expressIDFilter-active,
+.expressIDFilter:hover {
+    background: rgb(175, 171, 171);
+    color: rgb(37, 35, 35);
+}
+
+
+/* setting */
+
+.guiID {
+    position: fixed;
+    top: 210px;
+    right: 0;
+    max-height: calc(100vh - (var(--offset-cubeControl))- (var(--tabHeight)));
+    overflow-y: auto;
+}
+
+.guiID div,
+.guiID span,
+.guiID .cr,
+.guiID input {
+    line-height: 27px!important;
+}
+
+span.property-name {
+    align-items: left;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.labelDimension {
+    color: rgb(25, 24, 24);
+    font-family: sans-serif;
+    background: rgba(193, 13, 13, 0.6);
+    font-size: 12px;
+    line-height: 12px;
+    margin-top: -6px;
+    z-index: -1;
+}
+
+.dim {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: monospace;
+    font-size: 12px;
+    width: 40px;
+    height: 16px;
+    text-align: center;
+    border: none;
+    background: white;
+    border-radius: 2px;
+    padding: 1px 2px;
+}
+
+
+/* modify action */
+
+.pencil {
+    cursor: url("../img/pencil.png"), crosshair!important;
+}
+
+.maskDrop {
+    cursor: url("../img/gimpBrush.png"), crosshair!important;
+}
+
+.rectangle {
+    cursor: url("../img/rectangle.png"), crosshair!important;
+}
