@@ -1,13 +1,14 @@
-import { Scene, BufferGeometry, Vector3 } from "three";
+import { Scene } from "three";
 
 import { BaseView } from "./view";
 import { Tween } from "@tweenjs/tween.js";
-import { SettingModel } from "./model/SettingModel";
-import { ModelTypeClass, typeModel } from "./model";
-import { highlightModel, pickModel } from "./modify/selectModel";
+import { ModelTypeClass, typeModel, SettingModel, WorkPlane } from "./model";
+import { highlightModel, pickModel } from "./modeling/selectModel";
+import { CustomType } from "./modeling";
 
 export class DocumentModel {
 	models = [];
+
 	constructor(mainContainer, mainCanvas, cubeContainer, cubeCanvas) {
 		this.scene = new Scene();
 		this.width = mainContainer.clientWidth;
@@ -17,19 +18,17 @@ export class DocumentModel {
 		this.view.initCubeControls(cubeContainer, cubeCanvas);
 		this.view.onAnimate();
 		this.view.initResize(mainContainer, mainCanvas);
-		this.modelFree = new ModelTypeClass(typeModel.free, this.models, this.view);
-		this.modelInPlace = new ModelTypeClass(typeModel.inPlace, this.models, this.view);
+		this.workPlane = new WorkPlane(this.view);
+		this.extrude = new ModelTypeClass(typeModel.extrude, this.models, this.view);
+		this.sweep = new ModelTypeClass(typeModel.sweep, this.models, this.view);
+		this.revolve = new ModelTypeClass(typeModel.revolve, this.models, this.view);
+		this.grid = new ModelTypeClass(typeModel.grid, this.models, this.view);
+		this.level = new ModelTypeClass(typeModel.level, this.models, this.view);
 		this.evenMouseMove();
 	}
 	evenMouseMove() {
 		var _this = this;
-		_this.view.domElement.addEventListener(
-			"mousemove",
-			function (e) {
-				highlightModel(e, _this.view);
-			},
-			false
-		);
+
 		_this.view.domElement.addEventListener(
 			"click",
 			function (e) {
@@ -37,12 +36,63 @@ export class DocumentModel {
 			},
 			false
 		);
-		document.addEventListener("keydown", onkeydown, false);
+		// document.addEventListener("keydown", onkeydown, false);
 
-		function onkeydown(e) {
-			if (e.keyCode == 81 && _this.view.highlightModel) {
-				_this.view.tabKey = !_this.view.tabKey;
-			}
+		// function onkeydown(e) {
+		// 	if (e.keyCode == 81 && _this.view.highlightModel) {
+		// 		_this.view.tabKey = !_this.view.tabKey;
+		// 	}
+		// }
+	}
+	evenMouseDown(callback) {
+		var _this = this;
+		_this.view.domElement.addEventListener(
+			"mousedown",
+			function (e) {
+				var showMR = false;
+				var showAll = false;
+				var models = _this.scene.children.filter((c) => c.userData.Type == CustomType.model);
+				if (e.which == 3) {
+					if (models.length == 0) {
+						showMR = false;
+						showAll = false;
+					} else {
+						showMR = true;
+						showAll = _this.view.selectModel == null;
+					}
+					callback(showMR, { top: e.clientY, left: e.clientX, showAll: showAll });
+				}
+				if (e.which == 1) {
+					callback(false, { top: e.clientY, left: e.clientX, showAll: false });
+				}
+			},
+			false
+		);
+	}
+	handleDeleteModel() {
+		if (this.view.selectModel.userData.OutLine) {
+			this.view.selectModel.userData.OutLine.removeFromParent();
 		}
+		this.view.selectModel.removeFromParent();
+		this.view.selectModel = null;
+	}
+	handleHideModel() {
+		if (this.view.selectModel) {
+			if (this.view.selectModel.userData.OutLine) {
+				this.view.selectModel.userData.OutLine.visible = false;
+			}
+			this.view.selectModel.visible = false;
+			this.view.selectModel = null;
+		}
+	}
+	handleShowAllModel() {
+		this.scene.children.forEach((c) => {
+			if (c.userData.Type == CustomType.model) {
+				if (c.userData.OutLine) {
+					c.userData.OutLine.visible = true;
+				}
+				c.visible = true;
+			}
+		});
 	}
 }

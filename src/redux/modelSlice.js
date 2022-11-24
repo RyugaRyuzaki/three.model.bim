@@ -2,13 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 const modelSlice = createSlice({
 	name: "model",
 	initialState: {
-		typing: 0,
+		drawing: 0,
 		isModeling: false,
 	},
 	reducers: {
 		setModelType: (state, action) => {
-			const { typing, isModeling } = action.payload;
-			state.typing = typing;
+			const { drawing, isModeling } = action.payload;
+			state.drawing = drawing;
 			state.isModeling = isModeling;
 		},
 	},

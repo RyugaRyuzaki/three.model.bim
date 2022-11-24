@@ -33,11 +33,11 @@ export class SettingModel {
 			.onChange((value) => {
 				opacityCustomModel(value);
 			});
-		generalFolder
-			.add(_this, "outLine")
-			.name("Visibility Outline")
-			.onChange((value) => {
-				visibilityOutline(value);
-			});
+		// generalFolder
+		// 	.add(_this, "outLine")
+		// 	.name("Visibility Outline")
+		// 	.onChange((value) => {
+		// 		visibilityOutline(value);
+		// 	});
 	}
 }

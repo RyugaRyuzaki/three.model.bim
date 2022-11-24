@@ -11,68 +11,7 @@ import {
 	LineSegments,
 	Euler,
 } from "three";
-import { customMaterial, dimMaterial } from "../material";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import fontJSON from "../../assets/font/droid_sans_bold.typeface.json";
-export const filterModel = {
-	model: (scene) => {
-		return scene.children.filter((e) => e.userData.CustomModel && e.visible);
-	},
-};
-export function castElement(event, view, filter) {
-	const bounds = view.domElement.getBoundingClientRect();
-	const x1 = event.clientX - bounds.left;
-	const y1 = event.clientY - bounds.top;
-	const x2 = bounds.right - bounds.left;
-	view.mouse.x = (x1 / x2) * 2 - 1;
-	const y2 = bounds.bottom - bounds.top;
-	view.mouse.y = -(y1 / y2) * 2 + 1;
-	view.rayCaster.setFromCamera(view.mouse, view.camera);
-	return view.rayCaster.intersectObjects(filter);
-}
-export function changeCursor() {
-	return {
-		default: (domElement) => {
-			domElement.style.cursor = "default";
-		},
-		pointer: (domElement) => {
-			domElement.style.cursor = "pointer";
-		},
-		move: (domElement) => {
-			domElement.style.cursor = "move";
-		},
-		crosshair: (domElement) => {
-			domElement.style.cursor = "crosshair";
-		},
-		alias: (domElement) => {
-			domElement.style.cursor = "alias";
-		},
-		extrude: (domElement) => {
-			domElement.style.cursor = "row-resize";
-		},
-		notAllowed: (domElement) => {
-			domElement.style.cursor = "not-allowed";
-		},
-	};
-}
-export const MAX_POINTS = 10000;
-export const MAX_CIRCLE = 48;
-export const MIN_DIS = 0.1;
-export const ES = 1.0e-6;
-export const PROFILE = {
-	none: 0,
-	rect: 1,
-	polyGon: 2,
-	circle: 3,
-	halfCircle: 4,
-};
-export const CATEGORY = {
-	buildingProxy: 0,
-	slab: 1,
-	wall: 2,
-	beam: 3,
-	column: 4,
-};
+import { customMaterial } from "../material";
 
 export function intersectPlaneElevation(event, mouse, view, elevation) {
 	const bounds = view.renderer.domElement.getBoundingClientRect();
@@ -131,6 +70,9 @@ export function intersectPointPlane(event, mouse, view, found, plane) {
 export function areEqual(firstValue, secondValue, tolerance = 1.0e-9) {
 	return secondValue - tolerance < firstValue && firstValue < secondValue + tolerance;
 }
+export function areEqualVector(v1, v2) {
+	return areEqual(v1.x, v2.x, 1.0e-6) && areEqual(v1.y, v2.y, 1.0e-6) && areEqual(v1.z, v2.z, 1.0e-6);
+}
 
 export function getLocalVectorOnFace(normal) {
 	if (areEqual(normal.angleTo(new Vector3(0, 1, 0)), 0) || areEqual(normal.angleTo(new Vector3(0, 1, 0)), Math.PI)) {
@@ -163,30 +105,46 @@ export function getMiddlePoint(point1, point2) {
 	return newVector;
 }
 
-export function setPropertyCustomModel(mesh, outLine) {
-	outLine.userData.isOutLine = true;
-	mesh.userData.CustomModel = true;
-	mesh.userData.OutLine = outLine;
-	mesh.userData.IsSelect = false;
-	mesh.userData.Hover = customMaterial.hoverModel;
-	mesh.userData.Normal = customMaterial.normalModel;
-	mesh.userData.Select = customMaterial.selectModel;
-	mesh.userData.isExtrude = false;
-	// mesh.renderOrder = 1;
-}
 export function findPointFromFace(object, plane) {
-	var points = [];
+	var equalPoints = [];
+	var perPoints = [];
+	var equalIndex = [];
+	var perIndex = [];
+	var notEqualPoints = [];
 	var arrIndex = object.geometry.index.array;
 	var pos0 = object.geometry.attributes.position;
-	var newArrayIndex = [];
+	var normal0 = object.geometry.attributes.normal;
 	for (let i = 0; i < arrIndex.length; i++) {
+		var normal = new Vector3(normal0.getX(arrIndex[i]), normal0.getY(arrIndex[i]), normal0.getZ(arrIndex[i]));
 		var v0 = new Vector3(pos0.getX(arrIndex[i]), pos0.getY(arrIndex[i]), pos0.getZ(arrIndex[i]));
-		var dis = plane.distanceToPoint(v0);
-		if (areEqual(dis, 0.0)) {
-			points.push(v0);
-			newArrayIndex.push(arrIndex[i]);
+		if (areEqualVector(normal, plane.normal)) {
+			equalPoints.push(v0);
+			equalIndex.push(arrIndex[i]);
+		} else {
+			notEqualPoints.push(arrIndex[i]);
+			var dis = plane.distanceToPoint(v0);
+			if (areEqual(dis, 0.0, 1.0e-6) && areEqual(normal.angleTo(plane.normal), Math.PI / 2, 1.0e-6)) {
+				perIndex.push(arrIndex[i]);
+				perPoints.push(v0);
+			}
 		}
 	}
 
-	return { points: points, arrIndex: newArrayIndex };
+	return {
+		equalPoints: equalPoints,
+		equalIndex: equalIndex,
+		perPoints: perPoints,
+		perIndex: perIndex,
+		notEqualPoints: notEqualPoints,
+	};
+}
+export function getOldPoints(object) {
+	var points = [];
+	var arrIndex = object.geometry.index.array;
+	var pos0 = object.geometry.attributes.position;
+	for (let i = 0; i < arrIndex.length; i++) {
+		var v0 = new Vector3(pos0.getX(arrIndex[i]), pos0.getY(arrIndex[i]), pos0.getZ(arrIndex[i]));
+		points.push(v0);
+	}
+	return points;
 }

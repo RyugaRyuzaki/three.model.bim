@@ -65,6 +65,7 @@ export class BaseView {
 		this.mouse = new Vector2();
 		this.tabKey = false;
 		this.highlightModel = null;
+		this.selectModel = null;
 	}
 
 	initLight() {

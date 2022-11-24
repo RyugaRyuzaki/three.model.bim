@@ -1,8 +1,9 @@
-import { castElement, filterModel, changeCursor } from "./snap";
+import { castElement, filterModel, changeCursor } from "./cast";
+import { CustomType } from "./enum";
 
 export function highlightModel(event, view) {
 	view.scene.children.forEach((child) => {
-		if (child.userData.CustomModel) {
+		if (CustomType.isModel(child)) {
 			child.material = child.userData.IsSelect ? child.userData.Select : child.userData.Normal;
 		}
 	});
@@ -27,13 +28,23 @@ export function pickModel(event, view) {
 		changeCursor().pointer(view.domElement);
 		found.object.material = found.object.userData.Select;
 		found.object.userData.IsSelect = true;
+		// for (let i = 0; i < found.object.userData.Edges.length; i++) {
+		// 	const edge = found.object.userData.Edges[i];
+		// 	edge.visibility(found.object, true);
+		// }
+		view.selectModel = found.object;
 	} else {
 		changeCursor().default(view.domElement);
 		view.tabKey = false;
+		view.selectModel = null;
 		view.scene.children.forEach((child) => {
-			if (child.userData.CustomModel) {
+			if (CustomType.isModel(child)) {
 				child.userData.IsSelect = false;
 				child.material = child.userData.Normal;
+				// for (let i = 0; i < child.userData.Edges.length; i++) {
+				// 	const edge = child.userData.Edges[i];
+				// 	edge.visibility(child, false);
+				// }
 			}
 		});
 	}

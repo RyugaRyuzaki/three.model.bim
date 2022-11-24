@@ -1,19 +1,20 @@
-import { drawRect, drawExtrude } from "../modify";
+import { drawRect, drawExtrude, drawPolyGon } from "../modeling";
 
 export const typeModel = {
-	free: 0,
-	inPlace: 1,
+	extrude: 1,
+	sweep: 2,
+	revolve: 3,
+	grid: 4,
+	level: 5,
 };
-export const modelList = {
+
+export const drawList = {
 	none: 0,
 	rect: 1,
 	poly: 2,
 	circle: 3,
 	arc: 4,
-	extrude: 5,
-	workPlane: 6,
-	sweep: 7,
-	revolve: 8,
+	line: 5,
 };
 export class ModelTypeClass {
 	current;
@@ -35,6 +36,12 @@ export class ModelTypeClass {
 		var _this = this;
 		drawRect(_this.view, btn, (model) => {
 			_this.current = model;
+			callback();
+		});
+	}
+	drawFreePoly(btn, callback) {
+		var _this = this;
+		drawPolyGon(_this.view, btn, (model) => {
 			callback();
 		});
 	}

@@ -1,18 +1,10 @@
 import { BufferAttribute, BufferGeometry, Mesh, Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
 import { MeshBVH } from "three-mesh-bvh";
 import { customMaterial } from "../material";
-import {
-	MAX_POINTS,
-	getLocalVectorOnFace,
-	getProjectPointFromVector,
-	intersectPointPlane,
-	castElement,
-	changeCursor,
-	filterModel,
-	setPropertyCustomModel,
-	EdgeLine,
-	findPointFromFace,
-} from "./snap";
+import { castElement, changeCursor, filterModel } from "./cast";
+import { MAX_POINTS } from "./enum";
+import { setDefaultEdgesRectangle, setPropertyRectangle } from "./setProperty";
+import { getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane, findPointFromFace } from "./snap";
 export function drawRect(view, btn, callback) {
 	var count = 2;
 	var mouse = new Vector2();
@@ -75,6 +67,12 @@ export function drawRect(view, btn, callback) {
 		mesh.geometry.computeBoundingSphere();
 		mesh.geometry.computeVertexNormals();
 		mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
+		// var local = getLocalVectorOnFace(plane.normal);
+		// var v1 = p1.clone();
+		// var v2 = getProjectPointFromVector(p1, p2, local.z);
+		// var v3 = p2.clone();
+		// var v4 = getProjectPointFromVector(p1, p2, local.x);
+		// setDefaultEdgesRectangle(mesh, v1, v2, v3, v4);
 		// mesh.userData.edges.push(new EdgeLine(findPointFromFace(mesh, plane), plane));
 		changeCursor().default(view.domElement);
 		btn.style.background = "none";
@@ -102,10 +100,10 @@ function createRectangle(p1, p2, view) {
 	const edges = new EdgesGeometry(geometry);
 	const line = new LineSegments(edges, customMaterial.normalLine);
 
-	setPropertyCustomModel(mesh, line);
+	setPropertyRectangle(mesh, line);
 
-	view.scene.add(line);
 	view.scene.add(mesh);
+	view.scene.add(line);
 	return mesh;
 }
 function updatePositionRectangle(vertices, v1, v2, v3, v4) {

@@ -139,14 +139,13 @@ input {
 }
 
 .tab-content {
-    height: 45px!important;
-    border: 1px solid #7f8080;
+    height: 40px!important;
+    background: #7f8080;
 }
 
 .fade.tab-pane {
     height: 100%;
     align-items: center;
-    padding: 2px 0;
 }
 
 
@@ -591,4 +590,22 @@ span.property-name {
 
 .rectangle {
     cursor: url("../img/rectangle.png"), crosshair!important;
+}
+
+
+/* label */
+
+.dot {
+    height: 5px;
+    width: 5px;
+    background-color: rgb(220, 15, 15);
+    border-radius: 50%;
+    display: inline-block;
+}
+
+
+/* tab */
+
+.toolTab {
+    border: 1px solid #7f8080;
 }

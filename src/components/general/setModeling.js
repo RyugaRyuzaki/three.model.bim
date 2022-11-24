@@ -1,8 +1,8 @@
 import { setModelType } from "../../redux/modelSlice";
 
-export function setDisabled(target, type0, typing, isModeling) {
+export function setDisabled(target, draw0, drawing, isModeling) {
 	if (isModeling) {
-		if (typing == type0) {
+		if (drawing == draw0) {
 			target.current.disabled = false;
 		} else {
 			target.current.disabled = true;
@@ -11,9 +11,9 @@ export function setDisabled(target, type0, typing, isModeling) {
 		target.current.disabled = false;
 	}
 }
-export function setModelingType(type, dispatch) {
-	dispatch(setModelType({ typing: type, isModeling: true }));
+export function setModelingType(draw, dispatch) {
+	dispatch(setModelType({ drawing: draw, isModeling: true }));
 }
 export function refreshModelingType(dispatch) {
-	dispatch(setModelType({ typing: 0, isModeling: false }));
+	dispatch(setModelType({ drawing: 0, isModeling: false }));
 }

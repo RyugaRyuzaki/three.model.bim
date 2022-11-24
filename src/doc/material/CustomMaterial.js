@@ -1,4 +1,4 @@
-import { LineBasicMaterial, MeshNormalMaterial, DoubleSide, MeshBasicMaterial } from "three";
+import { LineBasicMaterial, DoubleSide, MeshBasicMaterial, MeshLambertMaterial } from "three";
 import { LightColor } from "./LightColor";
 export const customMaterial = {
 	normalLine: new MeshBasicMaterial({
@@ -28,7 +28,7 @@ export const customMaterial = {
 	selectModel: new MeshBasicMaterial({
 		transparent: true,
 		opacity: 1,
-		color: 0xf10cf5,
+		color: LightColor.normalCube,
 		side: DoubleSide,
 		depthWrite: true,
 		depthTest: true,
@@ -45,6 +45,23 @@ export const customMaterial = {
 		transparent: true,
 		opacity: 0.1,
 		color: 0x075eeb,
+		side: DoubleSide,
+		depthWrite: true,
+		depthTest: true,
+	}),
+
+	pointNormal: new MeshBasicMaterial({
+		transparent: true,
+		opacity: 0.1,
+		color: "green",
+		side: DoubleSide,
+		depthWrite: true,
+		depthTest: true,
+	}),
+	pointSelect: new MeshBasicMaterial({
+		transparent: true,
+		opacity: 0.1,
+		color: "red",
 		side: DoubleSide,
 		depthWrite: true,
 		depthTest: true,
