@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { ToolContext } from "../ToolContext";
 const MouseRight = () => {
-	const { showMR, visibilityMR, handleDeleteModel, handleHideModel, handleMoveModel, handleShowAllModel } =
+	const { showMR, visibilityMR, handleDeleteModel, handleHideModel, handlePropertyModel, handleShowAllModel } =
 		useContext(ToolContext);
 
 	const styleMouseRight = () => {
@@ -25,8 +25,8 @@ const MouseRight = () => {
 				<button className="btn" onClick={handleHideModel} style={styleElement(!visibilityMR.showAll)}>
 					Hide
 				</button>
-				<button className="btn" onClick={handleMoveModel} style={styleElement(!visibilityMR.showAll)}>
-					Move
+				<button className="btn" onClick={handlePropertyModel} style={styleElement(!visibilityMR.showAll)}>
+					Property
 				</button>
 				<button className="btn" onClick={handleShowAllModel} style={styleElement(visibilityMR.showAll)}>
 					Show All

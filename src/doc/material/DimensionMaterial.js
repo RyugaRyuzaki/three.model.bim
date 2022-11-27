@@ -69,7 +69,7 @@ export const dimMaterial = {
 		color: "green",
 		linewidth: 1,
 		scale: 1,
-		dashSize: 0.2,
+		dashSize: 0.1,
 		gapSize: 0.1,
 	}),
 	tagTemp: new LineDashedMaterial({

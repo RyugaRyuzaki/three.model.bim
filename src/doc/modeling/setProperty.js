@@ -35,12 +35,23 @@ export function setPropertyPolyGon(mesh, outLine) {
 	mesh.userData.Edges = [];
 	mesh.renderOrder = getElementID();
 }
-export function setDefaultEdgesRectangle(mesh, v1, v2, v3, v4) {
-	var lines = [];
-	lines.push({ pS: v1, pE: v2 });
-	lines.push({ pS: v2, pE: v3 });
-	lines.push({ pS: v3, pE: v4 });
-	lines.push({ pS: v4, pE: v1 });
-	var boundingEdge = new BoundingEdge(lines);
-	mesh.userData.Edges.push(boundingEdge);
+export function setDefaultEdgesRectangle(mesh, v1, v2, v3, v4) {}
+export function setDefaultModel(mesh, outLine, profile, normalVector) {
+	mesh.userData.Type = CustomType.model;
+	mesh.userData.OutLine = outLine;
+	mesh.userData.HasProfile = profile;
+	mesh.userData.CurvePath = false;
+	mesh.userData.NormalVector = normalVector;
+	mesh.userData.isSelected = false;
+	mesh.userData.Selection = {
+		refresh: () => {
+			mesh.material = mesh.userData.isSelected ? customMaterial.selectModel : customMaterial.normalModel;
+		},
+		selected: () => {
+			mesh.material = customMaterial.selectModel;
+		},
+		hover: () => {
+			if (!mesh.userData.isSelected) mesh.material = customMaterial.hoverModel;
+		},
+	};
 }

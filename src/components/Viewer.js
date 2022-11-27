@@ -4,6 +4,7 @@ import { faHome, faCog } from "@fortawesome/free-solid-svg-icons";
 import { DocumentModel } from "../doc/DocumentModel";
 import ToolTab from "./ToolTab";
 import SettingPanel from "./SettingPanel";
+import LinkTab from "./LinkTab";
 
 const Viewer = () => {
 	const mainView = useRef(null);
@@ -18,6 +19,7 @@ const Viewer = () => {
 	const [showGUI, setShowGUI] = useState(false);
 	return (
 		<>
+			<LinkTab></LinkTab>
 			<div className="mainView" ref={mainView}>
 				<canvas ref={mainCanvas}></canvas>
 				<div className="cubeView" ref={cubeView}>

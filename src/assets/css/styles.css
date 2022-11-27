@@ -1,6 +1,7 @@
 :root {
     --offset-cubeControl: 140px;
-    --tabHeight: 70px
+    --tabHeight: 70px;
+    --snap: 20px;
 }
 
 * {
@@ -48,6 +49,24 @@ input {
 }
 
 
+/* Link */
+
+.linkTab {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 26px;
+    background: #52ecec;
+}
+
+.linkTab .btn {
+    width: 25px;
+    height: 25px;
+    padding: 2px !important;
+    margin: 0 5px;
+}
+
+
 /* general */
 
 .card {
@@ -63,6 +82,20 @@ input {
 
 .card-body {
     padding: 0px;
+}
+
+.card-menu .input-payment div,
+.card-menu .input-payment input {
+    font-size: 16px;
+    height: 32px;
+    line-height: 32px;
+    margin: 0 10px;
+}
+
+.input-payment input {
+    width: 80px;
+    text-align: right;
+    padding-right: 5px!important;
 }
 
 
@@ -164,80 +197,6 @@ input {
 .menuItemBtn img {
     width: 18px;
     height: 18px
-}
-
-
-/* Model Browser */
-
-.modelBrowserQuantities,
-.modelBrowserContent {
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-height: 70vh;
-    padding: 0;
-}
-
-.modelBrowserContent {
-    background: rgb(58, 52, 52);
-}
-
-.modelBrowser {
-    position: fixed;
-    z-index: 10;
-}
-
-.modelBrowser .card-header {
-    cursor: move;
-}
-
-.modelBrowserTitle {
-    font-size: 16px;
-    line-height: 16px;
-    font-weight: 700;
-}
-
-.modelCategory {
-    width: 300px;
-}
-
-.modelType {
-    width: 100%;
-}
-
-.btn.eyes,
-.btn.showObjectItem,
-.btn.objectItem {
-    font-size: 12px;
-    text-align: left;
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden !important;
-    text-overflow: ellipsis;
-    margin: 5px 0!important;
-    padding: 5px!important;
-    color: white;
-}
-
-.btn.showObjectItem,
-.btn.objectItem {
-    width: 150px;
-}
-
-.objectFilter {
-    cursor: pointer;
-}
-
-.objectItem:hover,
-.showObjectItem:hover {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    background-size: 400% 400%;
-    animation: gradient 2s ease infinite;
-    color: white;
-}
-
-.connectMember {
-    width: 100%!important;
-    max-width: 500px!important;
 }
 
 
@@ -596,11 +555,58 @@ span.property-name {
 /* label */
 
 .dot {
-    height: 5px;
-    width: 5px;
+    height: var(--snap);
+    width: var(--snap);
     background-color: rgb(220, 15, 15);
     border-radius: 50%;
     display: inline-block;
+}
+
+.endPoint {
+    width: var(--snap);
+    height: var(--snap);
+    border: black 1px solid;
+}
+
+.middle {
+    background: transparent;
+    width: 0px;
+    height: 0px;
+    border-left: var(--snap) solid transparent;
+    border-right: var(--snap) solid transparent;
+    border-bottom: var(--snap) solid black;
+    border-top: var(--snap) solid transparent;
+    position: absolute;
+    bottom: 0!important;
+}
+
+.intersect {
+    position: relative;
+    height: var(--snap);
+    /* this can be anything */
+    width: var(--snap);
+    /* ...but maintain 1:1 aspect ratio */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.intersect::before,
+.intersect::after {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 1px;
+    /* cross thickness */
+    background-color: black;
+}
+
+.intersect::before {
+    transform: rotate(45deg);
+}
+
+.intersect::after {
+    transform: rotate(-45deg);
 }
 
 

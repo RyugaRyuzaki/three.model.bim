@@ -1,17 +1,18 @@
-import { Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
+import { Vector2, Vector3 } from "three";
 import { changeCursor } from "./cast";
 import { MIN_DIS } from "./enum";
 import { LocationLine } from "./Location";
 import { snapPoint } from "./selectModel";
-import { getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane, findPointFromFace } from "./snap";
+import { intersectPointPlane } from "./snap";
 
-export function drawRect(view, btn, workPlane, callback) {
+export function drawLine(view, btn, workPlane, callback) {
 	const { plane } = workPlane;
 	var count = 2;
 	var mouse = new Vector2();
 	var p1 = new Vector3();
 	var p2 = new Vector3();
-	var l1, l2, l3, l4, snap;
+	var line, snap;
+
 	function draw() {
 		btn.style.background = "#aaaaa9";
 		view.domElement.addEventListener("click", onMouseDown, false);
@@ -22,11 +23,8 @@ export function drawRect(view, btn, workPlane, callback) {
 		var keyCode = event.keyCode;
 		if (keyCode == 27) {
 			count = 0;
-			if (l1 && l2 && l3 && l4) {
-				l1.removeFromParent();
-				l2.removeFromParent();
-				l3.removeFromParent();
-				l4.removeFromParent();
+			if (line) {
+				line.removeFromParent();
 			}
 			finishCallBack();
 		}
@@ -45,15 +43,7 @@ export function drawRect(view, btn, workPlane, callback) {
 		}
 		count--;
 		if (count == 0) {
-			var local = getLocalVectorOnFace(plane.normal);
-			var v1 = p1.clone();
-			var v2 = getProjectPointFromVector(p1, p2, local.z);
-			var v3 = p2.clone();
-			var v4 = getProjectPointFromVector(p1, p2, local.x);
-			LocationLine.initLine(v1, v2, plane.normal, l1);
-			LocationLine.initLine(v2, v3, plane.normal, l2);
-			LocationLine.initLine(v3, v4, plane.normal, l3);
-			LocationLine.initLine(v4, v1, plane.normal, l4);
+			LocationLine.initLine(p1, p2, plane.normal, line);
 			finishCallBack();
 		}
 	}
@@ -69,25 +59,11 @@ export function drawRect(view, btn, workPlane, callback) {
 			if (snap) p2 = snap;
 			var dis = p1.distanceTo(p2);
 			if (dis > MIN_DIS) {
-				var local = getLocalVectorOnFace(plane.normal);
-				var v1 = p1.clone();
-				var v2 = getProjectPointFromVector(p1, p2, local.z);
-				var v3 = p2.clone();
-				var v4 = getProjectPointFromVector(p1, p2, local.x);
-				if (!l1 && !l2 && !l3 && !l4) {
-					l1 = LocationLine.createTempLine(v1, v2);
-					l2 = LocationLine.createTempLine(v2, v3);
-					l3 = LocationLine.createTempLine(v3, v4);
-					l4 = LocationLine.createTempLine(v4, v1);
-					view.scene.add(l1);
-					view.scene.add(l2);
-					view.scene.add(l3);
-					view.scene.add(l4);
+				if (!line) {
+					line = LocationLine.createTempLine(p1, p2);
+					view.scene.add(line);
 				} else {
-					LocationLine.updateTempLine(v1, v2, l1);
-					LocationLine.updateTempLine(v2, v3, l2);
-					LocationLine.updateTempLine(v3, v4, l3);
-					LocationLine.updateTempLine(v4, v1, l4);
+					LocationLine.updateTempLine(p1, p2, line);
 				}
 			}
 		}
@@ -100,7 +76,6 @@ export function drawRect(view, btn, workPlane, callback) {
 	function finishCallBack() {
 		changeCursor().default(view.domElement);
 		snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-
 		btn.style.background = "none";
 		view.domElement.removeEventListener("click", onMouseDown);
 		view.domElement.removeEventListener("mousemove", onMouseMove);

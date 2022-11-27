@@ -12,6 +12,7 @@ import {
 	Euler,
 } from "three";
 import { customMaterial } from "../material";
+import { INTERSECT_TYPE } from "./enum";
 
 export function intersectPlaneElevation(event, mouse, view, elevation) {
 	const bounds = view.renderer.domElement.getBoundingClientRect();
@@ -147,4 +148,39 @@ export function getOldPoints(object) {
 		points.push(v0);
 	}
 	return points;
+}
+
+export function getIntersectTypeLines(l1, l2) {
+	if (!l1.userData.Location || !l2.userData.Location) return INTERSECT_TYPE.dispose;
+	if (!l1.userData.Location.Direction || !l2.userData.Location.Direction) return INTERSECT_TYPE.dispose;
+	if (!l1.userData.Location.Normal || !l2.userData.Location.Normal) return INTERSECT_TYPE.dispose;
+	if (!areEqualVector(l1.userData.Location.Normal, l2.userData.Location.Normal)) return INTERSECT_TYPE.dispose;
+	if (areEqualVector(l1.userData.Location.Direction, l2.userData.Location.Direction)) {
+		const pro = l1.userData.Location.Start.position.clone().projectOnVector(l2.userData.Location.Direction);
+		if (areEqual(pro.distanceTo(l1.userData.Location.Start.position), 0.0, 1e-6)) {
+			return INTERSECT_TYPE.equal;
+		} else {
+			return INTERSECT_TYPE.parallel;
+		}
+	} else {
+		return INTERSECT_TYPE.intersect;
+	}
+}
+export function getIntersectLines(l1, l2) {
+	if (getIntersectTypeLines(l1, l2) != INTERSECT_TYPE.intersect) return null;
+	const proS = l1.userData.Location.Start.position.clone().projectOnVector(l2.userData.Location.Direction);
+	const proE = l1.userData.Location.End.position.clone().projectOnVector(l2.userData.Location.Direction);
+	var cS = new Vector3(
+		proS.x - l1.userData.Location.Start.position.x,
+		proS.y - l1.userData.Location.Start.position.y,
+		proS.z - l1.userData.Location.Start.position.z
+	).normalize();
+	var cE = new Vector3(
+		proE.x - l1.userData.Location.End.position.x,
+		proE.y - l1.userData.Location.End.position.y,
+		proE.z - l1.userData.Location.End.position.z
+	).normalize();
+	var disS = proS.distanceTo(l1.userData.Location.Start.position);
+	var disE = proE.distanceTo(l1.userData.Location.End.position);
+	if (areEqual(cE.angleTo(cS), 0.0, 1e-6)) return null;
 }

@@ -3,6 +3,22 @@ export const MAX_CIRCLE = 48;
 export const MIN_DIS = 0.1;
 export const ES = 1.0e-6;
 export const DiaP = 0.01;
+export const LINE_WIDTH = 0.08;
+export const SNAP = 0.1;
+export const SNAP_ANGLE = Math.PI / 12;
+
+export const extrudeSetting = (curve) => {
+	return {
+		extrudePath: curve,
+		steps: curve.getPoints().length,
+	};
+};
+export const CSS = {
+	intersect: "intersect",
+	dot: "dot",
+	middle: "intersect",
+	endPoint: "endPoint",
+};
 export const PROFILE = {
 	none: 0,
 	rect: 1,
@@ -38,4 +54,13 @@ export const CustomType = {
 	isModel: (mesh) => {
 		return CustomType.filter(mesh, CustomType.model);
 	},
+	isProfile: (mesh) => {
+		return mesh.userData.Profile;
+	},
+};
+export const INTERSECT_TYPE = {
+	dispose: "DISPOSE",
+	equal: "EQUAL",
+	parallel: "PARALLEL",
+	intersect: "INTERSECT",
 };

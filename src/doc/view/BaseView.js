@@ -20,6 +20,7 @@ import * as TWEEN from "@tweenjs/tween.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { LightColor, CubeControlMaterial, customMaterial } from "../material";
 import { CubeControls } from "./CubeControl";
+import { CustomType } from "./../modeling";
 
 export class BaseView {
 	constructor(scene, container, canvas, width, height, alpha = true) {
@@ -136,6 +137,7 @@ export class BaseView {
 		this.renderer.gammaFactor = 2.2;
 		this.labelRenderer = new CSS2DRenderer();
 		this.labelRenderer.setSize(this.width, this.height);
+
 		this.labelRenderer.domElement.style.position = "absolute";
 		this.labelRenderer.domElement.style.top = 0;
 		this.labelRenderer.domElement.setAttribute("tabindex", 1);
@@ -179,6 +181,14 @@ export class BaseView {
 			_this.camera.updateProjectionMatrix();
 			_this.renderer.setSize(_this.width, _this.height, true);
 			_this.labelRenderer.setSize(_this.width, _this.height, true);
+		}
+		_this.domElement.addEventListener("wheel", onWheel, false);
+		function onWheel(e) {
+			// _this.scene.children.forEach((c) => {
+			// 	if (c.userData.Type == CustomType.line) {
+			// 		c.scale.set(1 / _this.camera.zoom, 1 / _this.camera.zoom, 1 / _this.camera.zoom);
+			// 	}
+			// });
 		}
 	}
 

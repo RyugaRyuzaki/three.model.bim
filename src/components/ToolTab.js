@@ -6,6 +6,8 @@ import ModelInPlaceMenu from "./ModelInPlace/ModelInPlaceMenu";
 import ModelDetailMenu from "./ModelDetail/ModelDetailMenu";
 import ModelingMenu from "./Modeling/ModelingMenu";
 import MouseRight from "./MouseRight/MouseRight";
+import PropertyModel from "./Property/PropertyModel";
+import Modify from "./Modify/Modify";
 
 const ToolTab = (props) => {
 	const { documentModel } = props;
@@ -38,13 +40,12 @@ const ToolTab = (props) => {
 					</Tabs>
 				</div>
 				<div className="toolTab" style={{ width: "30%" }}>
-					<Tabs activeKey={0} className="mb-3">
-						<Tab eventKey={0} title="Modeling"></Tab>
-					</Tabs>
+					<Modify></Modify>
 				</div>
 			</div>
 
 			<MouseRight></MouseRight>
+			<PropertyModel></PropertyModel>
 		</ToolProvider>
 	);
 };

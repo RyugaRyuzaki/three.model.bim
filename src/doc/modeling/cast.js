@@ -2,7 +2,7 @@ import { CustomType } from "./enum";
 
 export const filterModel = {
 	model: (scene) => {
-		return scene.children.filter((e) => CustomType.isModel(e) && e.visible);
+		return scene.children.filter((e) => (CustomType.isModel(e) || CustomType.isProfile(e)) && e.visible);
 	},
 };
 export function castElement(event, view, filter) {

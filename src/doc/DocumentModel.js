@@ -2,7 +2,7 @@ import { Scene } from "three";
 
 import { BaseView } from "./view";
 import { Tween } from "@tweenjs/tween.js";
-import { ModelTypeClass, typeModel, SettingModel, WorkPlane } from "./model";
+import { ModelTypeClass, typeModel, SettingModel, WorkPlane, drawList } from "./model";
 import { highlightModel, pickModel } from "./modeling/selectModel";
 import { CustomType } from "./modeling";
 
@@ -30,19 +30,19 @@ export class DocumentModel {
 		var _this = this;
 
 		_this.view.domElement.addEventListener(
+			"mousemove",
+			function (e) {
+				highlightModel(e, _this.view);
+			},
+			false
+		);
+		_this.view.domElement.addEventListener(
 			"click",
 			function (e) {
 				pickModel(e, _this.view);
 			},
 			false
 		);
-		// document.addEventListener("keydown", onkeydown, false);
-
-		// function onkeydown(e) {
-		// 	if (e.keyCode == 81 && _this.view.highlightModel) {
-		// 		_this.view.tabKey = !_this.view.tabKey;
-		// 	}
-		// }
 	}
 	evenMouseDown(callback) {
 		var _this = this;
@@ -62,9 +62,17 @@ export class DocumentModel {
 					}
 					callback(showMR, { top: e.clientY, left: e.clientX, showAll: showAll });
 				}
-				if (e.which == 1) {
-					callback(false, { top: e.clientY, left: e.clientX, showAll: false });
-				}
+			},
+			false
+		);
+	}
+	evenClick(callback) {
+		var _this = this;
+		_this.view.domElement.addEventListener(
+			"click",
+			function (e) {
+				pickModel(e, _this.view);
+				callback(_this.view.selectModel);
 			},
 			false
 		);

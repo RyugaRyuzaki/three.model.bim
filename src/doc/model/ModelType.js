@@ -1,4 +1,4 @@
-import { drawRect, drawExtrude, drawPolyGon } from "../modeling";
+import { drawRect, drawExtrude, drawPolyGon, LocationLine, CustomType, extrudeProfile, drawLine } from "../modeling";
 
 export const typeModel = {
 	extrude: 1,
@@ -11,58 +11,55 @@ export const typeModel = {
 export const drawList = {
 	none: 0,
 	rect: 1,
-	poly: 2,
-	circle: 3,
-	arc: 4,
-	line: 5,
+	circle: 2,
+	arc: 3,
+	line: 4,
+	multiLine: 5,
 };
 export class ModelTypeClass {
-	current;
-	canCreate = false;
 	constructor(type, models, view) {
 		this.view = view;
 		this.type = type;
 		this.models = models;
 	}
 	dispose() {
-		if (this.current) {
-			this.current.removeFromParent();
-			this.current.userData.OutLine.removeFromParent();
-		}
-		this.current = null;
-		this.canCreate = false;
-	}
-	drawFreeRect(btn, callback) {
 		var _this = this;
-		drawRect(_this.view, btn, (model) => {
-			_this.current = model;
-			callback();
-		});
-	}
-	drawFreePoly(btn, callback) {
-		var _this = this;
-		drawPolyGon(_this.view, btn, (model) => {
-			callback();
-		});
-	}
-	drawFreeExtrude(btn, callback) {
-		var _this = this;
-		drawExtrude(_this.view, btn, (model) => {
-			console.log(model);
-			callback();
-		});
-	}
-	finish(callback) {
-		if (!this.canCreate) {
-			if (confirm("Can not create a model" + "\n" + "Do you to continue?")) {
-				callback(this.canCreate);
-			} else {
-				this.dispose();
-				callback(true);
+		_this.view.scene.children.forEach((c) => {
+			if (c.userData.Type == CustomType.line) {
+				c.userData.Selection.isSelect(_this.view.scene, false);
 			}
-		}
+		});
 	}
-	cancel() {
-		this.dispose();
+	createProfileRect(btn, workPlane, callback) {
+		var _this = this;
+		drawRect(_this.view, btn, workPlane, () => {
+			callback();
+		});
+	}
+	createProfileLine(btn, workPlane, callback) {
+		var _this = this;
+		drawLine(_this.view, btn, workPlane, () => {
+			callback();
+		});
+	}
+
+	canCreateProfile(callback) {
+		var profile = this.view.scene.children.filter((c) => c.userData.Type == CustomType.line);
+		if (profile.length <= 2) {
+			callback(null);
+			return;
+		}
+		callback(LocationLine.canCreateProfile());
+	}
+
+	createExtrude(profile, deepExtrude, plane) {
+		var points = [];
+		var offsetPs = [];
+		for (let i = 0; i < profile.length; i++) {
+			points.push(profile[i].userData.Start);
+			offsetPs.push(profile[i].userData.Start.clone().add(plane.normal.clone().multiplyScalar(deepExtrude)));
+			profile[i].removeFromParent();
+		}
+		var extrude = extrudeProfile(points, offsetPs, profile, plane.normal, this.view.scene);
 	}
 }
