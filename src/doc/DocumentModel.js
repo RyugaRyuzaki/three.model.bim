@@ -2,7 +2,7 @@ import { Scene } from "three";
 
 import { BaseView } from "./view";
 import { Tween } from "@tweenjs/tween.js";
-import { ModelTypeClass, typeModel, SettingModel, WorkPlane, drawList } from "./model";
+import { ModelTypeClass, typeModel, SettingModel, WorkPlane, UnitModel } from "./model";
 import { highlightModel, pickModel } from "./modeling/selectModel";
 import { CustomType } from "./modeling";
 
@@ -18,12 +18,13 @@ export class DocumentModel {
 		this.view.initCubeControls(cubeContainer, cubeCanvas);
 		this.view.onAnimate();
 		this.view.initResize(mainContainer, mainCanvas);
-		this.workPlane = new WorkPlane(this.view);
-		this.extrude = new ModelTypeClass(typeModel.extrude, this.models, this.view);
-		this.sweep = new ModelTypeClass(typeModel.sweep, this.models, this.view);
-		this.revolve = new ModelTypeClass(typeModel.revolve, this.models, this.view);
-		this.grid = new ModelTypeClass(typeModel.grid, this.models, this.view);
-		this.level = new ModelTypeClass(typeModel.level, this.models, this.view);
+		this.unit = new UnitModel(this.view);
+		this.workPlane = new WorkPlane(this.view, this.unit);
+		this.extrude = new ModelTypeClass(typeModel.extrude, this.models, this.view, this.unit);
+		this.sweep = new ModelTypeClass(typeModel.sweep, this.models, this.view, this.unit);
+		this.revolve = new ModelTypeClass(typeModel.revolve, this.models, this.view, this.unit);
+		this.grid = new ModelTypeClass(typeModel.grid, this.models, this.view, this.unit);
+		this.level = new ModelTypeClass(typeModel.level, this.models, this.view, this.unit);
 		this.evenMouseMove();
 	}
 	evenMouseMove() {
@@ -51,7 +52,7 @@ export class DocumentModel {
 			function (e) {
 				var showMR = false;
 				var showAll = false;
-				var models = _this.scene.children.filter((c) => c.userData.Type == CustomType.model);
+				var models = _this.scene.children.filter((c) => CustomType.isModel(c) || CustomType.isProfile(c));
 				if (e.which == 3) {
 					if (models.length == 0) {
 						showMR = false;
@@ -78,17 +79,23 @@ export class DocumentModel {
 		);
 	}
 	handleDeleteModel() {
-		if (this.view.selectModel.userData.OutLine) {
-			this.view.selectModel.userData.OutLine.removeFromParent();
+		if (this.view.selectModel) {
+			if (this.view.selectModel.userData.OutLine) {
+				this.view.selectModel.userData.OutLine.removeFromParent();
+			}
+			if (this.view.selectModel.userData.Profile) {
+				this.view.selectModel.userData.Location.remove(this.scene);
+			}
+			this.view.selectModel.removeFromParent();
+			this.view.selectModel = null;
 		}
-		this.view.selectModel.removeFromParent();
-		this.view.selectModel = null;
 	}
 	handleHideModel() {
 		if (this.view.selectModel) {
 			if (this.view.selectModel.userData.OutLine) {
 				this.view.selectModel.userData.OutLine.visible = false;
 			}
+
 			this.view.selectModel.visible = false;
 			this.view.selectModel = null;
 		}

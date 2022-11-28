@@ -22,7 +22,7 @@ export class LocationPoint {
 }
 
 export class LocationLine {
-	static initLine(pS, pE, normal, line) {
+	static initLine(view, factor, pS, pE, normal, line) {
 		line.userData.Type = CustomType.line;
 		line.userData.Location = {
 			Direction: new Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize(),
@@ -31,12 +31,19 @@ export class LocationLine {
 			End: createPoint(pE, CSS.endPoint),
 			InterSect: createPoint(getMiddlePoint(pS, pE), CSS.intersect),
 			Normal: normal,
-			onChange: (pS, pE, normal) => {
-				line.userData.Location.Normal = normal;
-				line.userData.Location.Start.setPosition(pS);
-				line.userData.Location.Mid.setPosition(getMiddlePoint(pS, pE));
-				line.userData.Location.End.setPosition(pE);
-				LocationLine.updateTempLine(pS, pE, normal, line);
+			Dimension: createDimension(view, factor, line, getMiddlePoint(pS, pE), pS, pE),
+			onChange: (pS, pE) => {
+				line.userData.Location.Start.userData.setPosition(pS);
+				line.userData.Location.Mid.userData.setPosition(getMiddlePoint(pS, pE));
+				line.userData.Location.End.userData.setPosition(pE);
+				LocationLine.updateTempLine(pS, pE, line);
+			},
+			remove: (scene) => {
+				line.userData.Location.Start.userData.visibility(scene, false);
+				line.userData.Location.End.userData.visibility(scene, false);
+				line.userData.Location.Mid.userData.visibility(scene, false);
+				line.userData.Location.InterSect.userData.visibility(scene, false);
+				line.userData.Location.Dimension.userData.visLabel(scene, false);
 			},
 		};
 
@@ -65,18 +72,25 @@ export class LocationLine {
 				line.userData.Location.Start.userData.visibility(scene, visible);
 				line.userData.Location.Mid.userData.visibility(scene, visible);
 				line.userData.Location.End.userData.visibility(scene, visible);
+
+				line.material = visible ? line.userData.Material.Select : line.userData.Material.Normal;
 			},
 		};
 	}
 	static createTempLine(pS, pE) {
 		var geometry = LocationLine.initGeometryLine(pS, pE);
-		const line = new Mesh(geometry, customMaterial.profile);
+		const line = new Mesh(geometry, customMaterial.normalLine);
 		line.geometry.computeBoundingBox();
 		line.geometry.computeBoundingSphere();
 		line.geometry.computeVertexNormals();
 		line.geometry.boundsTree = new MeshBVH(line.geometry);
 		line.renderOrder = 1;
 		line.userData.Profile = true;
+		line.userData.Material = {
+			Normal: customMaterial.normalLine,
+			Select: customMaterial.selectLine,
+			Hover: customMaterial.hoverLine,
+		};
 
 		return line;
 	}
@@ -178,4 +192,49 @@ export function createPoint(p, css) {
 	};
 
 	return point;
+}
+export function createDimension(view, factor, line, p, p1, p2) {
+	var input = document.createElement("input");
+	input.className = "dimension";
+	input.value = Math.round(p1.distanceTo(p2) * 1000) / 1000;
+	input.addEventListener(
+		"change",
+		function (e) {
+			onChangeDimension(e, factor);
+		},
+		false
+	);
+	var label = new CSS2DObject(input);
+	label.position.set(p.x, p.y, p.z);
+	label.userData.visLabel = (line, visible) => {
+		if (visible) {
+			line.add(label);
+		} else {
+			label.removeFromParent();
+		}
+	};
+	label.userData.onChangeLabel = (factor) => {
+		input.value = input.value * (factor == 1.0 ? 0.001 : 1000);
+		input.addEventListener(
+			"change",
+			function (e) {
+				onChangeDimension(e, factor);
+			},
+			false
+		);
+	};
+	label.userData.visLabel(line, view.showDimension);
+	function onChangeDimension(e, factor) {
+		if (isNaN(parseFloat(e.target.value * 1.0))) return;
+		if (line.userData.Location) {
+			var dim = parseFloat(e.target.value * 1.0 * factor);
+			var pS = line.userData.Location.Start.position;
+			var dir = line.userData.Location.Direction;
+			var pE = pS.clone().add(dir.clone().multiplyScalar(dim));
+			var pM = getMiddlePoint(pS, pE);
+			line.userData.Location.onChange(pS, pE);
+			label.position.set(pM.x, pM.y, pM.z);
+		}
+	}
+	return label;
 }

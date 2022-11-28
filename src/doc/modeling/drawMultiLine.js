@@ -5,8 +5,9 @@ import { LocationLine } from "./Location";
 import { snapPoint } from "./selectModel";
 import { intersectPointPlane } from "./snap";
 
-export function drawMultiLine(view, btn, workPlane, callback) {
+export function drawMultiLine(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
+	const { factor } = unit;
 	var count = 0;
 	var mouse = new Vector2();
 	var p1 = new Vector3(0, 0, 0);
@@ -42,7 +43,7 @@ export function drawMultiLine(view, btn, workPlane, callback) {
 				view.scene.add(line);
 			}
 
-			LocationLine.initLine(p1, p2, plane.normal, line);
+			LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
 			p1 = p2;
 			line = null;
 		}

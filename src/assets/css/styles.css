@@ -66,6 +66,16 @@ input {
     margin: 0 5px;
 }
 
+.linkTab.linkTab .unit {
+    background: white;
+}
+
+.unit .unit-label {
+    line-height: 25px;
+    margin: 0 5px;
+    font-weight: 700;
+}
+
 
 /* general */
 
@@ -521,19 +531,21 @@ span.property-name {
     z-index: -1;
 }
 
-.dim {
+.dimension {
     position: absolute;
     left: 0;
-    top: 0;
+    top: -16px;
     font-family: monospace;
     font-size: 12px;
-    width: 40px;
+    width: 60px;
+    max-width: 80px;
     height: 16px;
     text-align: center;
     border: none;
     background: white;
     border-radius: 2px;
     padding: 1px 2px;
+    background: transparent;
 }
 
 

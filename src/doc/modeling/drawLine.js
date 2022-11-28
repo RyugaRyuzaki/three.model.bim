@@ -5,8 +5,9 @@ import { LocationLine } from "./Location";
 import { snapPoint } from "./selectModel";
 import { intersectPointPlane } from "./snap";
 
-export function drawLine(view, btn, workPlane, callback) {
+export function drawLine(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
+	const { factor } = unit;
 	var count = 2;
 	var mouse = new Vector2();
 	var p1 = new Vector3();
@@ -33,7 +34,6 @@ export function drawLine(view, btn, workPlane, callback) {
 		if (count == 2) {
 			var intersect = intersectPointPlane(e, mouse, view, null, plane);
 			p1 = intersect.point;
-
 			if (snap) p1 = snap;
 		}
 		if (count == 1) {
@@ -43,7 +43,7 @@ export function drawLine(view, btn, workPlane, callback) {
 		}
 		count--;
 		if (count == 0) {
-			LocationLine.initLine(p1, p2, plane.normal, line);
+			LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
 			finishCallBack();
 		}
 	}

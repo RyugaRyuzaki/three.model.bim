@@ -23,6 +23,7 @@ import { CubeControls } from "./CubeControl";
 import { CustomType } from "./../modeling";
 
 export class BaseView {
+	showDimension = false;
 	constructor(scene, container, canvas, width, height, alpha = true) {
 		this.scene = scene;
 		this.container = container;
@@ -228,7 +229,20 @@ export class BaseView {
 		this.pivot.userData.Select = customMaterial.selectModel;
 		this.scene.add(this.pivot);
 	}
-
+	changeDimension(visible) {
+		var _this = this;
+		var lines = _this.scene.children.filter((c) => CustomType.isLine(c) && c.userData.Location.Dimension);
+		lines.forEach((c) => {
+			c.userData.Location.Dimension.userData.visLabel(c, visible);
+		});
+	}
+	onChangeDimensionLabel(factor) {
+		var _this = this;
+		var lines = _this.scene.children.filter((c) => CustomType.isLine(c) && c.userData.Location.Dimension);
+		lines.forEach((c) => {
+			c.userData.Location.Dimension.userData.onChangeLabel(factor);
+		});
+	}
 	onAnimate() {
 		var _this = this;
 		function animate() {

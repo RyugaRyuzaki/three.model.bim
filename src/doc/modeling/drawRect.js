@@ -5,8 +5,9 @@ import { LocationLine } from "./Location";
 import { snapPoint } from "./selectModel";
 import { getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane, findPointFromFace } from "./snap";
 
-export function drawRect(view, btn, workPlane, callback) {
+export function drawRect(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
+	const { label, factor } = unit;
 	var count = 2;
 	var mouse = new Vector2();
 	var p1 = new Vector3();
@@ -37,6 +38,32 @@ export function drawRect(view, btn, workPlane, callback) {
 			p1 = intersect.point;
 
 			if (snap) p1 = snap;
+			var length = window.prompt("Enter Length", label);
+			if (!isNaN(parseFloat(length * 1.0)) && length) {
+				var width = window.prompt("Enter Width", label);
+				if (!isNaN(parseFloat(width * 1.0))) {
+					var local = getLocalVectorOnFace(plane.normal);
+					var v1 = p1.clone();
+					var v2 = p1.clone().add(local.z.clone().multiplyScalar(width * factor));
+					var v3 = v2.clone().add(local.x.clone().multiplyScalar(length * factor));
+					var v4 = p1.clone().add(local.x.clone().multiplyScalar(length * factor));
+					if (!l1 && !l2 && !l3 && !l4) {
+						l1 = LocationLine.createTempLine(v1, v2);
+						l2 = LocationLine.createTempLine(v2, v3);
+						l3 = LocationLine.createTempLine(v3, v4);
+						l4 = LocationLine.createTempLine(v4, v1);
+						view.scene.add(l1);
+						view.scene.add(l2);
+						view.scene.add(l3);
+						view.scene.add(l4);
+						LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
+						LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
+						LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
+						LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
+					}
+					finishCallBack();
+				}
+			}
 		}
 		if (count == 1) {
 			var intersect = intersectPointPlane(e, mouse, view, null, plane);
@@ -50,10 +77,11 @@ export function drawRect(view, btn, workPlane, callback) {
 			var v2 = getProjectPointFromVector(p1, p2, local.z);
 			var v3 = p2.clone();
 			var v4 = getProjectPointFromVector(p1, p2, local.x);
-			LocationLine.initLine(v1, v2, plane.normal, l1);
-			LocationLine.initLine(v2, v3, plane.normal, l2);
-			LocationLine.initLine(v3, v4, plane.normal, l3);
-			LocationLine.initLine(v4, v1, plane.normal, l4);
+
+			LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
+			LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
+			LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
+			LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
 			finishCallBack();
 		}
 	}

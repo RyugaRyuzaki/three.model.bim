@@ -1,7 +1,7 @@
 import { LineBasicMaterial, DoubleSide, MeshBasicMaterial, MeshLambertMaterial } from "three";
 import { LightColor } from "./LightColor";
 export const customMaterial = {
-	profile: new MeshLambertMaterial({
+	normalLine: new MeshLambertMaterial({
 		transparent: true,
 		opacity: 1,
 		color: "red",
@@ -9,15 +9,15 @@ export const customMaterial = {
 		depthWrite: true,
 		depthTest: true,
 	}),
-	normalLine: new MeshLambertMaterial({
+	selectLine: new MeshLambertMaterial({
 		transparent: true,
 		opacity: 1,
-		color: "black",
+		color: 0x8a867c,
 		side: DoubleSide,
 		depthWrite: true,
 		depthTest: true,
 	}),
-	hoverLine: new LineBasicMaterial({
+	hoverLine: new MeshLambertMaterial({
 		transparent: true,
 		opacity: 1,
 		color: 0x075eeb,

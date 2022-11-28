@@ -19,7 +19,6 @@ const Viewer = () => {
 	const [showGUI, setShowGUI] = useState(false);
 	return (
 		<>
-			<LinkTab></LinkTab>
 			<div className="mainView" ref={mainView}>
 				<canvas ref={mainCanvas}></canvas>
 				<div className="cubeView" ref={cubeView}>
@@ -39,6 +38,7 @@ const Viewer = () => {
 			</div>
 			{documentModel ? (
 				<>
+					<LinkTab unit={documentModel.unit}></LinkTab>
 					<ToolTab documentModel={documentModel}></ToolTab>
 					<SettingPanel showGUI={showGUI} documentModel={documentModel}></SettingPanel>
 				</>

@@ -26,34 +26,35 @@ export const drawList = {
 	multiLine: 5,
 };
 export class ModelTypeClass {
-	constructor(type, models, view) {
+	constructor(type, models, view, unit) {
 		this.view = view;
 		this.type = type;
 		this.models = models;
+		this.unit = unit;
 	}
 	dispose() {
 		var _this = this;
-		_this.view.scene.children.forEach((c) => {
-			if (c.userData.Type == CustomType.line) {
-				c.userData.Selection.isSelect(_this.view.scene, false);
-			}
+		var profile = this.view.scene.children.filter((c) => c.userData.Profile);
+		profile.forEach((c) => {
+			c.userData.Location.remove(_this.view.scene);
+			c.removeFromParent();
 		});
 	}
 	createProfileRect(btn, workPlane, callback) {
 		var _this = this;
-		drawRect(_this.view, btn, workPlane, () => {
+		drawRect(_this.view, _this.unit, btn, workPlane, () => {
 			callback();
 		});
 	}
 	createProfileLine(btn, workPlane, callback) {
 		var _this = this;
-		drawLine(_this.view, btn, workPlane, () => {
+		drawLine(_this.view, _this.unit, btn, workPlane, () => {
 			callback();
 		});
 	}
 	createProfileMultiLine(btn, workPlane, callback) {
 		var _this = this;
-		drawMultiLine(_this.view, btn, workPlane, () => {
+		drawMultiLine(_this.view, _this.unit, btn, workPlane, () => {
 			callback();
 		});
 	}

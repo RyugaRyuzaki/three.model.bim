@@ -1,10 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const LinkTab = () => {
+const LinkTab = (props) => {
+	const { unit } = props;
+	const [unitLabel, setUnitLabel] = useState(unit.m);
+	const handleChangeUnit = (e) => {
+		setUnitLabel(e.target.value);
+		unit.onChange(e.target.value);
+	};
 	return (
 		<div className="linkTab">
 			<div className="d-flex justify-content-between">
+				<div className="d-flex justify-content-between unit">
+					<div className="unit-label">Unit</div>
+					<select
+						className="form-select"
+						style={{ width: "60px" }}
+						value={unitLabel}
+						onChange={handleChangeUnit}
+					>
+						<option value={unit.m}>{unit.m}</option>
+						<option value={unit.mm}>{unit.mm}</option>
+					</select>
+				</div>
 				<a className="btn" href="https://github.com/RyugaRyuzaki/three.model.bim">
 					<FontAwesomeIcon icon="fab fa-github" size="lg" />
 				</a>

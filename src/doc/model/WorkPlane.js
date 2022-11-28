@@ -7,8 +7,9 @@ import { createPoint } from "../modeling/Location";
 export class WorkPlane {
 	listWorkPlanes = [];
 	width = 10;
-	constructor(view) {
+	constructor(view, unit) {
 		this.view = view;
+		this.unit = unit;
 		this.initListWorkPlanes();
 		this.initWorkPlane();
 		this.show = false;

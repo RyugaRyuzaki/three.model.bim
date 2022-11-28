@@ -1,14 +1,16 @@
 import { getColorRGB, ViewMaterial } from "../material";
 import { GUI } from "dat.gui";
 import { Plane, Vector3 } from "three";
+import { CustomType } from "../modeling";
 
 export class SettingModel {
 	constructor() {
 		this.opacity = 1;
-		this.outLine = true;
+		this.dimension = false;
 	}
 
 	init(documentModel, guiContainer) {
+		var view = documentModel.view;
 		var scene = documentModel.scene;
 		function opacityCustomModel(opacity) {
 			var customModel = scene.children.filter((c) => c.userData.CustomModel);
@@ -16,12 +18,7 @@ export class SettingModel {
 				c.material.opacity = opacity;
 			});
 		}
-		function visibilityOutline(visible) {
-			var outLine = scene.children.filter((c) => c.userData.isOutLine);
-			outLine.forEach((c) => {
-				c.visible = visible;
-			});
-		}
+
 		this.gui = new GUI({ autoPlace: false });
 		guiContainer.appendChild(this.gui.domElement);
 		const generalFolder = this.gui.addFolder("General");
@@ -33,11 +30,11 @@ export class SettingModel {
 			.onChange((value) => {
 				opacityCustomModel(value);
 			});
-		// generalFolder
-		// 	.add(_this, "outLine")
-		// 	.name("Visibility Outline")
-		// 	.onChange((value) => {
-		// 		visibilityOutline(value);
-		// 	});
+		generalFolder
+			.add(view, "showDimension")
+			.name("Show Dimension")
+			.onChange((value) => {
+				view.changeDimension(value);
+			});
 	}
 }

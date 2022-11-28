@@ -5,6 +5,7 @@ export const ToolContext = createContext();
 
 export const ToolProvider = (props) => {
 	const { children, documentModel } = props;
+	//#region MouseRight
 	const [showMR, setShowMR] = useState(false);
 	const [visibilityMR, setVisibilityMR] = useState({ top: 0, left: 0, showAll: false });
 
@@ -59,9 +60,8 @@ export const ToolProvider = (props) => {
 			setShowMR(false);
 		}
 	};
+	//#endregion
 	const [modelType, setModelType] = useState(null);
-	const [showProfile, setShowProfile] = useState(false);
-	const [profile, setProfile] = useState(null);
 
 	const handleExtrude = () => {
 		setModelType(documentModel.extrude);
@@ -80,7 +80,8 @@ export const ToolProvider = (props) => {
 	};
 	const handleFinish = () => {
 		if (!profile) {
-			if (window.confirm("Can not create Extrude! \n Do you want to continue? ")) {
+			if (window.confirm("Can not create Extrude!\nDo you want to continue? ")) {
+				return;
 			} else {
 				setModelType(null);
 				setShowProfile(false);
@@ -107,34 +108,34 @@ export const ToolProvider = (props) => {
 		setShowProfile(false);
 		refreshModelingType(dispatch);
 	};
+	//#region Profile
+	const [showProfile, setShowProfile] = useState(false);
+	const [profile, setProfile] = useState(null);
 	const handleShowProfile = () => {
 		setShowProfile(true);
 	};
 	const handleFinishProfile = () => {
 		if (modelType) {
 			modelType.canCreateProfile((profile) => {
-				console.log(profile);
-				// if (!lines) {
-				// 	alert("Can not create a profile");
-				// } else {
-				// 	setShowProfile(false);
-				// 	setProfile(lines);
-				// 	refreshModelingType(dispatch);
-				// }
+				if (!profile) {
+					alert("Can not create a profile");
+				}
+				modelType.dispose();
 				setShowProfile(false);
-				setProfile(lines);
+				setProfile(profile);
 				refreshModelingType(dispatch);
 			});
 		}
 	};
 	const handleCancelProfile = () => {
-		setShowProfile(false);
-		setProfile(null);
 		if (modelType) {
 			modelType.dispose();
+			setShowProfile(false);
+			setProfile(null);
 			refreshModelingType(dispatch);
 		}
 	};
+	//#endregion
 	const [deepExtrude, setDeepExtrude] = useState(0);
 	const handleChangeDeepExtrude = (e) => {
 		if (isNaN(parseFloat(e.target.value * 1.0))) {
@@ -168,7 +169,9 @@ export const ToolProvider = (props) => {
 	//#endregion
 	const value = {
 		documentModel: documentModel,
+		factor: documentModel.unit.factor,
 		modelType: modelType,
+		profile: profile,
 		showProfile: showProfile,
 		handleExtrude: handleExtrude,
 		handleSweep: handleSweep,
