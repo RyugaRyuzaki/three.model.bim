@@ -3,7 +3,7 @@ export const MAX_CIRCLE = 48;
 export const MIN_DIS = 0.1;
 export const ES = 1.0e-6;
 export const DiaP = 0.01;
-export const LINE_WIDTH = 0.08;
+export const LINE_WIDTH = 0.01;
 export const SNAP = 0.1;
 export const SNAP_ANGLE = Math.PI / 12;
 

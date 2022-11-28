@@ -1,6 +1,7 @@
 export * from "./drawPolyGon";
 export * from "./drawRect";
 export * from "./drawLine";
+export * from "./drawMultiLine";
 export * from "./extrude";
 export * from "./cast";
 export * from "./enum";

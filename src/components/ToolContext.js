@@ -112,14 +112,18 @@ export const ToolProvider = (props) => {
 	};
 	const handleFinishProfile = () => {
 		if (modelType) {
-			modelType.canCreateProfile((lines) => {
-				if (!lines) {
-					alert("Can not create a profile");
-				} else {
-					setShowProfile(false);
-					setProfile(lines);
-					refreshModelingType(dispatch);
-				}
+			modelType.canCreateProfile((profile) => {
+				console.log(profile);
+				// if (!lines) {
+				// 	alert("Can not create a profile");
+				// } else {
+				// 	setShowProfile(false);
+				// 	setProfile(lines);
+				// 	refreshModelingType(dispatch);
+				// }
+				setShowProfile(false);
+				setProfile(lines);
+				refreshModelingType(dispatch);
 			});
 		}
 	};
@@ -149,6 +153,7 @@ export const ToolProvider = (props) => {
 	const handleApplyWorkPlane = () => {
 		documentModel.workPlane.setWorkPlane(workPlaneType);
 		setShowWorkPlane(true);
+		setPickWorkPlane(false);
 	};
 	const handleOnChangeWorkPlaneType = (e) => {
 		setWorkPlaneType(e.target.value);

@@ -44,7 +44,6 @@ const ModelingMenu = () => {
 	const handleLine = () => {
 		if (modelType) {
 			setModelingType(drawList.line, dispatch);
-
 			modelType.createProfileLine(targetLineRef.current, documentModel.workPlane, () => {
 				refreshModelingType(dispatch);
 			});
@@ -52,9 +51,8 @@ const ModelingMenu = () => {
 	};
 	const handleMultiLine = () => {
 		if (modelType) {
-			setModelingType(drawList.line, dispatch);
-
-			modelType.createProfileLine(targetLineRef.current, documentModel.workPlane, () => {
+			setModelingType(drawList.multiLine, dispatch);
+			modelType.createProfileMultiLine(targetMultiLineRef.current, documentModel.workPlane, () => {
 				refreshModelingType(dispatch);
 			});
 		}

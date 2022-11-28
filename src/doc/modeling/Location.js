@@ -125,11 +125,11 @@ export class LocationLine {
 	}
 	static initShape() {
 		return new Shape()
-			.moveTo(0, DiaP)
-			.quadraticCurveTo(DiaP, DiaP, DiaP, 0)
-			.quadraticCurveTo(DiaP, -DiaP, 0, -DiaP)
-			.quadraticCurveTo(-DiaP, -DiaP, -DiaP, 0)
-			.quadraticCurveTo(-DiaP, DiaP, 0, DiaP);
+			.moveTo(0, LINE_WIDTH)
+			.quadraticCurveTo(LINE_WIDTH, LINE_WIDTH, LINE_WIDTH, 0)
+			.quadraticCurveTo(LINE_WIDTH, -LINE_WIDTH, 0, -LINE_WIDTH)
+			.quadraticCurveTo(-LINE_WIDTH, -LINE_WIDTH, -LINE_WIDTH, 0)
+			.quadraticCurveTo(-LINE_WIDTH, LINE_WIDTH, 0, LINE_WIDTH);
 	}
 	static initGeometryLine(pS, pE) {
 		var curve = new LineCurve3(pS, pE);

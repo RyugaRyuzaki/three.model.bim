@@ -1,4 +1,13 @@
-import { drawRect, drawExtrude, drawPolyGon, LocationLine, CustomType, extrudeProfile, drawLine } from "../modeling";
+import {
+	drawRect,
+	drawExtrude,
+	drawPolyGon,
+	LocationLine,
+	CustomType,
+	extrudeProfile,
+	drawLine,
+	drawMultiLine,
+} from "../modeling";
 
 export const typeModel = {
 	extrude: 1,
@@ -42,14 +51,20 @@ export class ModelTypeClass {
 			callback();
 		});
 	}
+	createProfileMultiLine(btn, workPlane, callback) {
+		var _this = this;
+		drawMultiLine(_this.view, btn, workPlane, () => {
+			callback();
+		});
+	}
 
 	canCreateProfile(callback) {
-		var profile = this.view.scene.children.filter((c) => c.userData.Type == CustomType.line);
+		var profile = this.view.scene.children.filter((c) => c.userData.Profile);
 		if (profile.length <= 2) {
 			callback(null);
 			return;
 		}
-		callback(LocationLine.canCreateProfile());
+		callback(profile);
 	}
 
 	createExtrude(profile, deepExtrude, plane) {
