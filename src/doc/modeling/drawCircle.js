@@ -1,18 +1,19 @@
 import { Vector2, Vector3 } from "three";
 import { changeCursor } from "./cast";
 import { MIN_DIS } from "./enum";
-import { LocationLine } from "./Location";
+import { LocationArc } from "./Location";
 import { snapPoint } from "./selectModel";
-import { getLocalVectorOnFace, intersectPointPlane } from "./snap";
+import { intersectPointPlane } from "./snap";
 
-export function drawLine(view, unit, btn, workPlane, callback) {
+export function drawCircle(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
 	const { factor } = unit;
 	var count = 2;
 	var mouse = new Vector2();
 	var p1 = new Vector3();
 	var p2 = new Vector3();
-	var line, snap;
+	var p3 = new Vector3();
+	var arc1, arc2, snap;
 
 	function draw() {
 		btn.style.background = "#aaaaa9";
@@ -24,8 +25,9 @@ export function drawLine(view, unit, btn, workPlane, callback) {
 		var keyCode = event.keyCode;
 		if (keyCode == 27) {
 			count = 0;
-			if (line) {
-				line.removeFromParent();
+			if (arc1 && arc2) {
+				arc1.removeFromParent();
+				arc2.removeFromParent();
 			}
 			finishCallBack();
 		}
@@ -34,17 +36,20 @@ export function drawLine(view, unit, btn, workPlane, callback) {
 		if (count == 2) {
 			var intersect = intersectPointPlane(e, mouse, view, null, plane);
 			p1 = intersect.point;
-			console.log(snap);
 			if (snap) p1 = snap;
 		}
 		if (count == 1) {
 			var intersect = intersectPointPlane(e, mouse, view, null, plane);
 			p2 = intersect.point;
 			if (snap) p2 = snap;
+			var dis = p1.distanceTo(p2);
+			var dir = new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+			p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
 		}
 		count--;
 		if (count == 0) {
-			LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
+			LocationArc.initArc(view, factor, p1, p2, plane.normal, arc1);
+			LocationArc.initArc(view, factor, p1, p3, plane.normal, arc2);
 			finishCallBack();
 		}
 	}
@@ -57,24 +62,21 @@ export function drawLine(view, unit, btn, workPlane, callback) {
 		snap = snapPoint(workPlane, view, p);
 		if (count == 1) {
 			p2 = intersect.point;
-			var dis = p1.distanceTo(p2);
-			if (view.isOrthoLine) {
-				var local = getLocalVectorOnFace(plane.normal);
-				var dir = new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
-				var angleZ = dir.angleTo(local.z);
-				var angleX = dir.angleTo(local.x);
-				if (angleZ < Math.PI / 4 || angleZ > (Math.PI * 3) / 4) {
-					p2 = p1.clone().add(local.z.normalize().multiplyScalar(Math.cos(angleZ) * dis));
-				} else {
-					p2 = p1.clone().add(local.x.normalize().multiplyScalar(Math.cos(angleX) * dis));
-				}
-			}
 			if (snap) p2 = snap;
-			if (!line) {
-				line = LocationLine.createTempLine(p1, p2);
-				view.scene.add(line);
-			} else {
-				LocationLine.updateTempLine(p1, p2, line);
+
+			var dis = p1.distanceTo(p2);
+			var dir = new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+			p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
+			if (dis > MIN_DIS) {
+				if (!arc1 && !arc2) {
+					arc1 = LocationArc.createTempArc(p1, p2, plane.normal);
+					arc2 = LocationArc.createTempArc(p1, p3, plane.normal);
+					view.scene.add(arc1);
+					view.scene.add(arc2);
+				} else {
+					LocationArc.updateTempArc(p1, p2, plane.normal, arc1);
+					LocationArc.updateTempArc(p1, p3, plane.normal, arc2);
+				}
 			}
 		}
 

@@ -8,7 +8,7 @@ export const ToolProvider = (props) => {
 	//#region MouseRight
 	const [showMR, setShowMR] = useState(false);
 	const [visibilityMR, setVisibilityMR] = useState({ top: 0, left: 0, showAll: false });
-
+	const [selectModel, setSelectModel] = useState(null);
 	const dispatch = useDispatch();
 	useEffect(() => {
 		if (documentModel) {
@@ -17,10 +17,8 @@ export const ToolProvider = (props) => {
 				setVisibilityMR(vis);
 			});
 			documentModel.evenClick((model) => {
-				if (model) {
-				} else {
-					setShowMR(false);
-				}
+				setSelectModel(model);
+				setShowMR(false);
 			});
 		}
 	}, []);
@@ -117,10 +115,11 @@ export const ToolProvider = (props) => {
 	const handleFinishProfile = () => {
 		if (modelType) {
 			modelType.canCreateProfile((profile) => {
-				if (!profile) {
-					alert("Can not create a profile");
-				}
-				modelType.dispose();
+				// if (!profile) {
+				// 	alert("Can not create a profile");
+				// }
+				console.log(profile);
+				// modelType.dispose();
 				setShowProfile(false);
 				setProfile(profile);
 				refreshModelingType(dispatch);
@@ -167,8 +166,10 @@ export const ToolProvider = (props) => {
 	}, [showWorkPlane]);
 
 	//#endregion
+
 	const value = {
 		documentModel: documentModel,
+		view: documentModel.view,
 		factor: documentModel.unit.factor,
 		modelType: modelType,
 		profile: profile,
@@ -201,6 +202,7 @@ export const ToolProvider = (props) => {
 		handleApplyWorkPlane: handleApplyWorkPlane,
 		handleOnChangeWorkPlaneType: handleOnChangeWorkPlaneType,
 		handleShowWorkPlane: handleShowWorkPlane,
+		selectModel: selectModel,
 	};
 	return <ToolContext.Provider value={value}>{children}</ToolContext.Provider>;
 };

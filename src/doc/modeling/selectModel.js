@@ -13,6 +13,13 @@ export function snapPoint(workPlane, view, p) {
 			}
 		});
 	}
+	if (!snap) {
+		view.scene.children.forEach((c) => {
+			if (c.userData.Type == CustomType.arc) {
+				snap = c.userData.Selection.visibilitySnap(view.scene, p);
+			}
+		});
+	}
 	return snap;
 }
 export function highlightModel(event, view) {
@@ -37,6 +44,9 @@ export function pickModel(event, view) {
 		if (c.userData.Type == CustomType.line) {
 			c.userData.Selection.isSelect(view.scene, false);
 		}
+		if (c.userData.Type == CustomType.arc) {
+			c.userData.Selection.isSelect(view.scene, false);
+		}
 		if (c.userData.Type == CustomType.model) {
 			c.userData.isSelected = false;
 			c.userData.Selection.refresh();
@@ -45,6 +55,9 @@ export function pickModel(event, view) {
 	if (found) {
 		view.selectModel = found.object;
 		if (found.object.userData.Type == CustomType.line) {
+			found.object.userData.Selection.isSelect(view.scene, true);
+		}
+		if (found.object.userData.Type == CustomType.arc) {
 			found.object.userData.Selection.isSelect(view.scene, true);
 		}
 		if (found.object.userData.Type == CustomType.model) {

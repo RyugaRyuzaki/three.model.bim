@@ -1,9 +1,8 @@
 import { Vector2, Vector3 } from "three";
 import { changeCursor } from "./cast";
-import { MIN_DIS } from "./enum";
 import { LocationLine } from "./Location";
 import { snapPoint } from "./selectModel";
-import { intersectPointPlane } from "./snap";
+import { getLocalVectorOnFace, intersectPointPlane } from "./snap";
 
 export function drawMultiLine(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
@@ -59,6 +58,7 @@ export function drawMultiLine(view, unit, btn, workPlane, callback) {
 
 		p2 = intersect.point;
 		if (snap) p2 = snap;
+
 		if (generate) {
 			if (!tempLine) {
 				tempLine = LocationLine.createTempLine(p1, p2);

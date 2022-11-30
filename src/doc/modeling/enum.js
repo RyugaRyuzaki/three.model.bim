@@ -1,3 +1,5 @@
+import { Shape } from "three";
+
 export const MAX_POINTS = 10000;
 export const MAX_CIRCLE = 48;
 export const MIN_DIS = 0.1;
@@ -6,7 +8,17 @@ export const DiaP = 0.01;
 export const LINE_WIDTH = 0.01;
 export const SNAP = 0.1;
 export const SNAP_ANGLE = Math.PI / 12;
+export const OFFSET_DIM = 0.5;
+export const EXTEND_DIM = 0.05;
 
+export function initShape() {
+	return new Shape()
+		.moveTo(0, LINE_WIDTH)
+		.quadraticCurveTo(LINE_WIDTH, LINE_WIDTH, LINE_WIDTH, 0)
+		.quadraticCurveTo(LINE_WIDTH, -LINE_WIDTH, 0, -LINE_WIDTH)
+		.quadraticCurveTo(-LINE_WIDTH, -LINE_WIDTH, -LINE_WIDTH, 0)
+		.quadraticCurveTo(-LINE_WIDTH, LINE_WIDTH, 0, LINE_WIDTH);
+}
 export const extrudeSetting = (curve) => {
 	return {
 		extrudePath: curve,

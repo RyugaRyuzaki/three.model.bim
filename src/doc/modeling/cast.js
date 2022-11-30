@@ -10,8 +10,8 @@ export function castElement(event, view, filter) {
 	const x1 = event.clientX - bounds.left;
 	const y1 = event.clientY - bounds.top;
 	const x2 = bounds.right - bounds.left;
-	view.mouse.x = (x1 / x2) * 2 - 1;
 	const y2 = bounds.bottom - bounds.top;
+	view.mouse.x = (x1 / x2) * 2 - 1;
 	view.mouse.y = -(y1 / y2) * 2 + 1;
 	view.rayCaster.setFromCamera(view.mouse, view.camera);
 	return view.rayCaster.intersectObjects(filter);

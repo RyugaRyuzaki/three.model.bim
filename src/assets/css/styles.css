@@ -195,7 +195,7 @@ input {
 /* Menu */
 
 .menuItemBtn {
-    padding: 4px!important;
+    padding: 0px!important;
     margin: 2px!important;
 }
 
@@ -205,8 +205,8 @@ input {
 }
 
 .menuItemBtn img {
-    width: 18px;
-    height: 18px
+    width: 26px;
+    height: 26px
 }
 
 
@@ -228,6 +228,11 @@ input {
 
 
 /* mouseRight */
+
+.mouseModify {
+    position: absolute;
+    padding: 2px!important;
+}
 
 .mouseRight {
     position: absolute;
@@ -534,7 +539,7 @@ span.property-name {
 .dimension {
     position: absolute;
     left: 0;
-    top: -16px;
+    top: -24px;
     font-family: monospace;
     font-size: 12px;
     width: 60px;
@@ -569,9 +574,9 @@ span.property-name {
 .dot {
     height: var(--snap);
     width: var(--snap);
-    background-color: rgb(220, 15, 15);
     border-radius: 50%;
     display: inline-block;
+    border: #7f8080 solid 2px;
 }
 
 .endPoint {

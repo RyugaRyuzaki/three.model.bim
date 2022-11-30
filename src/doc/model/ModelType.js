@@ -1,12 +1,12 @@
 import {
 	drawRect,
+	drawCircle,
 	drawExtrude,
-	drawPolyGon,
-	LocationLine,
-	CustomType,
 	extrudeProfile,
 	drawLine,
 	drawMultiLine,
+	copyElement,
+	ProfileModel,
 } from "../modeling";
 
 export const typeModel = {
@@ -24,6 +24,11 @@ export const drawList = {
 	arc: 3,
 	line: 4,
 	multiLine: 5,
+	pentagon: 6,
+	align: 7,
+	copy: 8,
+	trim: 9,
+	extend: 10,
 };
 export class ModelTypeClass {
 	constructor(type, models, view, unit) {
@@ -46,6 +51,12 @@ export class ModelTypeClass {
 			callback();
 		});
 	}
+	createProfileCircle(btn, workPlane, callback) {
+		var _this = this;
+		drawCircle(_this.view, _this.unit, btn, workPlane, () => {
+			callback();
+		});
+	}
 	createProfileLine(btn, workPlane, callback) {
 		var _this = this;
 		drawLine(_this.view, _this.unit, btn, workPlane, () => {
@@ -60,12 +71,10 @@ export class ModelTypeClass {
 	}
 
 	canCreateProfile(callback) {
-		var profile = this.view.scene.children.filter((c) => c.userData.Profile);
-		if (profile.length <= 2) {
-			callback(null);
-			return;
-		}
-		callback(profile);
+		ProfileModel.conditionBound(this.view.scene, (data) => {
+			console.log(data);
+			callback(data.result);
+		});
 	}
 
 	createExtrude(profile, deepExtrude, plane) {
@@ -77,5 +86,11 @@ export class ModelTypeClass {
 			profile[i].removeFromParent();
 		}
 		var extrude = extrudeProfile(points, offsetPs, profile, plane.normal, this.view.scene);
+	}
+
+	static modifyCopyElement(btn, view, callback) {
+		copyElement(view, btn, () => {
+			callback();
+		});
 	}
 }

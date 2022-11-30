@@ -24,6 +24,7 @@ import { CustomType } from "./../modeling";
 
 export class BaseView {
 	showDimension = false;
+	isOrthoLine = false;
 	constructor(scene, container, canvas, width, height, alpha = true) {
 		this.scene = scene;
 		this.container = container;
@@ -41,7 +42,19 @@ export class BaseView {
 		this.initOrbitControls();
 		this.setDomElement();
 		this.initDefineAlpha();
+		this.initOrthoLine();
 		// this.initPivot();
+	}
+	initOrthoLine() {
+		var _this = this;
+
+		window.addEventListener(
+			"keydown",
+			function (e) {
+				if (e.keyCode == 79) _this.isOrthoLine = !_this.isOrthoLine;
+			},
+			false
+		);
 	}
 	initMeshBVH() {
 		BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -231,14 +244,18 @@ export class BaseView {
 	}
 	changeDimension(visible) {
 		var _this = this;
-		var lines = _this.scene.children.filter((c) => CustomType.isLine(c) && c.userData.Location.Dimension);
+		var lines = _this.scene.children.filter(
+			(c) => (CustomType.isLine(c) || CustomType.isArc(c)) && c.userData.Location.Dimension
+		);
 		lines.forEach((c) => {
-			c.userData.Location.Dimension.userData.visLabel(c, visible);
+			c.userData.Location.Dimension.userData.visibility(_this.scene, visible);
 		});
 	}
 	onChangeDimensionLabel(factor) {
 		var _this = this;
-		var lines = _this.scene.children.filter((c) => CustomType.isLine(c) && c.userData.Location.Dimension);
+		var lines = _this.scene.children.filter(
+			(c) => (CustomType.isLine(c) || CustomType.isArc(c)) && c.userData.Location.Dimension
+		);
 		lines.forEach((c) => {
 			c.userData.Location.Dimension.userData.onChangeLabel(factor);
 		});

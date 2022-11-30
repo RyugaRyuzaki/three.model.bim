@@ -22,6 +22,7 @@ const ModelingMenu = () => {
 	const targetArcRef = useRef(null);
 	const targetLineRef = useRef(null);
 	const targetMultiLineRef = useRef(null);
+	const targetPentagonRef = useRef(null);
 	const targetFinishRef = useRef(null);
 	const targetCancelRef = useRef(null);
 
@@ -35,7 +36,12 @@ const ModelingMenu = () => {
 	};
 
 	const handleCircle = () => {
-		setModelingType(drawList.circle, dispatch);
+		if (modelType) {
+			setModelingType(drawList.circle, dispatch);
+			modelType.createProfileCircle(targetCircleRef.current, documentModel.workPlane, () => {
+				refreshModelingType(dispatch);
+			});
+		}
 	};
 	const handleArc = () => {
 		setModelingType(drawList.arc, dispatch);
@@ -57,6 +63,14 @@ const ModelingMenu = () => {
 			});
 		}
 	};
+	const handlePentagon = () => {
+		if (modelType) {
+			setModelingType(drawList.pentagon, dispatch);
+			// modelType.createProfileMultiLine(targetMultiLineRef.current, documentModel.workPlane, () => {
+			// 	refreshModelingType(dispatch);
+			// });
+		}
+	};
 
 	useEffect(() => {
 		setShowTool(showProfile);
@@ -68,6 +82,7 @@ const ModelingMenu = () => {
 		setDisabled(targetArcRef, drawList.arc, drawing, isModeling);
 		setDisabled(targetLineRef, drawList.line, drawing, isModeling);
 		setDisabled(targetMultiLineRef, drawList.multiLine, drawing, isModeling);
+		setDisabled(targetPentagonRef, drawList.pentagon, drawing, isModeling);
 		targetFinishRef.current.disabled = isModeling;
 		targetCancelRef.current.disabled = isModeling;
 	}, [drawing, isModeling]);
@@ -101,6 +116,15 @@ const ModelingMenu = () => {
 				>
 					{<img src={imageModeling.multi} alt="" />}
 				</ToolButton>
+				<ToolButton
+					title="Pentagon"
+					handleClick={handlePentagon}
+					target={targetPentagonRef}
+					idTooltip={idTooltip}
+				>
+					{<img src={imageModeling.pentagon} alt="" />}
+				</ToolButton>
+
 				<FinishModel
 					handleFinish={handleFinishProfile}
 					target={targetFinishRef}

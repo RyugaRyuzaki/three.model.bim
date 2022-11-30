@@ -39,10 +39,10 @@ export class WorkPlane {
 	initPlaneMesh() {
 		var { points, gx, gz, snaps } = this.getAllPoints();
 		var geometry = new BufferGeometry().setFromPoints(points);
-		const mesh = new Mesh(geometry, PlaneModelMaterial.normalPlane);
+		// const mesh = new Mesh(geometry, PlaneModelMaterial.normalPlane);
 		const edges = new EdgesGeometry(geometry);
-		const line = new LineSegments(edges, customMaterial.normalLine);
-		mesh.userData.OutLine = line;
+		const mesh = new LineSegments(edges, customMaterial.normalLine);
+		// mesh.userData.OutLine = line;
 		const { gridX, gridZ } = this.initGird(gx, gz);
 		var snapPoint = createPoint(this.origin, CSS.intersect);
 		var _this = this;
@@ -89,7 +89,7 @@ export class WorkPlane {
 					mesh.userData.Grid.gridX[i].removeFromParent();
 					mesh.userData.Grid.gridZ[i].removeFromParent();
 				}
-				mesh.userData.OutLine.removeFromParent();
+				// mesh.userData.OutLine.removeFromParent();
 				mesh.removeFromParent();
 			},
 		};
@@ -185,11 +185,11 @@ export class WorkPlane {
 	showWorkPlane(visible) {
 		this.show = visible;
 		if (this.show) {
-			this.view.scene.add(this.planeMesh.userData.OutLine);
+			// this.view.scene.add(this.planeMesh.userData.OutLine);
 			this.view.scene.add(this.planeMesh);
 		} else {
 			this.planeMesh.removeFromParent();
-			this.planeMesh.userData.OutLine.removeFromParent();
+			// this.planeMesh.userData.OutLine.removeFromParent();
 		}
 		this.planeMesh.userData.Grid.visibility(this.show);
 	}

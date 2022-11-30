@@ -129,6 +129,7 @@ export function findPointFromFace(object, plane) {
 				perPoints.push(v0);
 			}
 		}
+		var position = new Vector3(pos0.getX(arrIndex[i]), pos0.getY(arrIndex[i]), pos0.getZ(arrIndex[i]));
 	}
 
 	return {

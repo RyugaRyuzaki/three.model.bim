@@ -4,7 +4,7 @@ import { LightColor } from "./LightColor";
 export const PlaneModelMaterial = {
 	normalPlane: new MeshBasicMaterial({
 		transparent: true,
-		opacity: 0.5,
+		opacity: 0.1,
 		color: LightColor.sectionBoxPlan,
 		side: DoubleSide,
 		depthWrite: true,
