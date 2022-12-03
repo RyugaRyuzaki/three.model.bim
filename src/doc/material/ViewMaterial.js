@@ -1,23 +1,21 @@
 import {
 	MeshLambertMaterial,
-	MeshBasicMaterial,
 	DoubleSide,
-	MeshPhongMaterial,
 	AlwaysStencilFunc,
 	BackSide,
 	IncrementWrapStencilOp,
 	FrontSide,
 	DecrementWrapStencilOp,
-	MeshNormalMaterial,
 	NotEqualStencilFunc,
 	ReplaceStencilOp,
+	MeshBasicMaterial,
 } from "three";
 export const ViewMaterial = {
-	createMaterial: (transparent, opacity, color) => {
+	createMaterial: (transparent, opacity) => {
 		return new MeshLambertMaterial({
 			transparent: transparent,
 			opacity: opacity,
-			color: color,
+			color: "#" + Math.floor(Math.random() * 16777215).toString(16),
 			side: DoubleSide,
 			depthWrite: true,
 			depthTest: true,

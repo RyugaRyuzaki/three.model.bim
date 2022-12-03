@@ -2,8 +2,7 @@ import { Vector2, Vector3 } from "three";
 import { changeCursor } from "./cast";
 import { MIN_DIS } from "./enum";
 import { LocationArc } from "./Location";
-import { snapPoint } from "./selectModel";
-import { intersectPointPlane } from "./snap";
+import { snapPoint, intersectPointPlane } from "./snap";
 
 export function drawCircle(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
@@ -14,7 +13,7 @@ export function drawCircle(view, unit, btn, workPlane, callback) {
 	var p2 = new Vector3();
 	var p3 = new Vector3();
 	var arc1, arc2, snap;
-
+	var angleArc = Math.PI;
 	function draw() {
 		btn.style.background = "#aaaaa9";
 		view.domElement.addEventListener("click", onMouseDown, false);
@@ -29,7 +28,7 @@ export function drawCircle(view, unit, btn, workPlane, callback) {
 				arc1.removeFromParent();
 				arc2.removeFromParent();
 			}
-			finishCallBack();
+			finishCallBack([]);
 		}
 	}
 	function onMouseDown(e) {
@@ -48,9 +47,9 @@ export function drawCircle(view, unit, btn, workPlane, callback) {
 		}
 		count--;
 		if (count == 0) {
-			LocationArc.initArc(view, factor, p1, p2, plane.normal, arc1);
-			LocationArc.initArc(view, factor, p1, p3, plane.normal, arc2);
-			finishCallBack();
+			LocationArc.initArc(view, factor, p1, p2, plane.normal, arc1, angleArc);
+			LocationArc.initArc(view, factor, p1, p3, plane.normal, arc2, angleArc);
+			finishCallBack([arc1, arc2]);
 		}
 	}
 
@@ -69,13 +68,13 @@ export function drawCircle(view, unit, btn, workPlane, callback) {
 			p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
 			if (dis > MIN_DIS) {
 				if (!arc1 && !arc2) {
-					arc1 = LocationArc.createTempArc(p1, p2, plane.normal);
-					arc2 = LocationArc.createTempArc(p1, p3, plane.normal);
+					arc1 = LocationArc.createTempArc(p1, p2, plane.normal, angleArc);
+					arc2 = LocationArc.createTempArc(p1, p3, plane.normal, angleArc);
 					view.scene.add(arc1);
 					view.scene.add(arc2);
 				} else {
-					LocationArc.updateTempArc(p1, p2, plane.normal, arc1);
-					LocationArc.updateTempArc(p1, p3, plane.normal, arc2);
+					LocationArc.updateTempArc(p1, p2, plane.normal, arc1, angleArc);
+					LocationArc.updateTempArc(p1, p3, plane.normal, arc2, angleArc);
 				}
 			}
 		}
@@ -85,14 +84,14 @@ export function drawCircle(view, unit, btn, workPlane, callback) {
 			view.domElement.removeEventListener("mousemove", onMouseMove);
 		}
 	}
-	function finishCallBack() {
+	function finishCallBack(list) {
 		changeCursor().default(view.domElement);
 		snap = workPlane.planeMesh.userData.Grid.refreshSnap();
 		btn.style.background = "none";
 		view.domElement.removeEventListener("click", onMouseDown);
 		view.domElement.removeEventListener("mousemove", onMouseMove);
 		window.removeEventListener("keydown", onkeydown);
-		callback();
+		callback(list);
 	}
 
 	draw();

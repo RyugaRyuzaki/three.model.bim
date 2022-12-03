@@ -1,16 +1,7 @@
-import {
-	BufferAttribute,
-	BufferGeometry,
-	Mesh,
-	Vector2,
-	Vector3,
-	EdgesGeometry,
-	LineSegments,
-	ShapeBufferGeometry,
-} from "three";
-import { customMaterial } from "../../material";
+import { BufferAttribute, BufferGeometry, Mesh, Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
+import { customMaterial } from "../../../material";
 import { changeCursor } from "../../utils";
-import { extrudeArc } from "../extrude";
+import { extrudeCircle } from "../extrude";
 import {
 	MAX_POINTS,
 	MAX_CIRCLE,
@@ -18,49 +9,32 @@ import {
 	PROFILE,
 	intersectPlaneElevation,
 	setPropertyCustomModel,
-	getMiddlePoint,
-	updateOrientText,
-	updateOrient,
+	updateOrientFree,
 	createOrient,
 	createOrientText,
-	updateOrientFree,
 	updateOrientTextFree,
-} from "../snap";
-import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import fontJSON from "../../../assets/font/droid_sans_bold.typeface.json";
+	pointerPosition,
+	updatePointerPosition,
+} from "../../snap";
 
-export function drawSlabArc(view, btn, elevation, thickness, factor, units, callback) {
-	var count = 3;
+export function drawSlabCircle(view, btn, elevation, thickness, factor, units, callback) {
+	var count = 2;
 	var mouse = new Vector2();
 	var p0 = new Vector3();
 	var p1 = new Vector3();
-	var p2 = new Vector3();
-	var p3 = new Vector3();
 	var mesh;
-	var loader = new FontLoader();
 
 	var pM = new Vector3();
-	var pX = new Vector3();
-	var pZ = new Vector3();
 	var positions = new Float32Array(12);
-	var geoX = new BufferGeometry();
-	geoX.setAttribute("position", new BufferAttribute(positions, 3));
-	geoX.setDrawRange(0, 6);
-	geoX.setIndex([0, 1, 2, 2, 1, 3]);
-	var geoZ = new BufferGeometry();
-	geoZ.setAttribute("position", new BufferAttribute(positions, 3));
-	geoZ.setDrawRange(0, 6);
-	geoZ.setIndex([0, 1, 2, 2, 1, 3]);
-	var coreX = geoX.attributes.position.array;
-	var coreZ = geoZ.attributes.position.array;
-	var axisX = createOrient(geoX, view);
-	var axisZ = createOrient(geoZ, view);
-	var textAxisX, textAxisZ;
-
-	loader.load(fontJSON, function (font) {
+	var geo = new BufferGeometry();
+	geo.setAttribute("position", new BufferAttribute(positions, 3));
+	geo.setDrawRange(0, 6);
+	geo.setIndex([0, 1, 2, 2, 1, 3]);
+	var core = geo.attributes.position.array;
+	var axis = createOrient(geo, view);
+	var textR;
+	pointerPosition(pM, view, (text, font) => {
 		function draw() {
-			textAxisX = createOrientText(pX, pM, font, view, true);
-			textAxisZ = createOrientText(pZ, pM, font, view, false);
 			btn.style.background = "#aaaaa9";
 			view.domElement.addEventListener("click", onMouseDown, false);
 			view.domElement.addEventListener("mousemove", onMouseMove, false);
@@ -74,10 +48,9 @@ export function drawSlabArc(view, btn, elevation, thickness, factor, units, call
 					mesh.removeFromParent();
 					mesh.userData.OutLine.removeFromParent();
 				}
-				if (axisX) axisX.removeFromParent();
-				if (axisZ) axisZ.removeFromParent();
-				if (textAxisX) textAxisX.removeFromParent();
-				if (textAxisZ) textAxisZ.removeFromParent();
+				if (axis) axis.removeFromParent();
+				if (textR) textR.removeFromParent();
+				text.removeFromParent();
 				changeCursor().default(view.renderer);
 				btn.style.background = "none";
 				view.domElement.removeEventListener("click", onMouseDown);
@@ -87,18 +60,26 @@ export function drawSlabArc(view, btn, elevation, thickness, factor, units, call
 			}
 		}
 		async function onMouseDown(e) {
-			if (count == 3) {
-				if (axisZ) axisZ.removeFromParent();
-				if (textAxisZ) textAxisZ.removeFromParent();
-				p0 = intersectPlaneElevation(e, mouse, view, elevation);
-			}
 			if (count == 2) {
-				p1 = intersectPlaneElevation(e, mouse, view, elevation);
-				p2 = getMiddlePoint(p0, p1);
-				mesh = createArcSlab(p2, p1, view);
+				p0 = intersectPlaneElevation(e, mouse, view, elevation);
+				textR = createOrientText(p0, pM, font, view, true);
+				mesh = createCircleSlab(p0, p1, view);
 				mesh.visible = false;
+				var radius = prompt("Radius", units.length);
+				if (radius) {
+					if (isNaN(parseFloat(radius))) {
+						alert("Invalid value");
+					} else {
+						radius = factor * radius;
+						p1 = new Vector3(p0.x + radius, p0.y, p0.z);
+						updateVerticesCircle(p0, p1, mesh);
+
+						finishCallBack();
+					}
+				}
 			}
 			if (count == 1) {
+				p1 = intersectPlaneElevation(e, mouse, view, elevation);
 				finishCallBack();
 			}
 			count--;
@@ -107,28 +88,16 @@ export function drawSlabArc(view, btn, elevation, thickness, factor, units, call
 		function onMouseMove(e) {
 			changeCursor().crosshair(view.renderer);
 
-			if (count == 3) {
-				pM = intersectPlaneElevation(e, mouse, view, elevation);
-				pX = new Vector3(0, pM.y, pM.z);
-				pZ = new Vector3(pM.x, pM.y, 0);
-				updateOrient(pX, pM, coreX, geoX, axisX, true);
-				updateOrient(pZ, pM, coreZ, geoZ, axisZ, true);
-				updateOrientText(pX, pM, font, true, textAxisX, view);
-				updateOrientText(pZ, pM, font, false, textAxisZ, view);
-			}
 			if (count == 2) {
-				p1 = intersectPlaneElevation(e, mouse, view, elevation);
-				updateOrientFree(p0, p1, coreX, geoX, axisX);
-				updateOrientTextFree(p0, p1, font, textAxisX, view);
+				pM = intersectPlaneElevation(e, mouse, view, elevation);
+				updatePointerPosition(pM, text, font, view);
 			}
 			if (count == 1) {
-				p3 = intersectPlaneElevation(e, mouse, view, elevation);
-				updateOrientFree(p2, p3, coreX, geoX, axisX);
-				updateOrientTextFree(p2, p3, font, textAxisX, view);
-				var dir = new Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
-				var dis = p3.distanceTo(p2);
-				var p3a = p2.clone().add(new Vector3(dir.x * dis, dir.y * dis, dir.z * dis));
-				updateVerticesArc(p2, p3a, mesh);
+				p1 = intersectPlaneElevation(e, mouse, view, elevation);
+				updateVerticesCircle(p0, p1, mesh);
+				updatePointerPosition(p1, text, font, view);
+				updateOrientFree(p0, p1, core, geo, axis);
+				updateOrientTextFree(p0, p1, font, textR, view);
 			}
 			if (count == 0) {
 				changeCursor().default(view.renderer);
@@ -136,11 +105,14 @@ export function drawSlabArc(view, btn, elevation, thickness, factor, units, call
 			}
 		}
 		function finishCallBack() {
+			text.removeFromParent();
+			if (axis) axis.removeFromParent();
+			if (textR) textR.removeFromParent();
 			if (!thickness || parseFloat(thickness) === 0) {
 				mesh.userData.CanCreateSlab = false;
 			} else {
 				if (confirm("Do you want to create Slab same thickness ")) {
-					extrudeArc(mesh, new Vector3(0, 1, 0), thickness);
+					extrudeCircle(mesh, new Vector3(0, 1, 0), thickness);
 					mesh.userData.CanCreateSlab = true;
 				} else {
 					mesh.userData.CanCreateSlab = false;
@@ -148,8 +120,6 @@ export function drawSlabArc(view, btn, elevation, thickness, factor, units, call
 			}
 			mesh.visible = true;
 			changeCursor().default(view.renderer);
-			if (axisX) axisX.removeFromParent();
-			if (textAxisX) textAxisX.removeFromParent();
 			btn.style.background = "none";
 			view.domElement.removeEventListener("click", onMouseDown);
 			view.domElement.removeEventListener("mousemove", onMouseMove);
@@ -159,14 +129,13 @@ export function drawSlabArc(view, btn, elevation, thickness, factor, units, call
 		draw();
 	});
 }
-
-function updateVerticesArc(p0, p1, mesh) {
+function updateVerticesCircle(p0, p1, mesh) {
 	var positions = mesh.geometry.attributes.position.array;
 
 	var dir = new Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
 	var r = p0.distanceTo(p1);
 	var angle = dir.angleTo(new Vector3(0, 0, 1));
-	for (let i = 0; i <= MAX_CIRCLE / 2; i++) {
+	for (let i = 0; i < MAX_CIRCLE; i++) {
 		var x = r * Math.sin(angle + (i * Math.PI * 2) / MAX_CIRCLE);
 		var z = r * Math.cos(angle + (i * Math.PI * 2) / MAX_CIRCLE);
 		positions[3 * (i + 1)] = x + p0.x;
@@ -176,7 +145,7 @@ function updateVerticesArc(p0, p1, mesh) {
 	mesh.geometry.attributes.position.needsUpdate = true;
 	mesh.userData.OutLine.geometry = new EdgesGeometry(mesh.geometry);
 }
-function createArcSlab(p0, p1, view) {
+function createCircleSlab(p0, p1, view) {
 	var positions = new Float32Array(MAX_POINTS * 3);
 	positions[0] = p0.x;
 	positions[1] = p0.y;
@@ -184,7 +153,7 @@ function createArcSlab(p0, p1, view) {
 	var dir = new Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
 	var r = p0.distanceTo(p1);
 	var angle = dir.angleTo(new Vector3(0, 0, 1));
-	for (let i = 0; i <= MAX_CIRCLE / 2; i++) {
+	for (let i = 0; i < MAX_CIRCLE; i++) {
 		var x = r * Math.sin(angle + (i * Math.PI * 2) / MAX_CIRCLE);
 		var z = r * Math.cos(angle + (i * Math.PI * 2) / MAX_CIRCLE);
 		positions[3 * (i + 1)] = x + p0.x;
@@ -193,12 +162,18 @@ function createArcSlab(p0, p1, view) {
 	}
 	var geometry = new BufferGeometry();
 	geometry.setAttribute("position", new BufferAttribute(positions, 3));
-	geometry.setDrawRange(0, (3 * MAX_CIRCLE) / 2);
+	geometry.setDrawRange(0, 3 * MAX_CIRCLE);
 	var indices = [];
-	for (let i = 0; i < MAX_CIRCLE / 2; i++) {
-		indices.push(0);
-		indices.push(i + 1);
-		indices.push(i + 2);
+	for (let i = 0; i < MAX_CIRCLE; i++) {
+		if (i === MAX_CIRCLE - 1) {
+			indices.push(0);
+			indices.push(MAX_CIRCLE);
+			indices.push(1);
+		} else {
+			indices.push(0);
+			indices.push(i + 1);
+			indices.push(i + 2);
+		}
 	}
 	geometry.setIndex(indices);
 

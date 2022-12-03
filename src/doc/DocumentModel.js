@@ -2,12 +2,14 @@ import { Scene } from "three";
 
 import { BaseView } from "./view";
 import { Tween } from "@tweenjs/tween.js";
-import { ModelTypeClass, typeModel, SettingModel, WorkPlane, UnitModel } from "./model";
+import { ModelTypeClass, typeModel, SettingModel, WorkPlane, UnitModel, ExportBimModel } from "./model";
 import { highlightModel, pickModel } from "./modeling/selectModel";
 import { CustomType } from "./modeling";
+import { ViewMaterial } from "./material";
 
 export class DocumentModel {
 	models = [];
+	materials = [];
 
 	constructor(mainContainer, mainCanvas, cubeContainer, cubeCanvas) {
 		this.scene = new Scene();
@@ -26,6 +28,34 @@ export class DocumentModel {
 		this.grid = new ModelTypeClass(typeModel.grid, this.models, this.view, this.unit);
 		this.level = new ModelTypeClass(typeModel.level, this.models, this.view, this.unit);
 		this.evenMouseMove();
+		this.exportBim = new ExportBimModel();
+		this.materials.push(this.initMaterial("Mat1"));
+		this.materials.push(this.initMaterial("Mat2"));
+		this.materials.push(this.initMaterial("Mat3"));
+	}
+	addMaterial() {
+		this.materials.push(this.initMaterial("New Mat"));
+	}
+	initMaterial(name) {
+		var mat = {
+			name: name,
+			material: ViewMaterial.createMaterial(true, 1),
+			alpha: 255,
+			onChangeName: (value) => {
+				mat.name = value;
+			},
+
+			setColor: () => {
+				return "#" + mat.material.color.getHexString();
+			},
+			onChangeColor: (value) => {
+				mat.material.color.set(value);
+			},
+			onChangeAlpha: (value) => {
+				mat.alpha = value;
+			},
+		};
+		return mat;
 	}
 	evenMouseMove() {
 		var _this = this;
@@ -78,6 +108,20 @@ export class DocumentModel {
 			false
 		);
 	}
+	evenDoubleClick(callback) {
+		var _this = this;
+		_this.view.domElement.addEventListener(
+			"dblclick",
+			function (e) {
+				if (!_this.view.selectModel) {
+					callback(false);
+				} else {
+					callback(_this.view.selectModel.userData.Type == CustomType.model);
+				}
+			},
+			false
+		);
+	}
 	handleDeleteModel() {
 		if (this.view.selectModel) {
 			if (this.view.selectModel.userData.OutLine) {
@@ -88,6 +132,7 @@ export class DocumentModel {
 			}
 			this.view.selectModel.removeFromParent();
 			this.view.selectModel = null;
+			this.models.splice(this.models.indexOf(this.view.selectModel), 1);
 		}
 	}
 	handleHideModel() {
@@ -109,5 +154,8 @@ export class DocumentModel {
 				c.visible = true;
 			}
 		});
+	}
+	getModelById(uuid) {
+		return this.models.find((c) => c.uuid == uuid);
 	}
 }

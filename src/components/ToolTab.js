@@ -8,6 +8,7 @@ import ModelingMenu from "./Modeling/ModelingMenu";
 import MouseRight from "./MouseRight/MouseRight";
 import PropertyModel from "./Property/PropertyModel";
 import Modify from "./Modify/Modify";
+import ExportModelMenu from "./ExportModel/ExportModelMenu";
 
 const ToolTab = (props) => {
 	const { documentModel } = props;
@@ -19,7 +20,7 @@ const ToolTab = (props) => {
 	return (
 		<ToolProvider documentModel={documentModel}>
 			<div className="d-flex justify-content-between">
-				<div className="toolTab" style={{ width: "40%" }}>
+				<div className="toolTab" style={{ width: "50%" }}>
 					<Tabs activeKey={tabType} onSelect={handleSelectTab} className="mb-3">
 						{/* <Tab eventKey={0} title="Model Free">
 							<ModelFreeMenu></ModelFreeMenu>
@@ -30,9 +31,12 @@ const ToolTab = (props) => {
 						<Tab eventKey={1} title="Model Detail">
 							<ModelDetailMenu></ModelDetailMenu>
 						</Tab>
+						<Tab eventKey={2} title="Export Model">
+							<ExportModelMenu></ExportModelMenu>
+						</Tab>
 					</Tabs>
 				</div>
-				<div className="toolTab" style={{ width: "30%" }}>
+				<div className="toolTab" style={{ width: "20%" }}>
 					<Tabs activeKey={0} className="mb-3">
 						<Tab eventKey={0} title="Modeling">
 							<ModelingMenu></ModelingMenu>

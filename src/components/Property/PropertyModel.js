@@ -1,22 +1,12 @@
-import React, { useContext, useEffect } from "react";
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import { ToolContext } from "../ToolContext";
+import MaterialModel from "./MaterialModel";
 
 const PropertyModel = () => {
-	const { showPropertyModel, handleGeneratePropertyModel, handleCancelPropertyModel, documentModel } =
+	const { selectModel, showPropertyModel, handleGeneratePropertyModel, handleCancelPropertyModel } =
 		useContext(ToolContext);
-	const [property, setProperty] = useState(null);
-	useEffect(() => {
-		if (showPropertyModel && documentModel?.view?.selectModel) {
-			setProperty(documentModel.view.selectModel);
-		}
-	}, [showPropertyModel]);
-	useEffect(() => {
-		if (property) {
-			console.log(property);
-		}
-	}, [property]);
+
 	return (
 		<Modal
 			size="sm"
@@ -28,9 +18,13 @@ const PropertyModel = () => {
 			keyboard={false}
 		>
 			<Modal.Header>
-				<Modal.Title></Modal.Title>
+				<Modal.Title>
+					<div className="property-model-title">uuid : {selectModel?.uuid}</div>
+				</Modal.Title>
 			</Modal.Header>
-			<Modal.Body></Modal.Body>
+			<Modal.Body>
+				<MaterialModel></MaterialModel>
+			</Modal.Body>
 			<Modal.Footer>
 				<button className="btn btn-secondary" onClick={handleCancelPropertyModel}>
 					Cancel

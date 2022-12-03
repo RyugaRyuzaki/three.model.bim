@@ -4,6 +4,9 @@ export const filterModel = {
 	model: (scene) => {
 		return scene.children.filter((e) => (CustomType.isModel(e) || CustomType.isProfile(e)) && e.visible);
 	},
+	export: (scene) => {
+		return scene.children.filter((e) => CustomType.isModel(e) && e.visible);
+	},
 };
 export function castElement(event, view, filter) {
 	const bounds = view.domElement.getBoundingClientRect();

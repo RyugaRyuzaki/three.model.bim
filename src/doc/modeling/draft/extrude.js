@@ -1,8 +1,8 @@
 import { BufferGeometry, EdgesGeometry, Plane, Vector2, Vector3 } from "three";
 import { MeshBVH } from "three-mesh-bvh";
-import { findPointFromFace, intersectPointOriginPlane, getOldPoints } from "./snap";
-import { castElement, changeCursor, filterModel } from "./cast";
-import { ES, MIN_DIS } from "./enum";
+import { findPointFromFace, intersectPointOriginPlane, getOldPoints } from "../snap";
+import { castElement, changeCursor, filterModel } from "../cast";
+import { ES, MIN_DIS } from "../enum";
 
 export function drawExtrude(view, btn, callback) {
 	var mouse = new Vector2();

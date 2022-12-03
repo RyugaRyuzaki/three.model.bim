@@ -1,27 +1,7 @@
+import { drawList } from "../model/ModelType";
 import { castElement, filterModel, changeCursor } from "./cast";
 import { CustomType } from "./enum";
 
-export function snapPoint(workPlane, view, p) {
-	var snap;
-	if (workPlane.show) {
-		snap = workPlane.planeMesh.userData.Grid.visibilitySnap(p);
-	}
-	if (!snap) {
-		view.scene.children.forEach((c) => {
-			if (c.userData.Type == CustomType.line) {
-				snap = c.userData.Selection.visibilitySnap(view.scene, p);
-			}
-		});
-	}
-	if (!snap) {
-		view.scene.children.forEach((c) => {
-			if (c.userData.Type == CustomType.arc) {
-				snap = c.userData.Selection.visibilitySnap(view.scene, p);
-			}
-		});
-	}
-	return snap;
-}
 export function highlightModel(event, view) {
 	view.scene.children.forEach((c) => {
 		if (c.userData.Type == CustomType.model) {
@@ -32,7 +12,7 @@ export function highlightModel(event, view) {
 	if (found) {
 		changeCursor().pointer(view.domElement);
 		if (found.object.userData.Type == CustomType.model) {
-			found.object.userData.Selection.hover();
+			if (view.drawing != drawList.workPlane) found.object.userData.Selection.hover();
 		}
 	} else {
 		changeCursor().default(view.domElement);
@@ -61,8 +41,10 @@ export function pickModel(event, view) {
 			found.object.userData.Selection.isSelect(view.scene, true);
 		}
 		if (found.object.userData.Type == CustomType.model) {
-			found.object.userData.isSelected = true;
-			found.object.userData.Selection.selected();
+			if (view.drawing != drawList.workPlane) {
+				found.object.userData.isSelected = true;
+				found.object.userData.Selection.selected();
+			}
 		}
 	} else {
 		view.selectModel = null;

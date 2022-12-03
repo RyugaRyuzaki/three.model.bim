@@ -1,5 +1,5 @@
 import { BufferAttribute, Line, BufferGeometry, Mesh, Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
-import { customMaterial } from "../../material";
+import { customMaterial } from "../../../material";
 import { changeCursor } from "../../utils";
 import { extrudePolyGon } from "../extrude";
 import {
@@ -10,7 +10,7 @@ import {
 	setPropertyCustomModel,
 	pointerPosition,
 	updatePointerPosition,
-} from "../snap";
+} from "../../snap";
 
 export function drawSlabPolyGon(view, btn, elevation, thickness, callback) {
 	var count = 0;

@@ -1,5 +1,5 @@
 import { BufferAttribute, BufferGeometry, Mesh, Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
-import { customMaterial } from "../../material";
+import { customMaterial } from "../../../material";
 import { changeCursor } from "../../utils";
 import { extrudeRectangle } from "../extrude";
 import {
@@ -14,7 +14,7 @@ import {
 	pointerPosition,
 	updatePointerPosition,
 	disposeMeshRecursively,
-} from "../snap";
+} from "../../snap";
 
 export function drawSlabRect(view, btn, elevation, thickness, factor, units, callback) {
 	var count = 2;

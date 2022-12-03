@@ -17,7 +17,7 @@ function str(v) {
 function enm(v) {
 	return { type: 3, value: v };
 }
-export class ExportModel {
+export class ExportIFCModel {
 	constructor(modelID, maxID, ifcAPI) {
 		this.modelID = modelID;
 		this.maxID = maxID;

@@ -9,7 +9,7 @@ import {
 	createOrientText,
 	updateOrient,
 	updateOrientText,
-} from "../snap";
+} from "../../snap";
 import { createWallLineItem, LocationLine } from "./lineItem";
 export function drawWallRect(view, btn, elevation, height, thickness, factor, units, callback) {
 	var count = 2;

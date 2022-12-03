@@ -1,8 +1,8 @@
 import { BufferAttribute, Line, BufferGeometry, Vector2, Vector3, RGB_PVRTC_2BPPV1_Format } from "three";
 import { changeCursor } from "../../utils";
-import { intersectPlaneElevation, updateOrientText, createOrient, createOrientText, updateOrient } from "../snap";
+import { intersectPlaneElevation, updateOrientText, createOrient, createOrientText, updateOrient } from "../../snap";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
-import fontJSON from "../../../assets/font/droid_sans_bold.typeface.json";
+import fontJSON from "../../../../assets/font/droid_sans_bold.typeface.json";
 import { createWallLineItem, LocationLine } from "./lineItem";
 
 export function drawWallPolyGon(view, btn, elevation, height, thickness, factor, units, callback) {

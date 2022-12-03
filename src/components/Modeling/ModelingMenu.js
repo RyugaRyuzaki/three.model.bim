@@ -22,7 +22,7 @@ const ModelingMenu = () => {
 	const targetArcRef = useRef(null);
 	const targetLineRef = useRef(null);
 	const targetMultiLineRef = useRef(null);
-	const targetPentagonRef = useRef(null);
+	const targetPolygonRef = useRef(null);
 	const targetFinishRef = useRef(null);
 	const targetCancelRef = useRef(null);
 
@@ -63,12 +63,12 @@ const ModelingMenu = () => {
 			});
 		}
 	};
-	const handlePentagon = () => {
+	const handlePolygon = () => {
 		if (modelType) {
 			setModelingType(drawList.pentagon, dispatch);
-			// modelType.createProfileMultiLine(targetMultiLineRef.current, documentModel.workPlane, () => {
-			// 	refreshModelingType(dispatch);
-			// });
+			modelType.createProfilePolygon(targetPolygonRef.current, documentModel.workPlane, () => {
+				refreshModelingType(dispatch);
+			});
 		}
 	};
 
@@ -82,7 +82,7 @@ const ModelingMenu = () => {
 		setDisabled(targetArcRef, drawList.arc, drawing, isModeling);
 		setDisabled(targetLineRef, drawList.line, drawing, isModeling);
 		setDisabled(targetMultiLineRef, drawList.multiLine, drawing, isModeling);
-		setDisabled(targetPentagonRef, drawList.pentagon, drawing, isModeling);
+		setDisabled(targetPolygonRef, drawList.polygon, drawing, isModeling);
 		targetFinishRef.current.disabled = isModeling;
 		targetCancelRef.current.disabled = isModeling;
 	}, [drawing, isModeling]);
@@ -116,13 +116,8 @@ const ModelingMenu = () => {
 				>
 					{<img src={imageModeling.multi} alt="" />}
 				</ToolButton>
-				<ToolButton
-					title="Pentagon"
-					handleClick={handlePentagon}
-					target={targetPentagonRef}
-					idTooltip={idTooltip}
-				>
-					{<img src={imageModeling.pentagon} alt="" />}
+				<ToolButton title="Polygon" handleClick={handlePolygon} target={targetPolygonRef} idTooltip={idTooltip}>
+					{<img src={imageModeling.polygon} alt="" />}
 				</ToolButton>
 
 				<FinishModel

@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry, Mesh, Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
-import { customMaterial } from "../../material";
-import { MAX_POINTS, CONFIG, PROFILE, setPropertyCustomModel, areEqual } from "../snap";
+import { customMaterial } from "../../../material";
+import { MAX_POINTS, CONFIG, PROFILE, setPropertyCustomModel, areEqual } from "../../snap";
 export class LocationLine {
 	constructor(p1, p2, thickness, height) {
 		this.p1 = p1;

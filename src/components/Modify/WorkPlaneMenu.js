@@ -5,6 +5,7 @@ import { imageModify } from "../general/ImageTool";
 
 const WorkPlaneMenu = () => {
 	const {
+		showProfile,
 		pickWorkPlane,
 		workPlaneType,
 		handleSetWorkPlane,
@@ -16,8 +17,11 @@ const WorkPlaneMenu = () => {
 	const idTooltip = "modify";
 	const targetWorkPlanRef = useRef(null);
 	const targetShowWorkPlanRef = useRef(null);
+	useEffect(() => {
+		targetWorkPlanRef.current.disabled = showProfile;
+	}, [showProfile]);
 	return (
-		<div className="d-flex justify-content-center">
+		<div className="d-flex justify-content-start">
 			<div className="card card-menu">
 				<ToolButton
 					title="Set Work Plane"

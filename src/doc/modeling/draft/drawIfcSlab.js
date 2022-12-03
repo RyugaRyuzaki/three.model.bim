@@ -13,9 +13,9 @@ import {
 	EdgesGeometry,
 	LineSegments,
 } from "three";
-import { customMaterial } from "../material";
+import { customMaterial } from "../../material";
 import { castElement, changeCursor, filterModel } from "../utils";
-import { MAX_POINTS, getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane } from "./snap";
+import { MAX_POINTS, getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane } from "../snap";
 export function drawIfcSlab(view, btn, callback) {
 	var isMatch = false;
 	var ifcType;

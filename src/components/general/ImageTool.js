@@ -1,19 +1,24 @@
-import rect from "../../assets/img/drawRectangle.png";
+import rect from "../../assets/img/tool/Rectangle.png";
 
-import circle from "../../assets/img/modeling-circle.PNG";
-import arc from "../../assets/img/modeling-arc.PNG";
-import line from "../../assets/img/modeling-line.png";
+import circle from "../../assets/img/tool/Circle.png";
+import arc from "../../assets/img/tool/Arc.png";
+import line from "../../assets/img/tool/Line.png";
+import multiLine from "../../assets/img/tool/Multi-Line.png";
+import polygon from "../../assets/img/tool/Pentagon.png";
+
 import extrude from "../../assets/img/noun-extrude-1404513.png";
 import workPlane from "../../assets/img/work-plane.png";
 import sweep from "../../assets/img/sweep.png";
 import revolve from "../../assets/img/revolve.jpg";
 import profile from "../../assets/img/noun-polygon-189082.png";
 import showWK from "../../assets/img/showworkplan.png";
-import pentagon from "../../assets/img/pentagon-outline-shape.png";
-import align from "../../assets/img/Align.png";
-import copy from "../../assets/img/Copy.png";
-import trim from "../../assets/img/Trim.png";
-import extend from "../../assets/img/Extend.png";
+
+import align from "../../assets/img/tool/Align.png";
+import copy from "../../assets/img/tool/Copy.png";
+import trim from "../../assets/img/tool/Trim.png";
+import extend from "../../assets/img/tool/Extend.png";
+import ifc from "../../assets/img/tool/ifc-img.png";
+import material from "../../assets/img/pencil.png";
 
 export const imageInPlace = {
 	extrude: extrude,
@@ -26,8 +31,8 @@ export const imageModeling = {
 	circle: circle,
 	arc: arc,
 	line: line,
-	multi: profile,
-	pentagon: pentagon,
+	multi: multiLine,
+	polygon: polygon,
 };
 
 export const imageModify = {
@@ -37,4 +42,8 @@ export const imageModify = {
 	copy: copy,
 	trim: trim,
 	extend: extend,
+};
+export const imageExport = {
+	ifc: ifc,
+	material: material,
 };

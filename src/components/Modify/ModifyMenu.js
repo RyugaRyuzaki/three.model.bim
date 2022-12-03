@@ -35,7 +35,7 @@ const ModifyMenu = () => {
 	};
 	//#endregion
 	return (
-		<div className="d-flex justify-content-center">
+		<div className="d-flex justify-content-start">
 			<div className="card card-menu">
 				<ToolButton title="Align" handleClick={handleAlignModify} target={targetAlignRef} idTooltip={idTooltip}>
 					{<img src={imageModify.align} alt="" />}

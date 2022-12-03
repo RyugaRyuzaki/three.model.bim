@@ -1,0 +1,92 @@
+.list-model {
+    position: fixed;
+    top: 100px;
+    width: 200px;
+    left: -200px;
+}
+
+.list-model-active {
+    animation: openListModel 0.3s;
+    left: 5px;
+}
+
+@keyframes openListModel {
+    from {
+        left: -200px;
+    }
+    to {
+        left: 5px;
+    }
+}
+
+.list-material {
+    position: fixed;
+    top: 100px;
+    width: 240px;
+    left: -240px;
+}
+
+.list-material-active {
+    animation: openListMaterial 0.3s;
+    left: 5px;
+}
+
+@keyframes openListMaterial {
+    from {
+        left: -240px;
+    }
+    to {
+        left: 5px;
+    }
+}
+
+.list-material td button,
+.list-model td button {
+    width: 100%;
+}
+
+.list-material td,
+.list-material th,
+.list-model td,
+.list-model th {
+    text-align: center;
+    align-items: center;
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+.list-model .modelID {
+    cursor: pointer;
+}
+
+.list-model .modelID:hover {
+    background: #7ed9d9;
+}
+
+.list-model td button {
+    margin: 0px!important;
+    padding: 2px!important;
+}
+
+.property-model-title {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+}
+
+.list-material td .form-control {
+    width: 60px!important;
+    margin: 0px!important;
+    line-height: 20px;
+    padding: 2px!important;
+}
+
+.select-material {
+    background: rgb(190, 162, 162);
+}

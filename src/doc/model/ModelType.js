@@ -1,14 +1,15 @@
 import {
 	drawRect,
 	drawCircle,
-	drawExtrude,
-	extrudeProfile,
 	drawLine,
 	drawMultiLine,
+	drawPolygon,
+	extrudeProfile,
 	copyElement,
 	ProfileModel,
+	meshProfile,
 } from "../modeling";
-
+import { Tween } from "@tweenjs/tween.js";
 export const typeModel = {
 	extrude: 1,
 	sweep: 2,
@@ -24,13 +25,17 @@ export const drawList = {
 	arc: 3,
 	line: 4,
 	multiLine: 5,
-	pentagon: 6,
+	polygon: 6,
 	align: 7,
 	copy: 8,
 	trim: 9,
 	extend: 10,
+	workPlane: 11,
 };
 export class ModelTypeClass {
+	listProfile = [];
+	listPointProfile = [];
+	meshProfile;
 	constructor(type, models, view, unit) {
 		this.view = view;
 		this.type = type;
@@ -39,53 +44,108 @@ export class ModelTypeClass {
 	}
 	dispose() {
 		var _this = this;
-		var profile = this.view.scene.children.filter((c) => c.userData.Profile);
-		profile.forEach((c) => {
+		_this.listProfile.forEach((c) => {
 			c.userData.Location.remove(_this.view.scene);
 			c.removeFromParent();
 		});
+		_this.listProfile = [];
+	}
+	disposeMeshProfile() {
+		if (this.meshProfile) {
+			this.listPointProfile = [];
+			if (this.meshProfile.userData.OutLine) this.meshProfile.userData.OutLine.removeFromParent();
+			this.meshProfile.removeFromParent();
+			this.meshProfile = null;
+		}
+	}
+	showProfile(profile) {
+		this.listProfile = profile;
+		for (let i = 0; i < profile.length; i++) {
+			this.view.scene.add(profile[i]);
+		}
+		this.disposeMeshProfile();
 	}
 	createProfileRect(btn, workPlane, callback) {
 		var _this = this;
-		drawRect(_this.view, _this.unit, btn, workPlane, () => {
+		drawRect(_this.view, _this.unit, btn, workPlane, (list) => {
+			_this.listProfile = _this.listProfile.concat(list);
 			callback();
 		});
 	}
 	createProfileCircle(btn, workPlane, callback) {
 		var _this = this;
-		drawCircle(_this.view, _this.unit, btn, workPlane, () => {
+		drawCircle(_this.view, _this.unit, btn, workPlane, (list) => {
+			_this.listProfile = _this.listProfile.concat(list);
 			callback();
 		});
 	}
 	createProfileLine(btn, workPlane, callback) {
 		var _this = this;
-		drawLine(_this.view, _this.unit, btn, workPlane, () => {
+		drawLine(_this.view, _this.unit, btn, workPlane, (list) => {
+			_this.listProfile = _this.listProfile.concat(list);
 			callback();
 		});
 	}
 	createProfileMultiLine(btn, workPlane, callback) {
 		var _this = this;
-		drawMultiLine(_this.view, _this.unit, btn, workPlane, () => {
+		drawMultiLine(_this.view, _this.unit, btn, workPlane, (list) => {
+			_this.listProfile = _this.listProfile.concat(list);
+			callback();
+		});
+	}
+	createProfilePolygon(btn, workPlane, callback) {
+		var _this = this;
+		drawPolygon(_this.view, _this.unit, btn, workPlane, (list) => {
+			_this.listProfile = _this.listProfile.concat(list);
 			callback();
 		});
 	}
 
 	canCreateProfile(callback) {
-		ProfileModel.conditionBound(this.view.scene, (data) => {
-			console.log(data);
-			callback(data.result);
+		var _this = this;
+		_this.listPointProfile = [];
+		_this.meshProfile = null;
+		ProfileModel.conditionBound(_this.listProfile, (data) => {
+			if (!data.result) {
+				if (data.elements) {
+					var pos0 = _this.view.controls.target;
+					var pos1 = data.elements.userData.Location.Start.position;
+					const tween = new Tween({ pos: pos0 }).to({ pos: pos1 }, 200).onUpdate((coords) => {
+						_this.view.controls.target = coords.pos;
+					});
+					tween.start();
+				}
+				callback(data.result, null);
+			} else {
+				_this.listPointProfile = ProfileModel.getListPointsProfile(_this.listProfile);
+				_this.meshProfile = meshProfile(_this.listPointProfile, _this.view.scene);
+				_this.dispose();
+				callback(data.result, _this.listProfile);
+			}
 		});
 	}
 
-	createExtrude(profile, deepExtrude, plane) {
-		var points = [];
+	createExtrude(profile, deepExtrude, plane, material) {
 		var offsetPs = [];
-		for (let i = 0; i < profile.length; i++) {
-			points.push(profile[i].userData.Start);
-			offsetPs.push(profile[i].userData.Start.clone().add(plane.normal.clone().multiplyScalar(deepExtrude)));
-			profile[i].removeFromParent();
+		for (let i = 0; i < this.listPointProfile.length; i++) {
+			offsetPs.push(
+				this.listPointProfile[i]
+					.clone()
+					.add(plane.normal.clone().multiplyScalar(deepExtrude * this.unit.factor))
+			);
 		}
-		var extrude = extrudeProfile(points, offsetPs, profile, plane.normal, this.view.scene);
+		this.models.push(
+			extrudeProfile(
+				this.listPointProfile,
+				offsetPs,
+				profile,
+				this.meshProfile,
+				material,
+				plane.normal,
+				this.view.scene
+			)
+		);
+		this.disposeMeshProfile();
 	}
 
 	static modifyCopyElement(btn, view, callback) {

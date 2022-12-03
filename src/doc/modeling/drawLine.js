@@ -1,9 +1,7 @@
 import { Vector2, Vector3 } from "three";
 import { changeCursor } from "./cast";
-import { MIN_DIS } from "./enum";
 import { LocationLine } from "./Location";
-import { snapPoint } from "./selectModel";
-import { getLocalVectorOnFace, intersectPointPlane } from "./snap";
+import { getLocalVectorOnFace, intersectPointPlane, snapPoint } from "./snap";
 
 export function drawLine(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
@@ -27,14 +25,13 @@ export function drawLine(view, unit, btn, workPlane, callback) {
 			if (line) {
 				line.removeFromParent();
 			}
-			finishCallBack();
+			finishCallBack([]);
 		}
 	}
 	function onMouseDown(e) {
 		if (count == 2) {
 			var intersect = intersectPointPlane(e, mouse, view, null, plane);
 			p1 = intersect.point;
-			console.log(snap);
 			if (snap) p1 = snap;
 		}
 		if (count == 1) {
@@ -45,7 +42,7 @@ export function drawLine(view, unit, btn, workPlane, callback) {
 		count--;
 		if (count == 0) {
 			LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
-			finishCallBack();
+			finishCallBack([line]);
 		}
 	}
 
@@ -83,14 +80,14 @@ export function drawLine(view, unit, btn, workPlane, callback) {
 			view.domElement.removeEventListener("mousemove", onMouseMove);
 		}
 	}
-	function finishCallBack() {
+	function finishCallBack(list) {
 		changeCursor().default(view.domElement);
 		snap = workPlane.planeMesh.userData.Grid.refreshSnap();
 		btn.style.background = "none";
 		view.domElement.removeEventListener("click", onMouseDown);
 		view.domElement.removeEventListener("mousemove", onMouseMove);
 		window.removeEventListener("keydown", onkeydown);
-		callback();
+		callback(list);
 	}
 
 	draw();

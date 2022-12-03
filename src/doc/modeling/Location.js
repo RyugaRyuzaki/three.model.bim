@@ -14,6 +14,7 @@ import {
 	CSS,
 	CustomType,
 	DiaP,
+	ES,
 	EXTEND_DIM,
 	extrudeSetting,
 	initShape,
@@ -71,61 +72,13 @@ export class LocationLine {
 				line.userData.Location.Dimension.userData.visibility(scene, false);
 			},
 			isConnectStart: (sameNormals) => {
-				var dif = [...sameNormals];
-				dif.splice(dif.indexOf(line), 1);
-				if (dif.length == sameNormals.length) return false;
-				var connectStart = [];
-				for (let j = 0; j < dif.length; j++) {
-					var disStart1 = line.userData.Location.Start.position.distanceTo(
-						dif[j].userData.Location.Start.position
-					);
-					var disStart2 = line.userData.Location.Start.position.distanceTo(
-						dif[j].userData.Location.End.position
-					);
-					console.log(disStart1);
-					console.log(disStart2);
-					if (areEqual(disStart1, 0.0, 1e-6) || areEqual(disStart2, 0.0, 1e-6)) {
-						connectStart.push(dif[j]);
-					}
-				}
-				return connectStart.length == 1;
+				return isConnected(sameNormals, line, line.userData.Location.Start);
 			},
 			isConnectEnd: (sameNormals) => {
-				var dif = [...sameNormals];
-				dif.splice(dif.indexOf(line), 1);
-				if (dif.length == sameNormals.length) return false;
-				var connectEnd = [];
-				for (let j = 0; j < dif.length; j++) {
-					var disEnd1 = line.userData.Location.End.position.distanceTo(
-						dif[j].userData.Location.Start.position
-					);
-					var disEnd2 = line.userData.Location.End.position.distanceTo(dif[j].userData.Location.End.position);
-					if (areEqual(disEnd1, 0.0, 1e-6) || areEqual(disEnd2, 0.0, 1e-6)) {
-						connectEnd.push(dif[j]);
-					}
-				}
-				return connectEnd.length == 1;
+				return isConnected(sameNormals, line, line.userData.Location.End);
 			},
 		};
 		line.userData.Selection = {
-			snapPoint: (p) => {
-				var snap;
-				if (p.distanceTo(line.userData.Location.Start.position) <= SNAP) snap = line.userData.Location.Start;
-				if (p.distanceTo(line.userData.Location.Mid.position) <= SNAP) snap = line.userData.Location.Mid;
-				if (p.distanceTo(line.userData.Location.End.position) <= SNAP) snap = line.userData.Location.End;
-				return snap;
-			},
-			visibilitySnap: (scene, p) => {
-				var snap = line.userData.Selection.snapPoint(p);
-				if (snap) {
-					snap.userData.visibility(scene, true);
-				} else {
-					line.userData.Location.Start.userData.visibility(scene, false);
-					line.userData.Location.Mid.userData.visibility(scene, false);
-					line.userData.Location.End.userData.visibility(scene, false);
-				}
-				return snap ? snap.position : p;
-			},
 			isSelect: (scene, visible) => {
 				line.userData.Location.Start.userData.visibility(scene, visible);
 				line.userData.Location.Mid.userData.visibility(scene, visible);
@@ -168,19 +121,20 @@ export class LocationLine {
 }
 
 export class LocationArc {
-	static initArc(view, factor, pS, pE, normal, arc) {
+	static initArc(view, factor, pS, pE, normal, arc, angleArc) {
 		var dir = new Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
 		var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
 		var p1 = pS.clone().add(per.clone().multiplyScalar(pS.distanceTo(pE)));
 		arc.userData.Type = CustomType.arc;
 		arc.userData.Location = {
+			AngleArc: angleArc,
 			Direction: dir,
 			Start: createPoint(pE, CSS.endPoint),
 			Center: createPoint(pS, CSS.dot),
 			End: createPoint(pS.clone().add(dir.clone().multiplyScalar(-pS.distanceTo(pE))), CSS.endPoint),
 			InterSect: createPoint(pS, CSS.intersect),
 			Normal: normal,
-			Curves: LocationArc.initCurveArc(pS, pE, normal),
+			Curves: LocationArc.initCurveArc(pS, pE, normal, angleArc),
 			Dimension: createDimension(view, factor, arc, getMiddlePoint(pS, p1), pS, p1, normal),
 			onChange: (pS, pE) => {
 				var dir = new Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
@@ -190,8 +144,13 @@ export class LocationArc {
 				arc.userData.Location.End.userData.setPosition(
 					pS.clone().add(dir.clone().multiplyScalar(-pS.distanceTo(pE)))
 				);
-				arc.userData.Location.Curves = LocationArc.initCurveArc(pS, pE, arc.userData.Location.Normal);
-				LocationArc.updateTempArc(pS, pE, arc.userData.Location.Normal, arc);
+				arc.userData.Location.Curves = LocationArc.initCurveArc(
+					pS,
+					pE,
+					arc.userData.Location.Normal,
+					arc.userData.Location.AngleArc
+				);
+				LocationArc.updateTempArc(pS, pE, arc.userData.Location.Normal, arc, arc.userData.Location.AngleArc);
 				arc.userData.Location.Dimension.userData.onChange(
 					pS,
 					pS.clone().add(per.clone().multiplyScalar(pS.distanceTo(pE))),
@@ -205,27 +164,15 @@ export class LocationArc {
 				arc.userData.Location.InterSect.userData.visibility(scene, false);
 				arc.userData.Location.Dimension.userData.visibility(scene, false);
 			},
+			isConnectStart: (sameNormals) => {
+				return isConnected(sameNormals, arc, arc.userData.Location.Start);
+			},
+			isConnectEnd: (sameNormals) => {
+				return isConnected(sameNormals, arc, arc.userData.Location.End);
+			},
 		};
 
 		arc.userData.Selection = {
-			snapPoint: (p) => {
-				var snap;
-				if (p.distanceTo(arc.userData.Location.Start.position) <= SNAP) snap = arc.userData.Location.Start;
-				if (p.distanceTo(arc.userData.Location.Center.position) <= SNAP) snap = arc.userData.Location.Center;
-				if (p.distanceTo(arc.userData.Location.End.position) <= SNAP) snap = arc.userData.Location.End;
-				return snap;
-			},
-			visibilitySnap: (scene, p) => {
-				var snap = arc.userData.Selection.snapPoint(p);
-				if (snap) {
-					snap.userData.visibility(scene, true);
-				} else {
-					arc.userData.Location.Start.userData.visibility(scene, false);
-					arc.userData.Location.Center.userData.visibility(scene, false);
-					arc.userData.Location.End.userData.visibility(scene, false);
-				}
-				return snap ? snap.position : p;
-			},
 			isSelect: (scene, visible) => {
 				arc.userData.Location.Start.userData.visibility(scene, visible);
 				arc.userData.Location.Center.userData.visibility(scene, visible);
@@ -234,8 +181,8 @@ export class LocationArc {
 			},
 		};
 	}
-	static createTempArc(p0, p, normal) {
-		var geometry = LocationArc.initGeometryArc(p0, p, normal);
+	static createTempArc(p0, p, normal, angleArc) {
+		var geometry = LocationArc.initGeometryArc(p0, p, normal, angleArc);
 		const arc = new Mesh(geometry, customMaterial.normalLine);
 		arc.geometry.computeBoundingBox();
 		arc.geometry.computeBoundingSphere();
@@ -251,25 +198,25 @@ export class LocationArc {
 		//mesh.useDate.Type=CustomType.model
 		return arc;
 	}
-	static updateTempArc(p0, p, normal, arc) {
-		arc.geometry = LocationArc.initGeometryArc(p0, p, normal);
+	static updateTempArc(p0, p, normal, arc, angleArc) {
+		arc.geometry = LocationArc.initGeometryArc(p0, p, normal, angleArc);
 		arc.geometry.computeBoundingBox();
 		arc.geometry.computeBoundingSphere();
 		arc.geometry.computeVertexNormals();
 		arc.geometry.boundsTree = new MeshBVH(arc.geometry);
 	}
-	static initGeometryArc(p0, p, normal) {
-		var curve = LocationArc.initCurveArc(p0, p, normal);
+	static initGeometryArc(p0, p, normal, angleArc) {
+		var curve = LocationArc.initCurveArc(p0, p, normal, angleArc);
 		var shape = initShape();
 		return new ExtrudeGeometry(shape, extrudeSetting(curve));
 	}
-	static initCurveArc(p0, p, normal) {
+	static initCurveArc(p0, p, normal, angleArc) {
 		var r = p0.distanceTo(p);
 		var dir = new Vector3(p.x - p0.x, p.y - p0.y, p.z - p0.z).normalize();
 		var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
 		var points = [];
 		points.push(p);
-		var angle0 = Math.PI / (MAX_CIRCLE / 2);
+		var angle0 = angleArc / (MAX_CIRCLE / 2);
 		for (let i = 0; i < MAX_CIRCLE / 2; i++) {
 			var angle = (i + 1) * angle0;
 			var sin = Math.sin(angle);
@@ -292,32 +239,57 @@ export class LocationArc {
 }
 
 export class ProfileModel {
-	static listProfile(scene) {
-		return scene.children.filter((c) => c.userData.Profile && c.userData.Location.Normal);
-	}
-	static listProfileSameNormal(scene) {
-		var listProfiles = ProfileModel.listProfile(scene);
-		for (let i = 0; i < listProfiles.length; i++) {
-			var sameNormal = listProfiles.filter((l) =>
-				areEqualVector(l.userData.Location.Normal, listProfiles[i].userData.Location.Normal)
-			);
-			if (sameNormal.length != listProfiles.length) return [];
-		}
-		return listProfiles;
-	}
-	static conditionBound(scene, callback) {
-		var sameNormals = ProfileModel.listProfileSameNormal(scene);
-		if (sameNormals.length == 0) return callback({ result: false, elements: null });
-		if (sameNormals.length == 1) return callback({ result: false, elements: sameNormals });
-		for (let i = 0; i < sameNormals.length; i++) {
-			var e = sameNormals[i];
-			if (!e.userData.Location.isConnectStart(sameNormals) || !e.userData.Location.isConnectEnd(sameNormals))
+	static conditionBound(listProfile, callback) {
+		if (listProfile.length == 0) return callback({ result: false, elements: null });
+		if (listProfile.length == 1) return callback({ result: false, elements: listProfile[0] });
+		for (let i = 0; i < listProfile.length; i++) {
+			var e = listProfile[i];
+			if (!e.userData.Location.isConnectStart(listProfile) || !e.userData.Location.isConnectEnd(listProfile))
 				return callback({ result: false, elements: e });
 		}
 		return callback({ result: true });
 	}
+	static getListCurvesProfile(listProfile) {
+		var curves = [];
+		for (let i = 0; i < listProfile.length; i++) {
+			if (listProfile[i].userData.Location.Curves) {
+				if (listProfile[i].userData.Type == CustomType.line) {
+					curves.push(listProfile[i].userData.Location.Curves);
+				}
+				if (listProfile[i].userData.Type == CustomType.arc) {
+					for (let j = 0; j < listProfile[i].userData.Location.Curves.curves.length; j++) {
+						curves.push(listProfile[i].userData.Location.Curves.curves[j]);
+					}
+				}
+			}
+		}
+		return curves;
+	}
+	static getListPointsProfile(listProfile) {
+		var curves = ProfileModel.getListCurvesProfile(listProfile);
+		var points = [];
+		for (let i = 0; i < curves.length; i++) {
+			points.push(curves[i].v1);
+			points.push(curves[i].v2);
+		}
+		points = points.filter((value, index, self) => self.findIndex((p) => p.distanceTo(value) < ES) === index);
+		return points;
+	}
 }
-
+function isConnected(sameNormals, mesh, point) {
+	var dif = [...sameNormals];
+	dif.splice(dif.indexOf(mesh), 1);
+	if (dif.length == sameNormals.length) return false;
+	var connect = [];
+	for (let j = 0; j < dif.length; j++) {
+		var disEnd1 = point.position.distanceTo(dif[j].userData.Location.Start.position);
+		var disEnd2 = point.position.distanceTo(dif[j].userData.Location.End.position);
+		if (areEqual(disEnd1, 0.0, 1e-6) || areEqual(disEnd2, 0.0, 1e-6)) {
+			connect.push(dif[j]);
+		}
+	}
+	return connect.length == 1;
+}
 export function createPoint(p, css) {
 	var div = document.createElement("div");
 	div.className = css;

@@ -12,7 +12,7 @@ import {
 	Euler,
 } from "three";
 import { customMaterial } from "../material";
-import { INTERSECT_TYPE } from "./enum";
+import { CustomType, ES, INTERSECT_TYPE, SNAP } from "./enum";
 
 export function intersectPlaneElevation(event, mouse, view, elevation) {
 	const bounds = view.renderer.domElement.getBoundingClientRect();
@@ -105,6 +105,74 @@ export function getMiddlePoint(point1, point2) {
 	newVector = newVector.add(new Vector3(vector.x * length, vector.y * length, vector.z * length));
 	return newVector;
 }
+export function getAllPointSnap(workPlane, view) {
+	var snaps = [];
+	if (workPlane.show) {
+		var workPlaneSnaps = workPlane.planeMesh.userData.Grid.snaps;
+		for (let i = 0; i < workPlaneSnaps.length; i++) {
+			snaps.push({
+				position: workPlaneSnaps[i],
+				point: workPlane.planeMesh.userData.Grid.snapPoint,
+			});
+		}
+	}
+	view.scene.children.forEach((c) => {
+		if (c.userData.Type == CustomType.line) {
+			snaps.push({
+				position: c.userData.Location.Start.position,
+				point: c.userData.Location.Start,
+			});
+			snaps.push({
+				position: c.userData.Location.Mid.position,
+				point: c.userData.Location.Mid,
+			});
+			snaps.push({
+				position: c.userData.Location.End.position,
+				point: c.userData.Location.End,
+			});
+		}
+		if (c.userData.Type == CustomType.arc) {
+			snaps.push({
+				position: c.userData.Location.Start.position,
+				point: c.userData.Location.Start,
+			});
+			snaps.push({
+				position: c.userData.Location.Center.position,
+				point: c.userData.Location.Center,
+			});
+			snaps.push({
+				position: c.userData.Location.End.position,
+				point: c.userData.Location.End,
+			});
+		}
+		if (c.userData.Type == CustomType.model) {
+			c.userData.Location.Snaps.forEach((m) => {
+				snaps.push({
+					position: m,
+					point: c.userData.Location.SnapPoint,
+				});
+			});
+		}
+	});
+	snaps = snaps.filter(
+		(value, index, self) => self.findIndex((snap) => snap.position.distanceTo(value.position) < ES) === index
+	);
+	return snaps;
+}
+
+export function snapPoint(workPlane, view, p) {
+	var allSnaps = getAllPointSnap(workPlane, view);
+	if (allSnaps.length == 0) return null;
+	var snap = allSnaps.filter((s) => p.distanceTo(s.position) <= SNAP)[0];
+	if (!snap) {
+		allSnaps.forEach((s) => s.point.userData.visibility(view.scene, false));
+		return null;
+	} else {
+		snap.point.userData.setPosition(snap.position);
+		snap.point.userData.visibility(view.scene, true);
+		return snap.position;
+	}
+}
 
 export function findPointFromFace(object, plane) {
 	var equalPoints = [];
@@ -129,7 +197,6 @@ export function findPointFromFace(object, plane) {
 				perPoints.push(v0);
 			}
 		}
-		var position = new Vector3(pos0.getX(arrIndex[i]), pos0.getY(arrIndex[i]), pos0.getZ(arrIndex[i]));
 	}
 
 	return {
@@ -140,6 +207,23 @@ export function findPointFromFace(object, plane) {
 		notEqualPoints: notEqualPoints,
 	};
 }
+export function findFacePoints(object, plane) {
+	var equalPoints = [];
+	var arrIndex = object.geometry.index.array;
+	var pos0 = object.geometry.attributes.position;
+	var normal0 = object.geometry.attributes.normal;
+	for (let i = 0; i < arrIndex.length; i++) {
+		var normal = new Vector3(normal0.getX(arrIndex[i]), normal0.getY(arrIndex[i]), normal0.getZ(arrIndex[i]));
+		var v0 = new Vector3(pos0.getX(arrIndex[i]), pos0.getY(arrIndex[i]), pos0.getZ(arrIndex[i]));
+		var dis = plane.distanceToPoint(v0);
+		if (areEqualVector(normal, plane.normal) && areEqual(dis, 0.0, 1.0e-6)) {
+			equalPoints.push(v0);
+		}
+	}
+
+	return equalPoints;
+}
+
 export function getOldPoints(object) {
 	var points = [];
 	var arrIndex = object.geometry.index.array;
@@ -151,37 +235,5 @@ export function getOldPoints(object) {
 	return points;
 }
 
-export function getIntersectTypeLines(l1, l2) {
-	if (!l1.userData.Location || !l2.userData.Location) return INTERSECT_TYPE.dispose;
-	if (!l1.userData.Location.Direction || !l2.userData.Location.Direction) return INTERSECT_TYPE.dispose;
-	if (!l1.userData.Location.Normal || !l2.userData.Location.Normal) return INTERSECT_TYPE.dispose;
-	if (!areEqualVector(l1.userData.Location.Normal, l2.userData.Location.Normal)) return INTERSECT_TYPE.dispose;
-	if (areEqualVector(l1.userData.Location.Direction, l2.userData.Location.Direction)) {
-		const pro = l1.userData.Location.Start.position.clone().projectOnVector(l2.userData.Location.Direction);
-		if (areEqual(pro.distanceTo(l1.userData.Location.Start.position), 0.0, 1e-6)) {
-			return INTERSECT_TYPE.equal;
-		} else {
-			return INTERSECT_TYPE.parallel;
-		}
-	} else {
-		return INTERSECT_TYPE.intersect;
-	}
-}
-export function getIntersectLines(l1, l2) {
-	if (getIntersectTypeLines(l1, l2) != INTERSECT_TYPE.intersect) return null;
-	const proS = l1.userData.Location.Start.position.clone().projectOnVector(l2.userData.Location.Direction);
-	const proE = l1.userData.Location.End.position.clone().projectOnVector(l2.userData.Location.Direction);
-	var cS = new Vector3(
-		proS.x - l1.userData.Location.Start.position.x,
-		proS.y - l1.userData.Location.Start.position.y,
-		proS.z - l1.userData.Location.Start.position.z
-	).normalize();
-	var cE = new Vector3(
-		proE.x - l1.userData.Location.End.position.x,
-		proE.y - l1.userData.Location.End.position.y,
-		proE.z - l1.userData.Location.End.position.z
-	).normalize();
-	var disS = proS.distanceTo(l1.userData.Location.Start.position);
-	var disE = proE.distanceTo(l1.userData.Location.End.position);
-	if (areEqual(cE.angleTo(cS), 0.0, 1e-6)) return null;
-}
+export function getIntersectTypeLines(l1, l2) {}
+export function getIntersectLines(l1, l2) {}

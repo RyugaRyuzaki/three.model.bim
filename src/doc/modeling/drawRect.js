@@ -1,9 +1,8 @@
-import { Vector2, Vector3, EdgesGeometry, LineSegments } from "three";
+import { Vector2, Vector3 } from "three";
 import { changeCursor } from "./cast";
 import { MIN_DIS } from "./enum";
 import { LocationLine } from "./Location";
-import { snapPoint } from "./selectModel";
-import { getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane, findPointFromFace } from "./snap";
+import { snapPoint, getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane } from "./snap";
 
 export function drawRect(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
@@ -29,7 +28,7 @@ export function drawRect(view, unit, btn, workPlane, callback) {
 				l3.removeFromParent();
 				l4.removeFromParent();
 			}
-			finishCallBack();
+			finishCallBack([]);
 		}
 	}
 	function onMouseDown(e) {
@@ -61,7 +60,7 @@ export function drawRect(view, unit, btn, workPlane, callback) {
 						LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
 						LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
 					}
-					finishCallBack();
+					finishCallBack([l1, l2, l3, l4]);
 				}
 			}
 		}
@@ -77,12 +76,11 @@ export function drawRect(view, unit, btn, workPlane, callback) {
 			var v2 = getProjectPointFromVector(p1, p2, local.z);
 			var v3 = p2.clone();
 			var v4 = getProjectPointFromVector(p1, p2, local.x);
-
 			LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
 			LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
 			LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
 			LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
-			finishCallBack();
+			finishCallBack([l1, l2, l3, l4]);
 		}
 	}
 
@@ -125,15 +123,14 @@ export function drawRect(view, unit, btn, workPlane, callback) {
 			view.domElement.removeEventListener("mousemove", onMouseMove);
 		}
 	}
-	function finishCallBack() {
+	function finishCallBack(list) {
 		changeCursor().default(view.domElement);
 		snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-
 		btn.style.background = "none";
 		view.domElement.removeEventListener("click", onMouseDown);
 		view.domElement.removeEventListener("mousemove", onMouseMove);
 		window.removeEventListener("keydown", onkeydown);
-		callback();
+		callback(list);
 	}
 
 	draw();

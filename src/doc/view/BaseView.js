@@ -25,6 +25,7 @@ import { CustomType } from "./../modeling";
 export class BaseView {
 	showDimension = false;
 	isOrthoLine = false;
+	drawing = 0;
 	constructor(scene, container, canvas, width, height, alpha = true) {
 		this.scene = scene;
 		this.container = container;

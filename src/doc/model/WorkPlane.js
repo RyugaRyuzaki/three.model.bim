@@ -1,7 +1,25 @@
-import { BufferAttribute, BufferGeometry, EdgesGeometry, Line, LineSegments, Mesh, Plane, Vector3 } from "three";
+import {
+	Vector2,
+	BufferAttribute,
+	BufferGeometry,
+	EdgesGeometry,
+	Line,
+	LineSegments,
+	Mesh,
+	Plane,
+	Vector3,
+} from "three";
 import { MeshBVH } from "three-mesh-bvh";
 import { customMaterial, dimMaterial, PlaneModelMaterial } from "../material";
-import { SNAP, getLocalVectorOnFace, CSS } from "../modeling";
+import {
+	SNAP,
+	getLocalVectorOnFace,
+	CSS,
+	castElement,
+	filterModel,
+	findFacePoints,
+	intersectPointPlane,
+} from "../modeling";
 import { createPoint } from "../modeling/Location";
 
 export class WorkPlane {
@@ -164,23 +182,86 @@ export class WorkPlane {
 		}
 		return { points: points, gx: gx, gz: gz, snaps: snaps };
 	}
+	pickPlane(callback) {
+		var _this = this;
+		var mouse = new Vector2();
+		var mesh;
+		function pick() {
+			_this.view.domElement.addEventListener("click", onMouseDown, false);
+			_this.view.domElement.addEventListener("mousemove", onMouseMove, false);
+			window.addEventListener("keydown", onkeydown, false);
+		}
+		function onkeydown(event) {
+			var keyCode = event.keyCode;
+			if (keyCode == 27) {
+				finishCallBack(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+			}
+		}
+		function onMouseDown(e) {
+			const found = castElement(e, _this.view, filterModel.export(_this.view.scene))[0];
+			var intersect = intersectPointPlane(e, mouse, _this.view, found, null);
+			var plane = intersect.plane;
+			if (found && mesh) {
+				finishCallBack(found.point, plane.normal);
+			}
+		}
+		function onMouseMove(e) {
+			const found = castElement(e, _this.view, filterModel.export(_this.view.scene))[0];
 
-	setWorkPlane(workPlaneType) {
+			var intersect = intersectPointPlane(e, mouse, _this.view, found, null);
+			var plane = intersect.plane;
+			if (found) {
+				var points = findFacePoints(found.object, plane);
+				var geometry = new BufferGeometry().setFromPoints(points);
+				if (!mesh) {
+					mesh = new Mesh(geometry, PlaneModelMaterial.hoverPlane);
+					_this.view.scene.add(mesh);
+				} else {
+					mesh.geometry = new BufferGeometry().setFromPoints(points);
+				}
+			} else {
+				if (mesh) mesh.removeFromParent();
+				mesh = null;
+			}
+		}
+		function finishCallBack(point, normal) {
+			if (mesh) mesh.removeFromParent();
+			_this.view.domElement.removeEventListener("click", onMouseDown);
+			_this.view.domElement.removeEventListener("mousemove", onMouseMove);
+			window.removeEventListener("keydown", onkeydown);
+			callback(point, normal);
+		}
+		pick();
+	}
+	setWorkPlane(workPlaneType, callback) {
 		var point, normal;
 		if (parseInt(workPlaneType) != 3) {
 			point = this.listWorkPlanes[parseInt(workPlaneType)].point;
 			normal = this.listWorkPlanes[parseInt(workPlaneType)].normal;
+			this.origin = point;
+			if (!this.plane) this.plane = new Plane(new Vector3(0, 1, 0), 0);
+			this.plane = this.plane.setFromNormalAndCoplanarPoint(normal, point);
+			if (this.planeMesh) {
+				this.planeMesh.userData.Grid.refreshGrid();
+				this.planeMesh = null;
+			}
+			this.planeMesh = this.initPlaneMesh();
+			this.showWorkPlane(true);
+			callback();
 		} else {
+			this.pickPlane((point, normal) => {
+				this.origin = point;
+				if (!this.plane) this.plane = new Plane(new Vector3(0, 1, 0), 0);
+				this.plane = this.plane.setFromNormalAndCoplanarPoint(normal, point);
+				if (this.planeMesh) {
+					this.planeMesh.userData.Grid.refreshGrid();
+					this.planeMesh = null;
+				}
+				this.planeMesh = this.initPlaneMesh();
+				this.showWorkPlane(true);
+				callback();
+			});
 		}
-		this.origin = point;
-		if (!this.plane) this.plane = new Plane(new Vector3(0, 1, 0), 0);
-		this.plane = this.plane.setFromNormalAndCoplanarPoint(normal, point);
-		if (this.planeMesh) {
-			this.planeMesh.userData.Grid.refreshGrid();
-			this.planeMesh = null;
-		}
-		this.planeMesh = this.initPlaneMesh();
-		this.showWorkPlane(true);
 	}
 	showWorkPlane(visible) {
 		this.show = visible;

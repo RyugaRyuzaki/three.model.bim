@@ -67,7 +67,7 @@ input {
 }
 
 .linkTab.linkTab .unit {
-    background: white;
+    background: rgb(188, 168, 168);
 }
 
 .unit .unit-label {
@@ -197,6 +197,8 @@ input {
 .menuItemBtn {
     padding: 0px!important;
     margin: 2px!important;
+    width: 30px;
+    height: 30px
 }
 
 .menuItemBtn-active,
@@ -342,8 +344,11 @@ input {
     padding: 0!important;
 }
 
-.propBody tr td {
+.propBody tr td,
+.propBody tr td div {
     padding: 2px!important;
+    font-size: 14px!important;
+    line-height: 18px!important;
 }
 
 .paraName {
@@ -364,9 +369,9 @@ input {
 .propBody tr td button,
 .propBody tr td input {
     margin: 0!important;
-    padding: 0!important;
-    font-size: 12px!important;
-    line-height: 12px!important;
+    padding: 2px!important;
+    font-size: 14px!important;
+    line-height: 14px!important;
     /* width: 100%; */
 }
 
@@ -562,10 +567,6 @@ span.property-name {
 
 .maskDrop {
     cursor: url("../img/gimpBrush.png"), crosshair!important;
-}
-
-.rectangle {
-    cursor: url("../img/rectangle.png"), crosshair!important;
 }
 
 
