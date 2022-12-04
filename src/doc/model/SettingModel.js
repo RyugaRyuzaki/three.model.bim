@@ -34,7 +34,7 @@ export class SettingModel {
 			.add(view, "showDimension")
 			.name("Show Dimension")
 			.onChange((value) => {
-				view.changeDimension(value);
+				view.onShowDimension(value);
 			});
 	}
 }

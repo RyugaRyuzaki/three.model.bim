@@ -1,6 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExport, faPumpSoap } from "@fortawesome/free-solid-svg-icons";
 import { ToolContext } from "../ToolContext";
 import ToolButton from "../general/ToolButton";
 import ListMaterial from "./ListMaterial";
@@ -26,7 +24,7 @@ const ExportModelMenu = () => {
 						target={targetShowListMaterialRef}
 						idTooltip={idTooltip}
 					>
-						{<FontAwesomeIcon icon={faPumpSoap} size="lg" />}
+						{<img src={imageExport.material} alt="" />}
 					</ToolButton>
 				</div>
 
@@ -37,7 +35,7 @@ const ExportModelMenu = () => {
 						target={targetExportBimRef}
 						idTooltip={idTooltip}
 					>
-						{<FontAwesomeIcon icon={faFileExport} size="lg" />}
+						{<img src={imageExport.bim} alt="" />}
 					</ToolButton>
 				</div>
 				<div className="card card-menu">

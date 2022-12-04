@@ -8,8 +8,8 @@ export const DiaP = 0.01;
 export const LINE_WIDTH = 0.008;
 export const SNAP = 0.1;
 export const SNAP_ANGLE = Math.PI / 12;
-export const OFFSET_DIM = 0.5;
-export const EXTEND_DIM = 0.05;
+export const OFFSET_DIM = 0.1;
+export const EXTEND_DIM = 0.01;
 
 export function initShape() {
 	return new Shape()

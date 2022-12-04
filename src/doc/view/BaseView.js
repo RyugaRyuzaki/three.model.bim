@@ -243,22 +243,28 @@ export class BaseView {
 		this.pivot.userData.Select = customMaterial.selectModel;
 		this.scene.add(this.pivot);
 	}
-	changeDimension(visible) {
+	onShowDimension(visible) {
 		var _this = this;
-		var lines = _this.scene.children.filter(
-			(c) => (CustomType.isLine(c) || CustomType.isArc(c)) && c.userData.Location.Dimension
-		);
+		var lines = _this.scene.children.filter((c) => CustomType.isLine(c) && c.userData.Location.Dimension);
+		var arcs = _this.scene.children.filter((c) => CustomType.isArc(c) && c.userData.Location.Dimension);
 		lines.forEach((c) => {
 			c.userData.Location.Dimension.userData.visibility(_this.scene, visible);
+		});
+		arcs.forEach((c) => {
+			c.userData.Location.Dimension.userData.visibility(_this.scene, visible);
+			c.userData.Location.AngleDimension.userData.visibility(_this.scene, visible);
 		});
 	}
 	onChangeDimensionLabel(factor) {
 		var _this = this;
-		var lines = _this.scene.children.filter(
-			(c) => (CustomType.isLine(c) || CustomType.isArc(c)) && c.userData.Location.Dimension
-		);
+		var lines = _this.scene.children.filter((c) => CustomType.isArc(c) && c.userData.Location.Dimension);
+		var arcs = _this.scene.children.filter((c) => CustomType.isArc(c) && c.userData.Location.Dimension);
 		lines.forEach((c) => {
 			c.userData.Location.Dimension.userData.onChangeLabel(factor);
+		});
+		arcs.forEach((c) => {
+			c.userData.Location.Dimension.userData.onChangeLabel(factor);
+			c.userData.Location.AngleDimension.userData.onChangeLabel(factor);
 		});
 	}
 	onAnimate() {

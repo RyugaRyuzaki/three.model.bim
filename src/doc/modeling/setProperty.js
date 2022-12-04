@@ -77,8 +77,8 @@ export function setDefaultModel(mesh, outLine, profile, meshProfile, material, n
 				a: mesh.userData.Selection.MaterialModel.alpha,
 			},
 			info: {
-				volume: getVolume(mesh.geometry).toString(),
-				area: getAreaSurface(mesh).toString(),
+				// volume: getVolume(mesh.geometry).toString(),
+				// area: getAreaSurface(mesh).toString(),
 				length: getBounding(mesh.geometry).length.toString(),
 				width: getBounding(mesh.geometry).width.toString(),
 				height: getBounding(mesh.geometry).height.toString(),
@@ -135,6 +135,7 @@ function getAreaSurface(mesh) {
 		var a = coords[i].distanceTo(coords[i + 1]);
 		var b = coords[i + 1].distanceTo(coords[i + 2]);
 		var c = coords[i + 2].distanceTo(coords[i]);
+
 		sum += Math.sqrt((a + b + c) * (a + b - c) * (b + c - a) * (c + a - b)) / 4;
 	}
 	return sum;

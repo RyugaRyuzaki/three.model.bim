@@ -45,6 +45,9 @@ const ModelingMenu = () => {
 	};
 	const handleArc = () => {
 		setModelingType(drawList.arc, dispatch);
+		modelType.createProfileArc(targetArcRef.current, documentModel.workPlane, () => {
+			refreshModelingType(dispatch);
+		});
 	};
 
 	const handleLine = () => {

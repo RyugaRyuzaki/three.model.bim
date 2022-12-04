@@ -124,25 +124,29 @@ export class LocationArc {
 	static initArc(view, factor, pS, pE, normal, arc, angleArc) {
 		var dir = new Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
 		var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
-		var p1 = pS.clone().add(per.clone().multiplyScalar(pS.distanceTo(pE)));
+		var p1 = pS
+			.clone()
+			.add(dir.clone().multiplyScalar(Math.cos(angleArc / 2) * pS.distanceTo(pE)))
+			.add(per.clone().multiplyScalar(Math.sin(angleArc / 2) * pS.distanceTo(pE)));
 		arc.userData.Type = CustomType.arc;
 		arc.userData.Location = {
 			AngleArc: angleArc,
 			Direction: dir,
 			Start: createPoint(pE, CSS.endPoint),
 			Center: createPoint(pS, CSS.dot),
-			End: createPoint(pS.clone().add(dir.clone().multiplyScalar(-pS.distanceTo(pE))), CSS.endPoint),
+			End: createPoint(LocationArc.getEndPointArc(pS, pE, normal, angleArc), CSS.endPoint),
 			InterSect: createPoint(pS, CSS.intersect),
 			Normal: normal,
 			Curves: LocationArc.initCurveArc(pS, pE, normal, angleArc),
 			Dimension: createDimension(view, factor, arc, getMiddlePoint(pS, p1), pS, p1, normal),
+			AngleDimension: createAngleDimension(view, arc, pS, pE, normal, angleArc),
 			onChange: (pS, pE) => {
 				var dir = new Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
-				var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+				var per = new Vector3(0, 0, 0).crossVectors(arc.userData.Location.Normal, dir).normalize();
 				arc.userData.Location.Start.userData.setPosition(pE);
 				arc.userData.Location.Center.userData.setPosition(pS);
 				arc.userData.Location.End.userData.setPosition(
-					pS.clone().add(dir.clone().multiplyScalar(-pS.distanceTo(pE)))
+					LocationArc.getEndPointArc(pS, pE, arc.userData.Location.Normal, arc.userData.Location.AngleArc)
 				);
 				arc.userData.Location.Curves = LocationArc.initCurveArc(
 					pS,
@@ -153,8 +157,21 @@ export class LocationArc {
 				LocationArc.updateTempArc(pS, pE, arc.userData.Location.Normal, arc, arc.userData.Location.AngleArc);
 				arc.userData.Location.Dimension.userData.onChange(
 					pS,
-					pS.clone().add(per.clone().multiplyScalar(pS.distanceTo(pE))),
+					pS
+						.clone()
+						.add(
+							dir.clone().multiplyScalar(Math.cos(arc.userData.Location.AngleArc / 2) * pS.distanceTo(pE))
+						)
+						.add(
+							per.clone().multiplyScalar(Math.sin(arc.userData.Location.AngleArc / 2) * pS.distanceTo(pE))
+						),
 					arc.userData.Location.Normal
+				);
+				arc.userData.Location.AngleDimension.userData.onChange(
+					pS,
+					pE,
+					arc.userData.Location.Normal,
+					arc.userData.Location.AngleArc
 				);
 			},
 			remove: (scene) => {
@@ -163,6 +180,7 @@ export class LocationArc {
 				arc.userData.Location.Center.userData.visibility(scene, false);
 				arc.userData.Location.InterSect.userData.visibility(scene, false);
 				arc.userData.Location.Dimension.userData.visibility(scene, false);
+				arc.userData.Location.AngleDimension.userData.visibility(scene, false);
 			},
 			isConnectStart: (sameNormals) => {
 				return isConnected(sameNormals, arc, arc.userData.Location.Start);
@@ -235,6 +253,17 @@ export class LocationArc {
 			}
 		}
 		return curves;
+	}
+	static getEndPointArc(p0, p, normal, angleArc) {
+		var r = p0.distanceTo(p);
+		var dir = new Vector3(p.x - p0.x, p.y - p0.y, p.z - p0.z).normalize();
+		var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+		var sin = Math.sin(angleArc);
+		var cos = Math.cos(angleArc);
+		return p0
+			.clone()
+			.add(dir.clone().multiplyScalar(cos * r))
+			.add(per.clone().multiplyScalar(sin * r));
 	}
 }
 
@@ -333,7 +362,10 @@ export function createDimension(view, factor, line, p, p1, p2, normal) {
 	);
 	var label = new CSS2DObject(input);
 	label.position.set(p.x, p.y, p.z);
-	var points = createPointGeometryDimension(p1, p2, normal);
+	var points =
+		line.userData.Type == CustomType.line
+			? createPointGeometryDimension(p1, p2, normal)
+			: createPointGeometryArcDimension(p1, p2, normal);
 	var geometry = new BufferGeometry().setFromPoints(points);
 	const edges = new EdgesGeometry(geometry);
 	const segment = new LineSegments(edges, customMaterial.normalLine);
@@ -347,7 +379,10 @@ export function createDimension(view, factor, line, p, p1, p2, normal) {
 	segment.userData.onChange = (pS, pE, normal) => {
 		var pM = getMiddlePoint(pS, pE);
 		label.position.set(pM.x, pM.y, pM.z);
-		var points = createPointGeometryDimension(pS, pE, normal);
+		var points =
+			line.userData.Type == CustomType.line
+				? createPointGeometryDimension(pS, pE, normal)
+				: createPointGeometryArcDimension(pS, pE, normal);
 		var geometry = new BufferGeometry().setFromPoints(points);
 		segment.geometry = new EdgesGeometry(geometry);
 	};
@@ -437,4 +472,92 @@ export function createPointGeometryDimension(pS, pE, normal) {
 	points.push(v12);
 	points.push(v11);
 	return points;
+}
+export function createPointGeometryArcDimension(pS, pE, normal) {
+	var points = [];
+	var dir = new Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
+	var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+	var v1 = pS.clone().add(per.clone().multiplyScalar(LINE_WIDTH / 2));
+	var v2 = pS.clone().add(per.clone().multiplyScalar(-LINE_WIDTH / 2));
+	var v3 = pE.clone().add(per.clone().multiplyScalar(-LINE_WIDTH / 2));
+	var v4 = pE.clone().add(per.clone().multiplyScalar(LINE_WIDTH / 2));
+	points.push(v1);
+	points.push(v2);
+	points.push(v3);
+	points.push(v1);
+	points.push(v3);
+	points.push(v4);
+	return points;
+}
+export function createAngleDimension(view, arc, p0, p1, normal, angleArc) {
+	var input = document.createElement("input");
+	input.className = "dimension";
+	input.value = Math.round(((angleArc * 180) / Math.PI) * 1000) / 1000;
+	input.addEventListener("change", onChangeAngleDimension, false);
+	var label = new CSS2DObject(input);
+	label.position.set(p0.x, p0.y, p0.z);
+	var points = createPointGeometryArcDimension(p0, p1, normal);
+	var r = p0.distanceTo(p1);
+	var dir = new Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
+	var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+	var p2 = p0
+		.clone()
+		.add(dir.clone().multiplyScalar(Math.cos(angleArc) * r))
+		.add(per.clone().multiplyScalar(Math.sin(angleArc) * r));
+	var p3 = p0
+		.clone()
+		.add(dir.clone().multiplyScalar(Math.cos(angleArc / 2) * r))
+		.add(per.clone().multiplyScalar(Math.sin(angleArc / 2) * r));
+	points = points.concat(createPointGeometryArcDimension(p0, p2, normal));
+	var geometry = new BufferGeometry().setFromPoints(points);
+	const edges = new EdgesGeometry(geometry);
+	const segment = new LineSegments(edges, customMaterial.normalLine);
+	segment.userData.visLabel = (visible) => {
+		if (visible) {
+			segment.add(label);
+		} else {
+			label.removeFromParent();
+		}
+	};
+	segment.userData.onChange = (p0, p1, normal, angleArc) => {
+		var points = createPointGeometryArcDimension(p0, p1, normal);
+		var r = p0.distanceTo(p1);
+		var dir = new Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
+		var per = new Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+		var sin = Math.sin(angleArc);
+		var cos = Math.cos(angleArc);
+		var p2 = p0
+			.clone()
+			.add(dir.clone().multiplyScalar(cos * r))
+			.add(per.clone().multiplyScalar(sin * r));
+		points = points.concat(createPointGeometryArcDimension(p0, p2, normal));
+		var geometry = new BufferGeometry().setFromPoints(points);
+		segment.geometry = new EdgesGeometry(geometry);
+	};
+	segment.userData.visibility = (scene, visible) => {
+		segment.userData.visLabel(visible);
+		if (visible) {
+			scene.add(segment);
+		} else {
+			segment.removeFromParent();
+		}
+	};
+	segment.userData.visibility(view.scene, view.showDimension);
+	segment.userData.onChangeLabel = () => {
+		input.addEventListener("change", onChangeAngleDimension, false);
+	};
+	function onChangeAngleDimension(e) {
+		if (isNaN(parseInt(e.target.value))) return;
+		var angle = (parseInt(e.target.value) * Math.PI) / 180;
+		arc.userData.Location.AngleArc = angle;
+		var pS = arc.userData.Location.Center.position;
+		var newDir = new Vector3(p3.x - pS.x, p3.y - pS.y, p3.z - pS.z).normalize();
+		var newPer = new Vector3(0, 0, 0).crossVectors(arc.userData.Location.Normal, newDir).normalize();
+		var pE = pS
+			.clone()
+			.add(newDir.clone().multiplyScalar(Math.cos(angle / 2) * r))
+			.add(newPer.clone().multiplyScalar(-Math.sin(angle / 2) * r));
+		arc.userData.Location.onChange(pS, pE);
+	}
+	return segment;
 }

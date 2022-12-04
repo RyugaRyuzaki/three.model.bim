@@ -4,6 +4,10 @@ export class ExportBimModel {
 			schema_version: "1.0.0",
 			meshes: [],
 			elements: [],
+			info: {
+				Author: "Ryuga Ryuzaki",
+				ProjectID: "aaaaa",
+			},
 		};
 	}
 	initModel(model) {

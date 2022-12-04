@@ -19,6 +19,7 @@ import trim from "../../assets/img/tool/Trim.png";
 import extend from "../../assets/img/tool/Extend.png";
 import ifc from "../../assets/img/tool/ifc-img.png";
 import material from "../../assets/img/pencil.png";
+import bim from "../../assets/img/bim-icon.png";
 
 export const imageInPlace = {
 	extrude: extrude,
@@ -46,4 +47,5 @@ export const imageModify = {
 export const imageExport = {
 	ifc: ifc,
 	material: material,
+	bim: bim,
 };

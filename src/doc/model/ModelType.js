@@ -1,6 +1,7 @@
 import {
 	drawRect,
 	drawCircle,
+	drawArc,
 	drawLine,
 	drawMultiLine,
 	drawPolygon,
@@ -79,6 +80,13 @@ export class ModelTypeClass {
 			callback();
 		});
 	}
+	createProfileArc(btn, workPlane, callback) {
+		var _this = this;
+		drawArc(_this.view, _this.unit, btn, workPlane, (list) => {
+			_this.listProfile = _this.listProfile.concat(list);
+			callback();
+		});
+	}
 	createProfileLine(btn, workPlane, callback) {
 		var _this = this;
 		drawLine(_this.view, _this.unit, btn, workPlane, (list) => {
@@ -119,13 +127,14 @@ export class ModelTypeClass {
 			} else {
 				_this.listPointProfile = ProfileModel.getListPointsProfile(_this.listProfile);
 				_this.meshProfile = meshProfile(_this.listPointProfile, _this.view.scene);
-				_this.dispose();
+
 				callback(data.result, _this.listProfile);
 			}
 		});
 	}
 
 	createExtrude(profile, deepExtrude, plane, material) {
+		this.dispose();
 		var offsetPs = [];
 		for (let i = 0; i < this.listPointProfile.length; i++) {
 			offsetPs.push(
