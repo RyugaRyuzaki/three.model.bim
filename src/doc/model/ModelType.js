@@ -127,7 +127,6 @@ export class ModelTypeClass {
 			} else {
 				_this.listPointProfile = ProfileModel.getListPointsProfile(_this.listProfile);
 				_this.meshProfile = meshProfile(_this.listPointProfile, _this.view.scene);
-
 				callback(data.result, _this.listProfile);
 			}
 		});

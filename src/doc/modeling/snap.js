@@ -1,17 +1,4 @@
-import {
-	Plane,
-	Raycaster,
-	Mesh,
-	Vector3,
-	ShapeBufferGeometry,
-	BufferGeometry,
-	BufferAttribute,
-	Line,
-	EdgesGeometry,
-	LineSegments,
-	Euler,
-} from "three";
-import { customMaterial } from "../material";
+import { Plane, Raycaster, Vector3 } from "three";
 import { CustomType, ES, INTERSECT_TYPE, SNAP } from "./enum";
 
 export function intersectPlaneElevation(event, mouse, view, elevation) {
@@ -95,6 +82,11 @@ export function getProjectPointFromVector(p1, p2, v) {
 	var v0 = new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
 	var dis1 = dis * Math.cos(v0.angleTo(v));
 	return p1.clone().add(new Vector3(v.x * dis1, v.y * dis1, v.z * dis1));
+}
+export function getProjectPointFrom3Point(p1, p2, p3) {
+	var v1 = new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+	var v2 = new Vector3(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z).normalize();
+	return p1.clone().add(v1.clone().multiplyScalar(p1.distanceTo(p3) * Math.cos(v1.angleTo(v2))));
 }
 
 export function getMiddlePoint(point1, point2) {

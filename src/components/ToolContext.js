@@ -39,7 +39,7 @@ export const ToolProvider = (props) => {
 			if (modelType) {
 				modelType.listProfile.splice(modelType.listProfile.indexOf(selectModel), 1);
 			}
-			documentModel.models.splice(documentModel.models.indexOf(selectModel), 1);
+			documentModel.models = documentModel.models.splice(documentModel.models.indexOf(selectModel), 1);
 			setListModel([...documentModel.models]);
 			setShowMR(false);
 		}

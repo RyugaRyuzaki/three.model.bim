@@ -10,7 +10,7 @@ module.exports = {
 		// bundle: path.resolve(__dirname, "src/index.test.js"),
 	},
 	output: {
-		path: path.resolve(__dirname, "dist/"),
+		path: path.resolve(__dirname, "build/"),
 		filename: "[name].js",
 		clean: true,
 		assetModuleFilename: "[name][ext]",
@@ -19,7 +19,7 @@ module.exports = {
 	devtool: "source-map",
 	devServer: {
 		static: {
-			directory: path.resolve(__dirname, "dist"),
+			directory: path.resolve(__dirname, "build"),
 		},
 		port: 4001,
 		open: true,

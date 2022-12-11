@@ -21,11 +21,8 @@ export function highlightModel(event, view) {
 export function pickModel(event, view) {
 	var found = castElement(event, view, filterModel.model(view.scene))[0];
 	view.scene.children.forEach((c) => {
-		if (c.userData.Type == CustomType.line) {
-			c.userData.Selection.isSelect(view.scene, false);
-		}
-		if (c.userData.Type == CustomType.arc) {
-			c.userData.Selection.isSelect(view.scene, false);
+		if ((c.userData.Type == CustomType.line || c.userData.Type == CustomType.arc) && c.userData.Location) {
+			c.userData.Location.isSelect(view.scene, false);
 		}
 		if (c.userData.Type == CustomType.model) {
 			c.userData.isSelected = false;
@@ -34,12 +31,13 @@ export function pickModel(event, view) {
 	});
 	if (found) {
 		view.selectModel = found.object;
-		if (found.object.userData.Type == CustomType.line) {
-			found.object.userData.Selection.isSelect(view.scene, true);
+		if (
+			(found.object.userData.Type == CustomType.line || found.object.userData.Type == CustomType.arc) &&
+			found.object.userData.Location
+		) {
+			found.object.userData.Location.isSelect(view.scene, true);
 		}
-		if (found.object.userData.Type == CustomType.arc) {
-			found.object.userData.Selection.isSelect(view.scene, true);
-		}
+
 		if (found.object.userData.Type == CustomType.model) {
 			if (view.drawing != drawList.workPlane) {
 				found.object.userData.isSelected = true;
@@ -49,8 +47,8 @@ export function pickModel(event, view) {
 	} else {
 		view.selectModel = null;
 		view.scene.children.forEach((c) => {
-			if (c.userData.Type == CustomType.line) {
-				c.userData.Selection.isSelect(view.scene, false);
+			if (c.userData.Type == CustomType.line && c.userData.Location) {
+				c.userData.Location.isSelect(view.scene, false);
 			}
 			if (c.userData.Type == CustomType.model) {
 				c.userData.isSelected = false;

@@ -257,7 +257,7 @@ export class BaseView {
 	}
 	onChangeDimensionLabel(factor) {
 		var _this = this;
-		var lines = _this.scene.children.filter((c) => CustomType.isArc(c) && c.userData.Location.Dimension);
+		var lines = _this.scene.children.filter((c) => CustomType.isLine(c) && c.userData.Location.Dimension);
 		var arcs = _this.scene.children.filter((c) => CustomType.isArc(c) && c.userData.Location.Dimension);
 		lines.forEach((c) => {
 			c.userData.Location.Dimension.userData.onChangeLabel(factor);
