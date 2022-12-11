@@ -14,7 +14,7 @@ module.exports = {
 		filename: "[name].js",
 		clean: true,
 		assetModuleFilename: "[name][ext]",
-		publicPath: "/",
+		publicPath: "./",
 	},
 	devtool: "source-map",
 	devServer: {
