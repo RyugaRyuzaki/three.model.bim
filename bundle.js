@@ -1364,14 +1364,13 @@ var ToolProvider = function ToolProvider(props) {
         (0,_general_setModeling__WEBPACK_IMPORTED_MODULE_3__.refreshModelingType)(dispatch);
       }
     } else {
-      if (deepExtrude <= 0) {
+      if (deepExtrude == 0) {
         alert("Deep is invalid, please try again");
         return;
       }
 
       if (modelType) {
-        modelType.createExtrude(profile, deepExtrude, documentModel.workPlane.plane, listMaterial[0]);
-        modelType.dispose();
+        modelType.createExtrude(profile, deepExtrude, documentModel.workPlane.plane, listMaterial[0].material);
         setListModel(_toConsumableArray(documentModel.models));
       }
 
@@ -1412,13 +1411,13 @@ var ToolProvider = function ToolProvider(props) {
 
   var handleFinishProfile = function handleFinishProfile() {
     if (modelType) {
-      modelType.canCreateProfile(function (result, profile) {
-        if (!result) {
-          alert("Can not create a profile");
-        } else {
+      modelType.canCreateProfile(function (result, profile, message) {
+        if (result) {
           setShowProfile(false);
           setProfile(profile);
           (0,_general_setModeling__WEBPACK_IMPORTED_MODULE_3__.refreshModelingType)(dispatch);
+        } else {
+          alert(message);
         }
       });
     }
@@ -2177,13 +2176,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "DocumentModel": () => (/* binding */ DocumentModel)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 /* harmony import */ var _view__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./view */ "./src/doc/view/index.js");
 /* harmony import */ var _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tweenjs/tween.js */ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js");
 /* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./model */ "./src/doc/model/index.js");
-/* harmony import */ var _modeling_selectModel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modeling/selectModel */ "./src/doc/modeling/selectModel.js");
-/* harmony import */ var _modeling__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modeling */ "./src/doc/modeling/index.js");
-/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./material */ "./src/doc/material/index.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./src/doc/utils/index.js");
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./material */ "./src/doc/material/index.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -2207,7 +2205,7 @@ var DocumentModel = /*#__PURE__*/function () {
 
     _defineProperty(this, "materials", []);
 
-    this.scene = new three__WEBPACK_IMPORTED_MODULE_6__.Scene();
+    this.scene = new three__WEBPACK_IMPORTED_MODULE_5__.Scene();
     this.width = mainContainer.clientWidth;
     this.height = mainContainer.clientHeight;
     this.settingModel = new _model__WEBPACK_IMPORTED_MODULE_2__.SettingModel();
@@ -2239,7 +2237,7 @@ var DocumentModel = /*#__PURE__*/function () {
     value: function initMaterial(name) {
       var mat = {
         name: name,
-        material: _material__WEBPACK_IMPORTED_MODULE_5__.ViewMaterial.createMaterial(true, 1),
+        material: _material__WEBPACK_IMPORTED_MODULE_4__.ViewMaterial.createMaterial(true, 1),
         alpha: 255,
         onChangeName: function onChangeName(value) {
           mat.name = value;
@@ -2262,11 +2260,11 @@ var DocumentModel = /*#__PURE__*/function () {
       var _this = this;
 
       _this.view.domElement.addEventListener("mousemove", function (e) {
-        (0,_modeling_selectModel__WEBPACK_IMPORTED_MODULE_3__.highlightModel)(e, _this.view);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_3__.highlightModel)(e, _this.view);
       }, false);
 
       _this.view.domElement.addEventListener("click", function (e) {
-        (0,_modeling_selectModel__WEBPACK_IMPORTED_MODULE_3__.pickModel)(e, _this.view);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_3__.pickModel)(e, _this.view);
       }, false);
     }
   }, {
@@ -2279,7 +2277,7 @@ var DocumentModel = /*#__PURE__*/function () {
         var showAll = false;
 
         var models = _this.scene.children.filter(function (c) {
-          return _modeling__WEBPACK_IMPORTED_MODULE_4__.CustomType.isModel(c) || _modeling__WEBPACK_IMPORTED_MODULE_4__.CustomType.isProfile(c);
+          return _utils__WEBPACK_IMPORTED_MODULE_3__.CustomType.isModel(c) || _utils__WEBPACK_IMPORTED_MODULE_3__.CustomType.isProfile(c);
         });
 
         if (e.which == 3) {
@@ -2305,7 +2303,7 @@ var DocumentModel = /*#__PURE__*/function () {
       var _this = this;
 
       _this.view.domElement.addEventListener("click", function (e) {
-        (0,_modeling_selectModel__WEBPACK_IMPORTED_MODULE_3__.pickModel)(e, _this.view);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_3__.pickModel)(e, _this.view);
         callback(_this.view.selectModel);
       }, false);
     }
@@ -2318,7 +2316,7 @@ var DocumentModel = /*#__PURE__*/function () {
         if (!_this.view.selectModel) {
           callback(false);
         } else {
-          callback(_this.view.selectModel.userData.Type == _modeling__WEBPACK_IMPORTED_MODULE_4__.CustomType.model);
+          callback(_this.view.selectModel.userData.Type == _utils__WEBPACK_IMPORTED_MODULE_3__.CustomType.model);
         }
       }, false);
     }
@@ -2355,7 +2353,7 @@ var DocumentModel = /*#__PURE__*/function () {
     key: "handleShowAllModel",
     value: function handleShowAllModel() {
       this.scene.children.forEach(function (c) {
-        if (c.userData.Type == _modeling__WEBPACK_IMPORTED_MODULE_4__.CustomType.model) {
+        if (c.userData.Type == _utils__WEBPACK_IMPORTED_MODULE_3__.CustomType.model) {
           if (c.userData.OutLine) {
             c.userData.OutLine.visible = true;
           }
@@ -4419,6 +4417,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _modeling__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../modeling */ "./src/doc/modeling/index.js");
 /* harmony import */ var _tweenjs_tween_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @tweenjs/tween.js */ "./node_modules/@tweenjs/tween.js/dist/tween.esm.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../utils */ "./src/doc/utils/index.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4426,6 +4425,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -4566,7 +4566,7 @@ var ModelTypeClass = /*#__PURE__*/function () {
 
       _this.listPointProfile = [];
       _this.meshProfile = null;
-      _modeling__WEBPACK_IMPORTED_MODULE_0__.ProfileModel.conditionBound(_this.listProfile, function (data) {
+      _utils__WEBPACK_IMPORTED_MODULE_2__.ProfileModel.conditionBound(_this.listProfile, function (data) {
         if (!data.result) {
           if (data.elements) {
             var pos0 = _this.view.controls.target;
@@ -4575,32 +4575,40 @@ var ModelTypeClass = /*#__PURE__*/function () {
               pos: pos0
             }).to({
               pos: pos1
-            }, 200).onUpdate(function (coords) {
+            }, 500).onUpdate(function (coords) {
               _this.view.controls.target = coords.pos;
             });
             tween.start();
           }
 
-          callback(data.result, null);
+          callback(data.result, null, "Profile is not continue");
         } else {
-          _this.listPointProfile = _modeling__WEBPACK_IMPORTED_MODULE_0__.ProfileModel.getListPointsProfile(_this.listProfile);
-          _this.meshProfile = (0,_modeling__WEBPACK_IMPORTED_MODULE_0__.meshProfile)(_this.listPointProfile, _this.view.scene);
-          callback(data.result, _this.listProfile);
+          _this.listPointProfile = _utils__WEBPACK_IMPORTED_MODULE_2__.ProfileModel.getListPointsProfile(_this.listProfile); //clockwise
+
+          _this.listPointProfile = _utils__WEBPACK_IMPORTED_MODULE_2__.ProfileModel.getClockWiseListPoints(_this.listPointProfile);
+
+          if (!_utils__WEBPACK_IMPORTED_MODULE_2__.ProfileModel.provePolygon(_this.listPointProfile)) {
+            _this.listPointProfile = [];
+            callback(false, null, "Profile is not Polygon");
+          } else {
+            _this.meshProfile = (0,_modeling__WEBPACK_IMPORTED_MODULE_0__.meshProfile)(_this.listPointProfile, _this.view.scene);
+            callback(data.result, {
+              listPointProfile: _this.listPointProfile,
+              listProfile: _this.listProfile,
+              meshProfile: _this.meshProfile
+            }, "OK");
+          } // polygon
+
         }
       });
     }
   }, {
     key: "createExtrude",
     value: function createExtrude(profile, deepExtrude, plane, material) {
+      this.models.push((0,_modeling__WEBPACK_IMPORTED_MODULE_0__.extrudeProfile)(profile, deepExtrude, plane, material, this.view.scene));
       this.dispose();
-      var offsetPs = [];
-
-      for (var i = 0; i < this.listPointProfile.length; i++) {
-        offsetPs.push(this.listPointProfile[i].clone().add(plane.normal.clone().multiplyScalar(deepExtrude * this.unit.factor)));
-      }
-
-      this.models.push((0,_modeling__WEBPACK_IMPORTED_MODULE_0__.extrudeProfile)(this.listPointProfile, offsetPs, profile, this.meshProfile, material, plane.normal, this.view.scene));
       this.disposeMeshProfile();
+      console.log(this.view.scene.children);
     }
   }], [{
     key: "modifyCopyElement",
@@ -4739,11 +4747,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "WorkPlane": () => (/* binding */ WorkPlane)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
 /* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../material */ "./src/doc/material/index.js");
-/* harmony import */ var _modeling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../modeling */ "./src/doc/modeling/index.js");
-/* harmony import */ var _modeling_Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../modeling/Location */ "./src/doc/modeling/Location.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4785,10 +4792,10 @@ var WorkPlane = /*#__PURE__*/function () {
   }, {
     key: "initListWorkPlanes",
     value: function initListWorkPlanes() {
-      this.initItemWorkPlane("XZ", 0, new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0), new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0));
-      this.initItemWorkPlane("XY", 1, new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 1), new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0));
-      this.initItemWorkPlane("YZ", 2, new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(1, 0, 0), new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0));
-      this.initItemWorkPlane("Pick a Plane", 3, new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0), new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0));
+      this.initItemWorkPlane("XZ", 0, new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 1, 0), new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 0));
+      this.initItemWorkPlane("XY", 1, new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 1), new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 0));
+      this.initItemWorkPlane("YZ", 2, new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(1, 0, 0), new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 0));
+      this.initItemWorkPlane("Pick a Plane", 3, new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 0), new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 0));
     }
   }, {
     key: "initWorkPlane",
@@ -4797,7 +4804,7 @@ var WorkPlane = /*#__PURE__*/function () {
           point = _this$listWorkPlanes$.point,
           normal = _this$listWorkPlanes$.normal;
       this.origin = point;
-      var plane = new three__WEBPACK_IMPORTED_MODULE_3__.Plane(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0), 0);
+      var plane = new three__WEBPACK_IMPORTED_MODULE_2__.Plane(new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 1, 0), 0);
       this.plane = plane.setFromNormalAndCoplanarPoint(normal, point);
       this.planeMesh = this.initPlaneMesh();
     }
@@ -4810,16 +4817,16 @@ var WorkPlane = /*#__PURE__*/function () {
           gz = _this$getAllPoints.gz,
           snaps = _this$getAllPoints.snaps;
 
-      var geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(points); // const mesh = new Mesh(geometry, PlaneModelMaterial.normalPlane);
+      var geometry = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints(points); // const mesh = new Mesh(geometry, PlaneModelMaterial.normalPlane);
 
-      var edges = new three__WEBPACK_IMPORTED_MODULE_3__.EdgesGeometry(geometry);
-      var mesh = new three__WEBPACK_IMPORTED_MODULE_3__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine); // mesh.userData.OutLine = line;
+      var edges = new three__WEBPACK_IMPORTED_MODULE_2__.EdgesGeometry(geometry);
+      var mesh = new three__WEBPACK_IMPORTED_MODULE_2__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine); // mesh.userData.OutLine = line;
 
       var _this$initGird = this.initGird(gx, gz),
           gridX = _this$initGird.gridX,
           gridZ = _this$initGird.gridZ;
 
-      var snapPoint = (0,_modeling_Location__WEBPACK_IMPORTED_MODULE_2__.createPoint)(this.origin, _modeling__WEBPACK_IMPORTED_MODULE_1__.CSS.intersect);
+      var snapPoint = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.createPoint)(this.origin, _utils__WEBPACK_IMPORTED_MODULE_1__.CSS.intersect);
 
       var _this = this;
 
@@ -4842,15 +4849,15 @@ var WorkPlane = /*#__PURE__*/function () {
         },
         setGrid: function setGrid(gx, gz, snaps) {
           for (var i = 0; i < mesh.userData.Grid.gridX.length; i++) {
-            mesh.userData.Grid.gridX[i].geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints([gx[i].start, gx[i].end]);
-            mesh.userData.Grid.gridZ[i].geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints([gz[i].start, gz[i].end]);
+            mesh.userData.Grid.gridX[i].geometry = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints([gx[i].start, gx[i].end]);
+            mesh.userData.Grid.gridZ[i].geometry = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints([gz[i].start, gz[i].end]);
           }
 
           mesh.userData.Grid.snaps = snaps;
         },
         snapGrid: function snapGrid(p) {
           return mesh.userData.Grid.snaps.filter(function (s) {
-            return p.distanceTo(s) <= _modeling__WEBPACK_IMPORTED_MODULE_1__.SNAP;
+            return p.distanceTo(s) <= _utils__WEBPACK_IMPORTED_MODULE_1__.SNAP;
           });
         },
         visibilitySnap: function visibilitySnap(p) {
@@ -4881,7 +4888,7 @@ var WorkPlane = /*#__PURE__*/function () {
       mesh.geometry.computeBoundingBox();
       mesh.geometry.computeBoundingSphere();
       mesh.geometry.computeVertexNormals();
-      mesh.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__.MeshBVH(mesh.geometry);
+      mesh.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_3__.MeshBVH(mesh.geometry);
       return mesh;
     }
   }, {
@@ -4891,12 +4898,12 @@ var WorkPlane = /*#__PURE__*/function () {
       var gridZ = [];
 
       for (var i = 0; i < gx.length; i++) {
-        var geoX = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints([gx[i].start, gx[i].end]);
-        var lx = new three__WEBPACK_IMPORTED_MODULE_3__.Line(geoX, _material__WEBPACK_IMPORTED_MODULE_0__.dimMaterial.dotSnap);
+        var geoX = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints([gx[i].start, gx[i].end]);
+        var lx = new three__WEBPACK_IMPORTED_MODULE_2__.Line(geoX, _material__WEBPACK_IMPORTED_MODULE_0__.dimMaterial.dotSnap);
         lx.computeLineDistances();
         gridX.push(lx);
-        var geoZ = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints([gz[i].start, gz[i].end]);
-        var lz = new three__WEBPACK_IMPORTED_MODULE_3__.Line(geoZ, _material__WEBPACK_IMPORTED_MODULE_0__.dimMaterial.dotSnap);
+        var geoZ = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints([gz[i].start, gz[i].end]);
+        var lz = new three__WEBPACK_IMPORTED_MODULE_2__.Line(geoZ, _material__WEBPACK_IMPORTED_MODULE_0__.dimMaterial.dotSnap);
         lz.computeLineDistances();
         gridZ.push(lz);
       }
@@ -4909,7 +4916,7 @@ var WorkPlane = /*#__PURE__*/function () {
   }, {
     key: "getAllPoints",
     value: function getAllPoints() {
-      var local = (0,_modeling__WEBPACK_IMPORTED_MODULE_1__.getLocalVectorOnFace)(this.plane.normal);
+      var local = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getLocalVectorOnFace)(this.plane.normal);
       var x = local.x.normalize();
       var nx = x.clone().negate();
       var z = local.z.normalize();
@@ -4990,7 +4997,7 @@ var WorkPlane = /*#__PURE__*/function () {
     value: function pickPlane(callback) {
       var _this = this;
 
-      var mouse = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2();
+      var mouse = new three__WEBPACK_IMPORTED_MODULE_2__.Vector2();
       var mesh;
 
       function pick() {
@@ -5005,13 +5012,13 @@ var WorkPlane = /*#__PURE__*/function () {
         var keyCode = event.keyCode;
 
         if (keyCode == 27) {
-          finishCallBack(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0), new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0));
+          finishCallBack(new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 0, 0), new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 1, 0));
         }
       }
 
       function onMouseDown(e) {
-        var found = (0,_modeling__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, _this.view, _modeling__WEBPACK_IMPORTED_MODULE_1__.filterModel["export"](_this.view.scene))[0];
-        var intersect = (0,_modeling__WEBPACK_IMPORTED_MODULE_1__.intersectPointPlane)(e, mouse, _this.view, found, null);
+        var found = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, _this.view, _utils__WEBPACK_IMPORTED_MODULE_1__.filterModel["export"](_this.view.scene))[0];
+        var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.intersectPointPlane)(e, mouse, _this.view, found, null);
         var plane = intersect.plane;
 
         if (found && mesh) {
@@ -5020,20 +5027,20 @@ var WorkPlane = /*#__PURE__*/function () {
       }
 
       function onMouseMove(e) {
-        var found = (0,_modeling__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, _this.view, _modeling__WEBPACK_IMPORTED_MODULE_1__.filterModel["export"](_this.view.scene))[0];
-        var intersect = (0,_modeling__WEBPACK_IMPORTED_MODULE_1__.intersectPointPlane)(e, mouse, _this.view, found, null);
+        var found = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, _this.view, _utils__WEBPACK_IMPORTED_MODULE_1__.filterModel["export"](_this.view.scene))[0];
+        var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.intersectPointPlane)(e, mouse, _this.view, found, null);
         var plane = intersect.plane;
 
         if (found) {
-          var points = (0,_modeling__WEBPACK_IMPORTED_MODULE_1__.findFacePoints)(found.object, plane);
-          var geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(points);
+          var points = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.findFacePoints)(found.object, plane);
+          var geometry = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints(points);
 
           if (!mesh) {
-            mesh = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.PlaneModelMaterial.hoverPlane);
+            mesh = new three__WEBPACK_IMPORTED_MODULE_2__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.PlaneModelMaterial.hoverPlane);
 
             _this.view.scene.add(mesh);
           } else {
-            mesh.geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(points);
+            mesh.geometry = new three__WEBPACK_IMPORTED_MODULE_2__.BufferGeometry().setFromPoints(points);
           }
         } else {
           if (mesh) mesh.removeFromParent();
@@ -5065,7 +5072,7 @@ var WorkPlane = /*#__PURE__*/function () {
         point = this.listWorkPlanes[parseInt(workPlaneType)].point;
         normal = this.listWorkPlanes[parseInt(workPlaneType)].normal;
         this.origin = point;
-        if (!this.plane) this.plane = new three__WEBPACK_IMPORTED_MODULE_3__.Plane(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0), 0);
+        if (!this.plane) this.plane = new three__WEBPACK_IMPORTED_MODULE_2__.Plane(new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 1, 0), 0);
         this.plane = this.plane.setFromNormalAndCoplanarPoint(normal, point);
 
         if (this.planeMesh) {
@@ -5079,7 +5086,7 @@ var WorkPlane = /*#__PURE__*/function () {
       } else {
         this.pickPlane(function (point, normal) {
           _this2.origin = point;
-          if (!_this2.plane) _this2.plane = new three__WEBPACK_IMPORTED_MODULE_3__.Plane(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0), 0);
+          if (!_this2.plane) _this2.plane = new three__WEBPACK_IMPORTED_MODULE_2__.Plane(new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(0, 1, 0), 0);
           _this2.plane = _this2.plane.setFromNormalAndCoplanarPoint(normal, point);
 
           if (_this2.planeMesh) {
@@ -5150,41 +5157,1189 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/doc/modeling/Location.js":
+/***/ "./src/doc/modeling/drawArc.js":
+/*!*************************************!*\
+  !*** ./src/doc/modeling/drawArc.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "drawArc": () => (/* binding */ drawArc)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+
+function drawArc(view, unit, btn, workPlane, callback) {
+  var plane = workPlane.plane;
+  var factor = unit.factor;
+  var count = 0;
+  var mouse = new three__WEBPACK_IMPORTED_MODULE_1__.Vector2();
+  var p1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p3 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var arc, snap;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27) {
+      count = 0;
+
+      if (arc) {
+        arc.removeFromParent();
+      }
+
+      finishCallBack([]);
+    }
+  }
+
+  function onMouseDown(e) {
+    if (count == 0) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p1 = intersect.point;
+      if (snap) p1 = snap;
+    }
+
+    if (count == 1) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+    }
+
+    if (count == 2) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p3 = intersect.point;
+      if (snap) p3 = snap;
+      var pro = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getProjectPointFrom3Point)(p1, p2, p3);
+      var d0 = p1.distanceTo(p2);
+      var d1 = p3.distanceTo(pro);
+      var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(plane.normal, dir).normalize();
+      var v0 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(pro.x - p3.x, pro.y - p3.y, pro.z - p3.z).normalize();
+      var mid = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getMiddlePoint)(p1, p2);
+      var d2 = Math.sqrt(d1 * d1 + d0 * d0 / 4);
+      var d3 = d2 * d2 / (2 * d1) - d1;
+      var p0, angleArc;
+
+      if (d1 > d0 / 2) {
+        p0 = mid.add(v0.clone().multiplyScalar(-Math.abs(d3)));
+        angleArc = 2 * Math.PI - 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
+      } else {
+        p0 = mid.add(v0.clone().multiplyScalar(Math.abs(d3)));
+        angleArc = 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
+      }
+
+      var pS = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.areEqual)(v0.angleTo(per), 0.0, 1e-6) ? p1 : p2;
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.initArc(view, factor, p0, pS, plane.normal, arc, angleArc);
+    }
+
+    count++;
+
+    if (count == 3) {
+      finishCallBack([arc]);
+    }
+  }
+
+  function onMouseMove(e) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
+    var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+    var p = intersect.point;
+    snap = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.snapPoint)(workPlane, view, p);
+
+    if (count == 1) {
+      p2 = intersect.point;
+      var dis = p1.distanceTo(p2);
+
+      if (view.isOrthoLine) {
+        var local = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getLocalVectorOnFace)(plane.normal);
+        var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+        var angleZ = dir.angleTo(local.z);
+        var angleX = dir.angleTo(local.x);
+
+        if (angleZ < Math.PI / 4 || angleZ > Math.PI * 3 / 4) {
+          p2 = p1.clone().add(local.z.normalize().multiplyScalar(Math.cos(angleZ) * dis));
+        } else {
+          p2 = p1.clone().add(local.x.normalize().multiplyScalar(Math.cos(angleX) * dis));
+        }
+      }
+
+      if (snap) p2 = snap;
+
+      if (!arc) {
+        arc = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(p1, p2);
+        view.scene.add(arc);
+      } else {
+        _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(p1, p2, arc);
+      }
+    }
+
+    if (count == 2) {
+      p3 = intersect.point;
+      if (snap) p3 = snap;
+      var pro = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getProjectPointFrom3Point)(p1, p2, p3);
+      var d0 = p1.distanceTo(p2);
+      var d1 = p3.distanceTo(pro);
+      var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(plane.normal, dir).normalize();
+
+      if (d1 > d0 * 0.1) {
+        var v0 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(pro.x - p3.x, pro.y - p3.y, pro.z - p3.z).normalize();
+        var mid = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getMiddlePoint)(p1, p2);
+        var d2 = Math.sqrt(d1 * d1 + d0 * d0 / 4);
+        var d3 = d2 * d2 / (2 * d1) - d1;
+        var p0, angleArc;
+
+        if (d1 > d0 / 2) {
+          p0 = mid.add(v0.clone().multiplyScalar(-Math.abs(d3)));
+          angleArc = 2 * Math.PI - 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
+        } else {
+          p0 = mid.add(v0.clone().multiplyScalar(Math.abs(d3)));
+          angleArc = 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
+        }
+
+        var pS = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.areEqual)(v0.angleTo(per), 0.0, 1e-6) ? p1 : p2;
+        _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.updateTempArc(p0, pS, plane.normal, arc, angleArc);
+      }
+    }
+
+    if (count == 3) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+      view.domElement.removeEventListener("mousemove", onMouseMove);
+    }
+  }
+
+  function finishCallBack(list) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback(list);
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/drawCircle.js":
+/*!****************************************!*\
+  !*** ./src/doc/modeling/drawCircle.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "drawCircle": () => (/* binding */ drawCircle)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+
+function drawCircle(view, unit, btn, workPlane, callback) {
+  var plane = workPlane.plane;
+  var factor = unit.factor;
+  var count = 2;
+  var mouse = new three__WEBPACK_IMPORTED_MODULE_1__.Vector2();
+  var p1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p3 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var arc1, arc2, snap;
+  var angleArc = Math.PI;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27) {
+      count = 0;
+
+      if (arc1 && arc2) {
+        arc1.removeFromParent();
+        arc2.removeFromParent();
+      }
+
+      finishCallBack([]);
+    }
+  }
+
+  function onMouseDown(e) {
+    if (count == 2) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p1 = intersect.point;
+      if (snap) p1 = snap;
+    }
+
+    if (count == 1) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+      var dis = p1.distanceTo(p2);
+      var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+      p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
+    }
+
+    count--;
+
+    if (count == 0) {
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.initArc(view, factor, p1, p2, plane.normal, arc1, angleArc);
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.initArc(view, factor, p1, p3, plane.normal, arc2, angleArc);
+      finishCallBack([arc1, arc2]);
+    }
+  }
+
+  function onMouseMove(e) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
+    var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+    var p = intersect.point;
+    snap = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.snapPoint)(workPlane, view, p);
+
+    if (count == 1) {
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+      var dis = p1.distanceTo(p2);
+      var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+      p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
+
+      if (dis > _utils__WEBPACK_IMPORTED_MODULE_0__.MIN_DIS) {
+        if (!arc1 && !arc2) {
+          arc1 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.createTempArc(p1, p2, plane.normal, angleArc);
+          arc2 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.createTempArc(p1, p3, plane.normal, angleArc);
+          view.scene.add(arc1);
+          view.scene.add(arc2);
+        } else {
+          _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.updateTempArc(p1, p2, plane.normal, arc1, angleArc);
+          _utils__WEBPACK_IMPORTED_MODULE_0__.LocationArc.updateTempArc(p1, p3, plane.normal, arc2, angleArc);
+        }
+      }
+    }
+
+    if (count == 0) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+      view.domElement.removeEventListener("mousemove", onMouseMove);
+    }
+  }
+
+  function finishCallBack(list) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback(list);
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/drawLine.js":
 /*!**************************************!*\
-  !*** ./src/doc/modeling/Location.js ***!
+  !*** ./src/doc/modeling/drawLine.js ***!
   \**************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LocationArc": () => (/* binding */ LocationArc),
-/* harmony export */   "LocationLine": () => (/* binding */ LocationLine),
-/* harmony export */   "LocationPoint": () => (/* binding */ LocationPoint),
-/* harmony export */   "ProfileModel": () => (/* binding */ ProfileModel),
-/* harmony export */   "createPoint": () => (/* binding */ createPoint),
-/* harmony export */   "createPointGeometryArcDimension": () => (/* binding */ createPointGeometryArcDimension),
-/* harmony export */   "createPointGeometryDimension": () => (/* binding */ createPointGeometryDimension)
+/* harmony export */   "drawLine": () => (/* binding */ drawLine)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+
+function drawLine(view, unit, btn, workPlane, callback) {
+  var plane = workPlane.plane;
+  var factor = unit.factor;
+  var count = 2;
+  var mouse = new three__WEBPACK_IMPORTED_MODULE_1__.Vector2();
+  var p1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var line, snap;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27) {
+      count = 0;
+
+      if (line) {
+        line.removeFromParent();
+      }
+
+      finishCallBack([]);
+    }
+  }
+
+  function onMouseDown(e) {
+    if (count == 2) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p1 = intersect.point;
+      if (snap) p1 = snap;
+    }
+
+    if (count == 1) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+    }
+
+    count--;
+
+    if (count == 0) {
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
+      finishCallBack([line]);
+    }
+  }
+
+  function onMouseMove(e) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
+    var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+    var p = intersect.point;
+    snap = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.snapPoint)(workPlane, view, p);
+
+    if (count == 1) {
+      p2 = intersect.point;
+      var dis = p1.distanceTo(p2);
+
+      if (view.isOrthoLine) {
+        var local = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getLocalVectorOnFace)(plane.normal);
+        var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+        var angleZ = dir.angleTo(local.z);
+        var angleX = dir.angleTo(local.x);
+
+        if (angleZ < Math.PI / 4 || angleZ > Math.PI * 3 / 4) {
+          p2 = p1.clone().add(local.z.normalize().multiplyScalar(Math.cos(angleZ) * dis));
+        } else {
+          p2 = p1.clone().add(local.x.normalize().multiplyScalar(Math.cos(angleX) * dis));
+        }
+      }
+
+      if (snap) p2 = snap;
+
+      if (!line) {
+        line = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(p1, p2);
+        view.scene.add(line);
+      } else {
+        _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(p1, p2, line);
+      }
+    }
+
+    if (count == 0) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+      view.domElement.removeEventListener("mousemove", onMouseMove);
+    }
+  }
+
+  function finishCallBack(list) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback(list);
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/drawMultiLine.js":
+/*!*******************************************!*\
+  !*** ./src/doc/modeling/drawMultiLine.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "drawMultiLine": () => (/* binding */ drawMultiLine)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+
+function drawMultiLine(view, unit, btn, workPlane, callback) {
+  var plane = workPlane.plane;
+  var factor = unit.factor;
+  var count = 0;
+  var mouse = new three__WEBPACK_IMPORTED_MODULE_1__.Vector2();
+  var p1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0);
+  var p2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0);
+  var line, tempLine, snap;
+  var list = [];
+  var generate = false;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27 || keyCode == 13) {
+      if (tempLine) {
+        tempLine.removeFromParent();
+      }
+
+      finishCallBack();
+    }
+  }
+
+  function onMouseDown(e) {
+    if (count == 0) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p1 = intersect.point;
+      if (snap) p1 = snap;
+    } else {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+
+      if (!line) {
+        line = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(p1, p2);
+        view.scene.add(line);
+      }
+
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
+      list.push(line);
+      p1 = p2;
+      line = null;
+    }
+
+    count++;
+    generate = true;
+  }
+
+  function onMouseMove(e) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
+    var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+    var p = intersect.point;
+    snap = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.snapPoint)(workPlane, view, p);
+    p2 = intersect.point;
+    if (snap) p2 = snap;
+
+    if (generate) {
+      if (!tempLine) {
+        tempLine = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(p1, p2);
+        view.scene.add(tempLine);
+      } else {
+        _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(p1, p2, tempLine);
+      }
+    }
+  }
+
+  function finishCallBack() {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback(list);
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/drawPolygon.js":
+/*!*****************************************!*\
+  !*** ./src/doc/modeling/drawPolygon.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "drawPolygon": () => (/* binding */ drawPolygon)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+
+function drawPolygon(view, unit, btn, workPlane, callback) {
+  var plane = workPlane.plane;
+  var label = unit.label,
+      factor = unit.factor;
+  var count = 2;
+  var mouse = new three__WEBPACK_IMPORTED_MODULE_1__.Vector2();
+  var p1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var poly = [],
+      snap,
+      edge = 3;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27) {
+      count = 0;
+      poly.forEach(function (p) {
+        return p.removeFromParent();
+      });
+      poly = [];
+      finishCallBack(poly);
+    }
+  }
+
+  function onMouseDown(e) {
+    if (count == 2) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p1 = intersect.point;
+      if (snap) p1 = snap;
+      edge = window.prompt("Enter number of edge", edge);
+      if (isNaN(parseInt(edge)) || parseInt(edge) <= 2) edge = 3;
+    }
+
+    if (count == 1) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+      var dis = p1.distanceTo(p2);
+      var points = generatePoints(dis);
+
+      for (var i = 0; i < points.length; i++) {
+        var v1, v2;
+
+        if (i == points.length - 1) {
+          v1 = points[i];
+          v2 = points[0];
+        } else {
+          v1 = points[i];
+          v2 = points[i + 1];
+        }
+
+        _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v1, v2, plane.normal, poly[i]);
+      }
+    }
+
+    count--;
+
+    if (count == 0) {
+      finishCallBack(poly);
+    }
+  }
+
+  function onMouseMove(e) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
+    var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+    var p = intersect.point;
+    snap = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.snapPoint)(workPlane, view, p);
+
+    if (count == 1) {
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+      var dis = p1.distanceTo(p2);
+
+      if (dis > _utils__WEBPACK_IMPORTED_MODULE_0__.MIN_DIS) {
+        var points = generatePoints(dis);
+
+        if (poly.length === 0) {
+          for (var i = 0; i < points.length; i++) {
+            var v1, v2;
+
+            if (i == points.length - 1) {
+              v1 = points[i];
+              v2 = points[0];
+            } else {
+              v1 = points[i];
+              v2 = points[i + 1];
+            }
+
+            var l = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v1, v2);
+            view.scene.add(l);
+            poly.push(l);
+          }
+        } else {
+          for (var _i = 0; _i < points.length; _i++) {
+            var v1, v2;
+
+            if (_i == points.length - 1) {
+              v1 = points[_i];
+              v2 = points[0];
+            } else {
+              v1 = points[_i];
+              v2 = points[_i + 1];
+            }
+
+            _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(v1, v2, poly[_i]);
+          }
+        }
+      }
+    }
+
+    if (count == 0) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+      view.domElement.removeEventListener("mousemove", onMouseMove);
+    }
+  }
+
+  function finishCallBack(list) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback(list);
+  }
+
+  function generatePoints(dis) {
+    var dir = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+    var per = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(plane.normal, dir).normalize();
+    var points = [];
+
+    for (var i = 0; i < edge; i++) {
+      var angle = i * 2 * Math.PI / edge;
+      var sin = Math.sin(angle);
+      var cos = Math.cos(angle);
+      points.push(p1.clone().add(dir.clone().multiplyScalar(cos * dis)).add(per.clone().multiplyScalar(sin * dis)));
+    }
+
+    return points;
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/drawRect.js":
+/*!**************************************!*\
+  !*** ./src/doc/modeling/drawRect.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "drawRect": () => (/* binding */ drawRect)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+
+function drawRect(view, unit, btn, workPlane, callback) {
+  var plane = workPlane.plane;
+  var label = unit.label,
+      factor = unit.factor;
+  var count = 2;
+  var mouse = new three__WEBPACK_IMPORTED_MODULE_1__.Vector2();
+  var p1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var p2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3();
+  var l1, l2, l3, l4, snap;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27) {
+      count = 0;
+
+      if (l1 && l2 && l3 && l4) {
+        l1.removeFromParent();
+        l2.removeFromParent();
+        l3.removeFromParent();
+        l4.removeFromParent();
+      }
+
+      finishCallBack([]);
+    }
+  }
+
+  function onMouseDown(e) {
+    if (count == 2) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p1 = intersect.point;
+      if (snap) p1 = snap;
+      var length = window.prompt("Enter Length", label);
+
+      if (!isNaN(parseFloat(length * 1.0)) && length) {
+        var width = window.prompt("Enter Width", label);
+
+        if (!isNaN(parseFloat(width * 1.0))) {
+          var local = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getLocalVectorOnFace)(plane.normal);
+          var v1 = p1.clone();
+          var v2 = p1.clone().add(local.z.clone().multiplyScalar(width * factor));
+          var v3 = v2.clone().add(local.x.clone().multiplyScalar(length * factor));
+          var v4 = p1.clone().add(local.x.clone().multiplyScalar(length * factor));
+
+          if (!l1 && !l2 && !l3 && !l4) {
+            l1 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v1, v2);
+            l2 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v2, v3);
+            l3 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v3, v4);
+            l4 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v4, v1);
+            view.scene.add(l1);
+            view.scene.add(l2);
+            view.scene.add(l3);
+            view.scene.add(l4);
+            _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
+            _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
+            _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
+            _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
+          }
+
+          finishCallBack([l1, l2, l3, l4]);
+        }
+      }
+    }
+
+    if (count == 1) {
+      var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+    }
+
+    count--;
+
+    if (count == 0) {
+      var local = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getLocalVectorOnFace)(plane.normal);
+      var v1 = p1.clone();
+      var v2 = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getProjectPointFromVector)(p1, p2, local.z);
+      var v3 = p2.clone();
+      var v4 = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getProjectPointFromVector)(p1, p2, local.x);
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
+      _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
+      finishCallBack([l1, l2, l3, l4]);
+    }
+  }
+
+  function onMouseMove(e) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
+    var intersect = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.intersectPointPlane)(e, mouse, view, null, plane);
+    var p = intersect.point;
+    snap = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.snapPoint)(workPlane, view, p);
+
+    if (count == 1) {
+      p2 = intersect.point;
+      if (snap) p2 = snap;
+      var dis = p1.distanceTo(p2);
+
+      if (dis > _utils__WEBPACK_IMPORTED_MODULE_0__.MIN_DIS) {
+        var local = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getLocalVectorOnFace)(plane.normal);
+        var v1 = p1.clone();
+        var v2 = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getProjectPointFromVector)(p1, p2, local.z);
+        var v3 = p2.clone();
+        var v4 = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getProjectPointFromVector)(p1, p2, local.x);
+
+        if (!l1 && !l2 && !l3 && !l4) {
+          l1 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v1, v2);
+          l2 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v2, v3);
+          l3 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v3, v4);
+          l4 = _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.createTempLine(v4, v1);
+          view.scene.add(l1);
+          view.scene.add(l2);
+          view.scene.add(l3);
+          view.scene.add(l4);
+        } else {
+          _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(v1, v2, l1);
+          _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(v2, v3, l2);
+          _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(v3, v4, l3);
+          _utils__WEBPACK_IMPORTED_MODULE_0__.LocationLine.updateTempLine(v4, v1, l4);
+        }
+      }
+    }
+
+    if (count == 0) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+      view.domElement.removeEventListener("mousemove", onMouseMove);
+    }
+  }
+
+  function finishCallBack(list) {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
+    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback(list);
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/extrudeProfile.js":
+/*!********************************************!*\
+  !*** ./src/doc/modeling/extrudeProfile.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "extrudeProfile": () => (/* binding */ extrudeProfile),
+/* harmony export */   "meshProfile": () => (/* binding */ meshProfile)
 /* harmony export */ });
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../material */ "./src/doc/material/index.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-/* harmony import */ var three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three/examples/jsm/renderers/CSS2DRenderer */ "./node_modules/three/examples/jsm/renderers/CSS2DRenderer.js");
 /* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../material */ "./src/doc/material/index.js");
+/* harmony import */ var _model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../model */ "./src/doc/model/index.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+/* harmony import */ var _utils_ProfileModel_InterSectCurve__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/ProfileModel/InterSectCurve */ "./src/doc/utils/ProfileModel/InterSectCurve.js");
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+function meshProfile(points, scene) {
+  var center = _utils__WEBPACK_IMPORTED_MODULE_2__.ProfileModel.getCenterOfListPoints(points);
+  var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(getMeshPoints(points, center));
+  var mesh = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalModel);
+  var edges = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
+  var line = new three__WEBPACK_IMPORTED_MODULE_4__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
+  mesh.geometry.computeBoundingBox();
+  mesh.geometry.computeBoundingSphere();
+  mesh.geometry.computeVertexNormals();
+  mesh.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__.MeshBVH(mesh.geometry);
+  scene.add(line);
+  mesh.userData.OutLine = line;
+  scene.add(mesh);
+  return mesh;
+}
+function extrudeProfile(profile, deepExtrude, plane, material, scene) {
+  var listPointProfile = profile.listPointProfile,
+      listProfile = profile.listProfile,
+      meshProfile = profile.meshProfile;
+  var center = _utils__WEBPACK_IMPORTED_MODULE_2__.ProfileModel.getCenterOfListPoints(listPointProfile);
+  var deepPoint = center.clone().add(plane.normal.clone().multiplyScalar(deepExtrude));
+  var curvePath = new three__WEBPACK_IMPORTED_MODULE_4__.CurvePath();
+  curvePath.add(new three__WEBPACK_IMPORTED_MODULE_4__.LineCurve3(center, deepPoint));
+  var shape = createShapeFromProfile(listPointProfile, center, plane);
+  var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.ExtrudeGeometry(shape, (0,_utils__WEBPACK_IMPORTED_MODULE_2__.extrudeSetting)(curvePath));
+  var mesh = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, material);
+  scene.add(mesh);
+  return mesh;
+}
+
+function createShapeFromProfile(listPointProfile, center, plane) {
+  var listLineShape = [];
+  var local = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.getLocalVectorOnFace)(plane.normal);
+
+  for (var i = 0; i < listPointProfile.length; i++) {
+    var point = listPointProfile[i];
+    var dis = point.distanceTo(center);
+    var dir = (0,_utils_ProfileModel_InterSectCurve__WEBPACK_IMPORTED_MODULE_3__.getDirection2Point)(center, point);
+    var y = dis * Math.cos(dir.angleTo(local.z));
+    var x = dis * Math.cos(dir.angleTo(local.x));
+    listLineShape.push({
+      x: x,
+      y: y
+    });
+  }
+
+  var shape = new three__WEBPACK_IMPORTED_MODULE_4__.Shape();
+
+  for (var _i = 0; _i < listLineShape.length; _i++) {
+    if (_i == 0) {
+      shape.moveTo(listLineShape[0].x, listLineShape[0].y);
+    } else {
+      if (_i == listLineShape.length - 1) {
+        shape.lineTo(listLineShape[_i].x, listLineShape[_i].y);
+        shape.lineTo(listLineShape[0].x, listLineShape[0].y);
+      } else {
+        shape.lineTo(listLineShape[_i].x, listLineShape[_i].y);
+      }
+    }
+  }
+
+  return shape;
+}
+
+function getMeshPoints(points, center) {
+  var ps = [];
+
+  for (var i = 0; i < points.length; i++) {
+    if (i == points.length - 1) {
+      ps.push(center);
+      ps.push(points[i]);
+      ps.push(points[0]);
+    } else {
+      ps.push(center);
+      ps.push(points[i]);
+      ps.push(points[i + 1]);
+    }
+  }
+
+  return ps;
+}
+
+function getExtrudePoints(points, offsetPs) {
+  var ps = [];
+
+  for (var i = 0; i < points.length - 2; i++) {
+    ps.push(points[0]);
+    ps.push(points[i + 1]);
+    ps.push(points[i + 2]);
+  }
+
+  for (var _i2 = 0; _i2 < offsetPs.length - 2; _i2++) {
+    ps.push(offsetPs[0]);
+    ps.push(offsetPs[_i2 + 1]);
+    ps.push(offsetPs[_i2 + 2]);
+  }
+
+  for (var _i3 = 0; _i3 < points.length; _i3++) {
+    if (_i3 == points.length - 1) {
+      ps.push(points[_i3]);
+      ps.push(points[0]);
+      ps.push(offsetPs[0]);
+      ps.push(points[_i3]);
+      ps.push(offsetPs[0]);
+      ps.push(offsetPs[_i3]);
+    } else {
+      ps.push(points[_i3]);
+      ps.push(points[_i3 + 1]);
+      ps.push(offsetPs[_i3 + 1]);
+      ps.push(points[_i3]);
+      ps.push(offsetPs[_i3 + 1]);
+      ps.push(offsetPs[_i3]);
+    }
+  }
+
+  return ps;
+}
+
+/***/ }),
+
+/***/ "./src/doc/modeling/index.js":
+/*!***********************************!*\
+  !*** ./src/doc/modeling/index.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "TrimElement": () => (/* reexport safe */ _modify__WEBPACK_IMPORTED_MODULE_6__.TrimElement),
+/* harmony export */   "copyElement": () => (/* reexport safe */ _modify__WEBPACK_IMPORTED_MODULE_6__.copyElement),
+/* harmony export */   "drawArc": () => (/* reexport safe */ _drawArc__WEBPACK_IMPORTED_MODULE_5__.drawArc),
+/* harmony export */   "drawCircle": () => (/* reexport safe */ _drawCircle__WEBPACK_IMPORTED_MODULE_1__.drawCircle),
+/* harmony export */   "drawLine": () => (/* reexport safe */ _drawLine__WEBPACK_IMPORTED_MODULE_2__.drawLine),
+/* harmony export */   "drawMultiLine": () => (/* reexport safe */ _drawMultiLine__WEBPACK_IMPORTED_MODULE_3__.drawMultiLine),
+/* harmony export */   "drawPolygon": () => (/* reexport safe */ _drawPolygon__WEBPACK_IMPORTED_MODULE_4__.drawPolygon),
+/* harmony export */   "drawRect": () => (/* reexport safe */ _drawRect__WEBPACK_IMPORTED_MODULE_0__.drawRect),
+/* harmony export */   "extrudeProfile": () => (/* reexport safe */ _extrudeProfile__WEBPACK_IMPORTED_MODULE_7__.extrudeProfile),
+/* harmony export */   "meshProfile": () => (/* reexport safe */ _extrudeProfile__WEBPACK_IMPORTED_MODULE_7__.meshProfile)
+/* harmony export */ });
+/* harmony import */ var _drawRect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./drawRect */ "./src/doc/modeling/drawRect.js");
+/* harmony import */ var _drawCircle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./drawCircle */ "./src/doc/modeling/drawCircle.js");
+/* harmony import */ var _drawLine__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./drawLine */ "./src/doc/modeling/drawLine.js");
+/* harmony import */ var _drawMultiLine__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./drawMultiLine */ "./src/doc/modeling/drawMultiLine.js");
+/* harmony import */ var _drawPolygon__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./drawPolygon */ "./src/doc/modeling/drawPolygon.js");
+/* harmony import */ var _drawArc__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./drawArc */ "./src/doc/modeling/drawArc.js");
+/* harmony import */ var _modify__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modify */ "./src/doc/modeling/modify.js");
+/* harmony import */ var _extrudeProfile__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./extrudeProfile */ "./src/doc/modeling/extrudeProfile.js");
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "./src/doc/modeling/modify.js":
+/*!************************************!*\
+  !*** ./src/doc/modeling/modify.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "TrimElement": () => (/* binding */ TrimElement),
+/* harmony export */   "copyElement": () => (/* binding */ copyElement)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/doc/utils/index.js");
+
+function copyElement(view, btn, callback) {
+  var div;
+  var element;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27 || keyCode == 13) {
+      finishCallBack();
+    }
+  }
+
+  function onMouseDown(e) {
+    var found = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.castElement)(e, view, _utils__WEBPACK_IMPORTED_MODULE_0__.filterModel.model(view.scene))[0];
+    element = found ? found.object : null;
+  }
+
+  function onMouseMove(e) {
+    if (!div) {
+      div = document.createElement("div");
+      div.className = "card mouseModify";
+      div.textContent = "Select element";
+      div.style.top = e.clientY + "px";
+      div.style.left = e.clientX + "px";
+      document.body.appendChild(div);
+    } else {
+      div.style.top = e.clientY + 5 + "px";
+      div.style.left = e.clientX + 5 + "px";
+    }
+
+    if (element) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().move(view.domElement);
+    }
+  }
+
+  function finishCallBack() {
+    if (div) {
+      div.remove();
+    }
+
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback();
+  }
+
+  draw();
+}
+function TrimElement(view, btn, callback) {
+  var div;
+  var element;
+
+  function draw() {
+    btn.style.background = "#aaaaa9";
+    view.domElement.addEventListener("click", onMouseDown, false);
+    view.domElement.addEventListener("mousemove", onMouseMove, false);
+    window.addEventListener("keydown", onkeydown, false);
+  }
+
+  function onkeydown(event) {
+    var keyCode = event.keyCode;
+
+    if (keyCode == 27 || keyCode == 13) {
+      finishCallBack();
+    }
+  }
+
+  function onMouseDown(e) {
+    var found = (0,_utils__WEBPACK_IMPORTED_MODULE_0__.castElement)(e, view, _utils__WEBPACK_IMPORTED_MODULE_0__.filterModel.model(view.scene))[0];
+    element = found ? found.object : null;
+  }
+
+  function onMouseMove(e) {
+    if (!div) {
+      div = document.createElement("div");
+      div.className = "card mouseModify";
+      div.textContent = "Select element";
+      div.style.top = e.clientY + "px";
+      div.style.left = e.clientX + "px";
+      document.body.appendChild(div);
+    } else {
+      div.style.top = e.clientY + 5 + "px";
+      div.style.left = e.clientX + 5 + "px";
+    }
+
+    if (element) {
+      (0,_utils__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().move(view.domElement);
+    }
+  }
+
+  function finishCallBack() {
+    if (div) {
+      div.remove();
+    }
+
+    btn.style.background = "none";
+    view.domElement.removeEventListener("click", onMouseDown);
+    view.domElement.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("keydown", onkeydown);
+    callback();
+  }
+
+  draw();
+}
+
+/***/ }),
+
+/***/ "./src/doc/utils/Location/LocationArc.js":
+/*!***********************************************!*\
+  !*** ./src/doc/utils/Location/LocationArc.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LocationArc": () => (/* binding */ LocationArc)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three/examples/jsm/renderers/CSS2DRenderer */ "./node_modules/three/examples/jsm/renderers/CSS2DRenderer.js");
+/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../material */ "./src/doc/material/index.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../snap */ "./src/doc/utils/snap.js");
+/* harmony import */ var _LocationUtils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LocationUtils */ "./src/doc/utils/Location/LocationUtils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -5197,186 +6352,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var LocationPoint = /*#__PURE__*/function () {
-  function LocationPoint(p) {
-    _classCallCheck(this, LocationPoint);
 
-    this.p = p;
-    this.center = createPoint(this.p, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.intersect);
-  }
-
-  _createClass(LocationPoint, [{
-    key: "visibility",
-    value: function visibility(parent, visible, p) {
-      this.center.userData.visLabel(visible);
-
-      if (visible) {
-        this.center.userData.setPosition(p);
-        parent.add(this.center);
-      } else {
-        this.center.removeFromParent();
-      }
-    }
-  }]);
-
-  return LocationPoint;
-}();
-var LocationLine = /*#__PURE__*/function () {
-  function LocationLine(view, factor, line, pS, pE, normal) {
-    _classCallCheck(this, LocationLine);
-
-    this.line = line;
-    this.Direction = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
-    this.Start = createPoint(pS, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.endPoint);
-    this.Mid = createPoint((0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE), _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.middle);
-    this.End = createPoint(pE, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.endPoint);
-    this.Normal = normal;
-    this.Curves = new three__WEBPACK_IMPORTED_MODULE_4__.LineCurve3(pS, pE);
-    this.Dimension = LocationLine.createDimension(view, factor, this.line, (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE), pS, pE, this.Normal);
-  }
-
-  _createClass(LocationLine, [{
-    key: "onChange",
-    value: function onChange(pS, pE) {
-      this.Start.userData.setPosition(pS);
-      this.Mid.userData.setPosition((0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE));
-      this.End.userData.setPosition(pE);
-      this.Curves = new three__WEBPACK_IMPORTED_MODULE_4__.LineCurve3(pS, pE);
-      LocationLine.updateTempLine(pS, pE, this.line);
-      this.Dimension.userData.onChange(pS, pE, this.Normal);
-    }
-  }, {
-    key: "remove",
-    value: function remove(scene) {
-      this.Start.userData.visibility(scene, false);
-      this.End.userData.visibility(scene, false);
-      this.Mid.userData.visibility(scene, false);
-      this.Dimension.userData.visibility(scene, false);
-    }
-  }, {
-    key: "isSelect",
-    value: function isSelect(scene, visible) {
-      this.Start.userData.visibility(scene, visible);
-      this.Mid.userData.visibility(scene, visible);
-      this.End.userData.visibility(scene, visible);
-      this.line.material = visible ? this.line.userData.Material.Select : this.line.userData.Material.Normal;
-    }
-  }, {
-    key: "isConnectStart",
-    value: function isConnectStart(sameNormals) {
-      return isConnected(sameNormals, this.line, this.Start);
-    }
-  }, {
-    key: "isConnectEnd",
-    value: function isConnectEnd(sameNormals) {
-      return isConnected(sameNormals, this.line, this.End);
-    }
-  }], [{
-    key: "initLine",
-    value: function initLine(view, factor, pS, pE, normal, line) {
-      line.userData.Type = _enum__WEBPACK_IMPORTED_MODULE_1__.CustomType.line;
-      line.userData.Location = new LocationLine(view, factor, line, pS, pE, normal);
-    }
-  }, {
-    key: "createTempLine",
-    value: function createTempLine(pS, pE) {
-      var geometry = LocationLine.initGeometryLine(pS, pE);
-      var line = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
-      line.geometry.computeBoundingBox();
-      line.geometry.computeBoundingSphere();
-      line.geometry.computeVertexNormals();
-      line.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__.MeshBVH(line.geometry);
-      line.renderOrder = 1;
-      line.userData.Profile = true;
-      line.userData.Material = {
-        Normal: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine,
-        Select: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.selectLine,
-        Hover: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.hoverLine
-      };
-      return line;
-    }
-  }, {
-    key: "updateTempLine",
-    value: function updateTempLine(pS, pE, line) {
-      line.geometry = LocationLine.initGeometryLine(pS, pE);
-      line.geometry.computeBoundingBox();
-      line.geometry.computeBoundingSphere();
-      line.geometry.computeVertexNormals();
-      line.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__.MeshBVH(line.geometry);
-    }
-  }, {
-    key: "initGeometryLine",
-    value: function initGeometryLine(pS, pE) {
-      var curve = new three__WEBPACK_IMPORTED_MODULE_4__.LineCurve3(pS, pE);
-      var shape = (0,_enum__WEBPACK_IMPORTED_MODULE_1__.initShape)();
-      return new three__WEBPACK_IMPORTED_MODULE_4__.ExtrudeGeometry(shape, (0,_enum__WEBPACK_IMPORTED_MODULE_1__.extrudeSetting)(curve));
-    }
-  }, {
-    key: "createDimension",
-    value: function createDimension(view, factor, line, p, p1, p2, normal) {
-      var input = document.createElement("input");
-      input.className = "dimension";
-      input.value = Math.round(p1.distanceTo(p2) / factor * 1000) / 1000;
-      input.addEventListener("change", function (e) {
-        onChangeDimension(e, factor);
-      }, false);
-      var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__.CSS2DObject(input);
-      label.position.set(p.x, p.y, p.z);
-      var points = createPointGeometryDimension(p1, p2, normal);
-      var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(points);
-      var edges = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
-      var segment = new three__WEBPACK_IMPORTED_MODULE_4__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
-
-      segment.userData.visLabel = function (visible) {
-        if (visible) {
-          segment.add(label);
-        } else {
-          label.removeFromParent();
-        }
-      };
-
-      segment.userData.onChange = function (pS, pE, normal) {
-        var pM = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE);
-        label.position.set(pM.x, pM.y, pM.z);
-        var points = createPointGeometryDimension(pS, pE, normal);
-        var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(points);
-        segment.geometry = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
-      };
-
-      segment.userData.visibility = function (scene, visible) {
-        segment.userData.visLabel(visible);
-
-        if (visible) {
-          scene.add(segment);
-        } else {
-          segment.removeFromParent();
-        }
-      };
-
-      segment.userData.visibility(view.scene, view.showDimension);
-
-      segment.userData.onChangeLabel = function (factor) {
-        input.value = input.value * (factor == 1.0 ? 0.001 : 1000);
-        input.addEventListener("change", function (e) {
-          onChangeDimension(e, factor);
-        }, false);
-      };
-
-      function onChangeDimension(e, factor) {
-        if (isNaN(parseFloat(e.target.value * 1.0))) return;
-        var dim = parseFloat(e.target.value * 1.0 * factor);
-        var pS = line.userData.Location.Start.position;
-        var dir = line.userData.Location.Direction;
-        var pE = pS.clone().add(dir.clone().multiplyScalar(dim));
-        line.userData.Location.onChange(pS, pE);
-      }
-
-      return segment;
-    }
-  }]);
-
-  return LocationLine;
-}();
 var LocationArc = /*#__PURE__*/function () {
   function LocationArc(view, factor, arc, normal, angleArc, p0, pS) {
     _classCallCheck(this, LocationArc);
@@ -5386,9 +6362,9 @@ var LocationArc = /*#__PURE__*/function () {
     this.AngleArc = angleArc;
     this.Vertices = this.initVertices(p0, pS, normal, angleArc);
     this.Direction = this.initDirection(p0, this.Vertices);
-    this.Start = createPoint(pS, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.endPoint);
-    this.Center = createPoint(p0, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.dot);
-    this.End = createPoint(LocationArc.getEndPointArc(p0, pS, normal, angleArc), _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.endPoint);
+    this.Start = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPoint)(pS, _enum__WEBPACK_IMPORTED_MODULE_2__.CSS.endPoint);
+    this.Center = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPoint)(p0, _enum__WEBPACK_IMPORTED_MODULE_2__.CSS.dot);
+    this.End = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPoint)(LocationArc.getEndPointArc(p0, pS, normal, angleArc), _enum__WEBPACK_IMPORTED_MODULE_2__.CSS.endPoint);
     this.Curves = LocationArc.initCurveArc(p0, pS, normal, angleArc);
     this.Dimension = LocationArc.createDimension(view, factor, this.arc, p0, this.Vertices, normal);
     this.AngleDimension = LocationArc.createAngleDimension(view, this.arc, p0, pS, normal, angleArc);
@@ -5397,20 +6373,20 @@ var LocationArc = /*#__PURE__*/function () {
   _createClass(LocationArc, [{
     key: "initVertices",
     value: function initVertices(p0, pS, normal, angleArc) {
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pS.x - p0.x, pS.y - p0.y, pS.z - p0.z).normalize();
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+      var dir = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(pS.x - p0.x, pS.y - p0.y, pS.z - p0.z).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
       return p0.clone().add(dir.clone().multiplyScalar(Math.cos(angleArc / 2) * pS.distanceTo(p0))).add(per.clone().multiplyScalar(Math.sin(angleArc / 2) * pS.distanceTo(p0)));
     }
   }, {
     key: "initDirection",
     value: function initDirection(p0, vertices) {
-      return new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(vertices.x - p0.x, vertices.y - p0.y, vertices.z - p0.z).normalize();
+      return new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(vertices.x - p0.x, vertices.y - p0.y, vertices.z - p0.z).normalize();
     }
   }, {
     key: "onChange",
     value: function onChange(vertices) {
       if (vertices) this.Vertices = vertices;
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(this.Normal, this.Direction).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0).crossVectors(this.Normal, this.Direction).normalize();
       var pS = this.Center.position.clone().add(this.Direction.clone().multiplyScalar(Math.cos(this.AngleArc / 2) * this.Center.position.distanceTo(this.Vertices))).add(per.clone().multiplyScalar(-Math.sin(this.AngleArc / 2) * this.Center.position.distanceTo(this.Vertices)));
       this.Start.userData.setPosition(pS);
       this.End.userData.setPosition(LocationArc.getEndPointArc(this.Center.position, pS, this.Normal, this.AngleArc));
@@ -5439,34 +6415,34 @@ var LocationArc = /*#__PURE__*/function () {
   }, {
     key: "isConnectStart",
     value: function isConnectStart(sameNormals) {
-      return isConnected(sameNormals, this.arc, this.Start);
+      return (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.isConnected)(sameNormals, this.arc, this.Start);
     }
   }, {
     key: "isConnectEnd",
     value: function isConnectEnd(sameNormals) {
-      return isConnected(sameNormals, this.arc, this.End);
+      return (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.isConnected)(sameNormals, this.arc, this.End);
     }
   }], [{
     key: "initArc",
     value: function initArc(view, factor, p0, pS, normal, arc, angleArc) {
-      arc.userData.Type = _enum__WEBPACK_IMPORTED_MODULE_1__.CustomType.arc;
+      arc.userData.Type = _enum__WEBPACK_IMPORTED_MODULE_2__.CustomType.arc;
       arc.userData.Location = new LocationArc(view, factor, arc, normal, angleArc, p0, pS);
     }
   }, {
     key: "createTempArc",
     value: function createTempArc(p0, p, normal, angleArc) {
       var geometry = LocationArc.initGeometryArc(p0, p, normal, angleArc);
-      var arc = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
+      var arc = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_1__.customMaterial.normalLine);
       arc.geometry.computeBoundingBox();
       arc.geometry.computeBoundingSphere();
       arc.geometry.computeVertexNormals();
-      arc.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__.MeshBVH(arc.geometry);
+      arc.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_6__.MeshBVH(arc.geometry);
       arc.renderOrder = 1;
       arc.userData.Profile = true;
       arc.userData.Material = {
-        Normal: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine,
-        Select: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.selectLine,
-        Hover: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.hoverLine
+        Normal: _material__WEBPACK_IMPORTED_MODULE_1__.customMaterial.normalLine,
+        Select: _material__WEBPACK_IMPORTED_MODULE_1__.customMaterial.selectLine,
+        Hover: _material__WEBPACK_IMPORTED_MODULE_1__.customMaterial.hoverLine
       };
       return arc;
     }
@@ -5477,37 +6453,37 @@ var LocationArc = /*#__PURE__*/function () {
       arc.geometry.computeBoundingBox();
       arc.geometry.computeBoundingSphere();
       arc.geometry.computeVertexNormals();
-      arc.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__.MeshBVH(arc.geometry);
+      arc.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_6__.MeshBVH(arc.geometry);
     }
   }, {
     key: "initGeometryArc",
     value: function initGeometryArc(p0, p, normal, angleArc) {
       var curve = LocationArc.initCurveArc(p0, p, normal, angleArc);
-      var shape = (0,_enum__WEBPACK_IMPORTED_MODULE_1__.initShape)();
-      return new three__WEBPACK_IMPORTED_MODULE_4__.ExtrudeGeometry(shape, (0,_enum__WEBPACK_IMPORTED_MODULE_1__.extrudeSetting)(curve));
+      var shape = (0,_enum__WEBPACK_IMPORTED_MODULE_2__.initShape)();
+      return new three__WEBPACK_IMPORTED_MODULE_5__.ExtrudeGeometry(shape, (0,_enum__WEBPACK_IMPORTED_MODULE_2__.extrudeSetting)(curve));
     }
   }, {
     key: "initCurveArc",
     value: function initCurveArc(p0, p, normal, angleArc) {
       var r = p0.distanceTo(p);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p.x - p0.x, p.y - p0.y, p.z - p0.z).normalize();
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+      var dir = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(p.x - p0.x, p.y - p0.y, p.z - p0.z).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
       var points = [];
       points.push(p);
-      var angle0 = angleArc / (_enum__WEBPACK_IMPORTED_MODULE_1__.MAX_CIRCLE / 2);
+      var angle0 = angleArc / (_enum__WEBPACK_IMPORTED_MODULE_2__.MAX_CIRCLE / 2);
 
-      for (var i = 0; i < _enum__WEBPACK_IMPORTED_MODULE_1__.MAX_CIRCLE / 2; i++) {
+      for (var i = 0; i < _enum__WEBPACK_IMPORTED_MODULE_2__.MAX_CIRCLE / 2; i++) {
         var angle = (i + 1) * angle0;
         var sin = Math.sin(angle);
         var cos = Math.cos(angle);
         points.push(p0.clone().add(dir.clone().multiplyScalar(cos * r)).add(per.clone().multiplyScalar(sin * r)));
       }
 
-      var curves = new three__WEBPACK_IMPORTED_MODULE_4__.CurvePath();
+      var curves = new three__WEBPACK_IMPORTED_MODULE_5__.CurvePath();
 
       for (var _i = 0; _i < points.length; _i++) {
         if (_i < points.length - 1) {
-          curves.add(new three__WEBPACK_IMPORTED_MODULE_4__.LineCurve3(points[_i], points[_i + 1]));
+          curves.add(new three__WEBPACK_IMPORTED_MODULE_5__.LineCurve3(points[_i], points[_i + 1]));
         }
       }
 
@@ -5517,8 +6493,8 @@ var LocationArc = /*#__PURE__*/function () {
     key: "getEndPointArc",
     value: function getEndPointArc(p0, p, normal, angleArc) {
       var r = p0.distanceTo(p);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p.x - p0.x, p.y - p0.y, p.z - p0.z).normalize();
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+      var dir = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(p.x - p0.x, p.y - p0.y, p.z - p0.z).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
       var sin = Math.sin(angleArc);
       var cos = Math.cos(angleArc);
       return p0.clone().add(dir.clone().multiplyScalar(cos * r)).add(per.clone().multiplyScalar(sin * r));
@@ -5532,13 +6508,13 @@ var LocationArc = /*#__PURE__*/function () {
       input.addEventListener("change", function (e) {
         onChangeDimension(e, factor);
       }, false);
-      var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__.CSS2DObject(input);
-      var p = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(p0, vertices);
+      var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_0__.CSS2DObject(input);
+      var p = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getMiddlePoint)(p0, vertices);
       label.position.set(p.x, p.y, p.z);
-      var points = createPointGeometryArcDimension(p0, vertices, normal);
-      var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(points);
-      var edges = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
-      var segment = new three__WEBPACK_IMPORTED_MODULE_4__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
+      var points = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryArcDimension)(p0, vertices, normal);
+      var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry().setFromPoints(points);
+      var edges = new three__WEBPACK_IMPORTED_MODULE_5__.EdgesGeometry(geometry);
+      var segment = new three__WEBPACK_IMPORTED_MODULE_5__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_1__.customMaterial.normalLine);
 
       segment.userData.visLabel = function (visible) {
         if (visible) {
@@ -5549,11 +6525,11 @@ var LocationArc = /*#__PURE__*/function () {
       };
 
       segment.userData.onChange = function (p0, vertices, normal) {
-        var p = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(p0, vertices);
+        var p = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getMiddlePoint)(p0, vertices);
         label.position.set(p.x, p.y, p.z);
-        var points = createPointGeometryArcDimension(p0, vertices, normal);
-        var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(points);
-        segment.geometry = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
+        var points = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryArcDimension)(p0, vertices, normal);
+        var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry().setFromPoints(points);
+        segment.geometry = new three__WEBPACK_IMPORTED_MODULE_5__.EdgesGeometry(geometry);
       };
 
       segment.userData.visibility = function (scene, visible) {
@@ -5593,17 +6569,17 @@ var LocationArc = /*#__PURE__*/function () {
       input.className = "angle";
       input.value = Math.round(angleArc * 180 / Math.PI * 1000) / 1000;
       input.addEventListener("change", onChangeAngleDimension, false);
-      var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__.CSS2DObject(input);
+      var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_0__.CSS2DObject(input);
       label.position.set(p0.x, p0.y, p0.z);
-      var points = createPointGeometryArcDimension(p0, p1, normal);
+      var points = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryArcDimension)(p0, p1, normal);
       var r = p0.distanceTo(p1);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+      var dir = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
+      var per = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
       var p2 = p0.clone().add(dir.clone().multiplyScalar(Math.cos(angleArc) * r)).add(per.clone().multiplyScalar(Math.sin(angleArc) * r));
-      points = points.concat(createPointGeometryArcDimension(p0, p2, normal));
-      var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(points);
-      var edges = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
-      var segment = new three__WEBPACK_IMPORTED_MODULE_4__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
+      points = points.concat((0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryArcDimension)(p0, p2, normal));
+      var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry().setFromPoints(points);
+      var edges = new three__WEBPACK_IMPORTED_MODULE_5__.EdgesGeometry(geometry);
+      var segment = new three__WEBPACK_IMPORTED_MODULE_5__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_1__.customMaterial.normalLine);
 
       segment.userData.visLabel = function (visible) {
         if (visible) {
@@ -5614,14 +6590,14 @@ var LocationArc = /*#__PURE__*/function () {
       };
 
       segment.userData.onChange = function (p0, p1, normal, angleArc) {
-        var points = createPointGeometryArcDimension(p0, p1, normal);
+        var points = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryArcDimension)(p0, p1, normal);
         var r = p0.distanceTo(p1);
-        var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
-        var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+        var dir = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z).normalize();
+        var per = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
         var p2 = p0.clone().add(dir.clone().multiplyScalar(Math.cos(angleArc) * r)).add(per.clone().multiplyScalar(Math.sin(angleArc) * r));
-        points = points.concat(createPointGeometryArcDimension(p0, p2, normal));
-        var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry().setFromPoints(points);
-        segment.geometry = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
+        points = points.concat((0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryArcDimension)(p0, p2, normal));
+        var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry().setFromPoints(points);
+        segment.geometry = new three__WEBPACK_IMPORTED_MODULE_5__.EdgesGeometry(geometry);
       };
 
       segment.userData.visibility = function (scene, visible) {
@@ -5653,6 +6629,544 @@ var LocationArc = /*#__PURE__*/function () {
 
   return LocationArc;
 }();
+
+/***/ }),
+
+/***/ "./src/doc/utils/Location/LocationLine.js":
+/*!************************************************!*\
+  !*** ./src/doc/utils/Location/LocationLine.js ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LocationLine": () => (/* binding */ LocationLine)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../material */ "./src/doc/material/index.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../snap */ "./src/doc/utils/snap.js");
+/* harmony import */ var three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three/examples/jsm/renderers/CSS2DRenderer */ "./node_modules/three/examples/jsm/renderers/CSS2DRenderer.js");
+/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
+/* harmony import */ var _LocationUtils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LocationUtils */ "./src/doc/utils/Location/LocationUtils.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+
+
+
+
+
+var LocationLine = /*#__PURE__*/function () {
+  function LocationLine(view, factor, line, pS, pE, normal) {
+    _classCallCheck(this, LocationLine);
+
+    this.line = line;
+    this.Direction = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
+    this.Start = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPoint)(pS, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.endPoint);
+    this.Mid = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPoint)((0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE), _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.middle);
+    this.End = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPoint)(pE, _enum__WEBPACK_IMPORTED_MODULE_1__.CSS.endPoint);
+    this.Normal = normal;
+    this.Curves = new three__WEBPACK_IMPORTED_MODULE_5__.LineCurve3(pS, pE);
+    this.Dimension = LocationLine.createDimension(view, factor, this.line, (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE), pS, pE, this.Normal);
+  }
+
+  _createClass(LocationLine, [{
+    key: "onChange",
+    value: function onChange(pS, pE) {
+      this.Start.userData.setPosition(pS);
+      this.Mid.userData.setPosition((0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE));
+      this.End.userData.setPosition(pE);
+      this.Curves = new three__WEBPACK_IMPORTED_MODULE_5__.LineCurve3(pS, pE);
+      LocationLine.updateTempLine(pS, pE, this.line);
+      this.Dimension.userData.onChange(pS, pE, this.Normal);
+    }
+  }, {
+    key: "remove",
+    value: function remove(scene) {
+      this.Start.userData.visibility(scene, false);
+      this.End.userData.visibility(scene, false);
+      this.Mid.userData.visibility(scene, false);
+      this.Dimension.userData.visibility(scene, false);
+    }
+  }, {
+    key: "isSelect",
+    value: function isSelect(scene, visible) {
+      this.Start.userData.visibility(scene, visible);
+      this.Mid.userData.visibility(scene, visible);
+      this.End.userData.visibility(scene, visible);
+      this.line.material = visible ? this.line.userData.Material.Select : this.line.userData.Material.Normal;
+    }
+  }, {
+    key: "isConnectStart",
+    value: function isConnectStart(sameNormals) {
+      return (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.isConnected)(sameNormals, this.line, this.Start);
+    }
+  }, {
+    key: "isConnectEnd",
+    value: function isConnectEnd(sameNormals) {
+      return (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.isConnected)(sameNormals, this.line, this.End);
+    }
+  }], [{
+    key: "initLine",
+    value: function initLine(view, factor, pS, pE, normal, line) {
+      line.userData.Type = _enum__WEBPACK_IMPORTED_MODULE_1__.CustomType.line;
+      line.userData.Location = new LocationLine(view, factor, line, pS, pE, normal);
+    }
+  }, {
+    key: "createTempLine",
+    value: function createTempLine(pS, pE) {
+      var geometry = LocationLine.initGeometryLine(pS, pE);
+      var line = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
+      line.geometry.computeBoundingBox();
+      line.geometry.computeBoundingSphere();
+      line.geometry.computeVertexNormals();
+      line.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_6__.MeshBVH(line.geometry);
+      line.renderOrder = 1;
+      line.userData.Profile = true;
+      line.userData.Material = {
+        Normal: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine,
+        Select: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.selectLine,
+        Hover: _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.hoverLine
+      };
+      return line;
+    }
+  }, {
+    key: "updateTempLine",
+    value: function updateTempLine(pS, pE, line) {
+      line.geometry = LocationLine.initGeometryLine(pS, pE);
+      line.geometry.computeBoundingBox();
+      line.geometry.computeBoundingSphere();
+      line.geometry.computeVertexNormals();
+      line.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_6__.MeshBVH(line.geometry);
+    }
+  }, {
+    key: "initGeometryLine",
+    value: function initGeometryLine(pS, pE) {
+      var curve = new three__WEBPACK_IMPORTED_MODULE_5__.LineCurve3(pS, pE);
+      var shape = (0,_enum__WEBPACK_IMPORTED_MODULE_1__.initShape)();
+      return new three__WEBPACK_IMPORTED_MODULE_5__.ExtrudeGeometry(shape, (0,_enum__WEBPACK_IMPORTED_MODULE_1__.extrudeSetting)(curve));
+    }
+  }, {
+    key: "createDimension",
+    value: function createDimension(view, factor, line, p, p1, p2, normal) {
+      var input = document.createElement("input");
+      input.className = "dimension";
+      input.value = Math.round(p1.distanceTo(p2) / factor * 1000) / 1000;
+      input.addEventListener("change", function (e) {
+        onChangeDimension(e, factor);
+      }, false);
+      var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__.CSS2DObject(input);
+      label.position.set(p.x, p.y, p.z);
+      var points = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryDimension)(p1, p2, normal);
+      var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry().setFromPoints(points);
+      var edges = new three__WEBPACK_IMPORTED_MODULE_5__.EdgesGeometry(geometry);
+      var segment = new three__WEBPACK_IMPORTED_MODULE_5__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
+
+      segment.userData.visLabel = function (visible) {
+        if (visible) {
+          segment.add(label);
+        } else {
+          label.removeFromParent();
+        }
+      };
+
+      segment.userData.onChange = function (pS, pE, normal) {
+        var pM = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getMiddlePoint)(pS, pE);
+        label.position.set(pM.x, pM.y, pM.z);
+        var points = (0,_LocationUtils__WEBPACK_IMPORTED_MODULE_4__.createPointGeometryDimension)(pS, pE, normal);
+        var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry().setFromPoints(points);
+        segment.geometry = new three__WEBPACK_IMPORTED_MODULE_5__.EdgesGeometry(geometry);
+      };
+
+      segment.userData.visibility = function (scene, visible) {
+        segment.userData.visLabel(visible);
+
+        if (visible) {
+          scene.add(segment);
+        } else {
+          segment.removeFromParent();
+        }
+      };
+
+      segment.userData.visibility(view.scene, view.showDimension);
+
+      segment.userData.onChangeLabel = function (factor) {
+        input.value = input.value * (factor == 1.0 ? 0.001 : 1000);
+        input.addEventListener("change", function (e) {
+          onChangeDimension(e, factor);
+        }, false);
+      };
+
+      function onChangeDimension(e, factor) {
+        if (isNaN(parseFloat(e.target.value * 1.0))) return;
+        var dim = parseFloat(e.target.value * 1.0 * factor);
+        var pS = line.userData.Location.Start.position;
+        var dir = line.userData.Location.Direction;
+        var pE = pS.clone().add(dir.clone().multiplyScalar(dim));
+        line.userData.Location.onChange(pS, pE);
+      }
+
+      return segment;
+    }
+  }]);
+
+  return LocationLine;
+}();
+
+/***/ }),
+
+/***/ "./src/doc/utils/Location/LocationUtils.js":
+/*!*************************************************!*\
+  !*** ./src/doc/utils/Location/LocationUtils.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createPoint": () => (/* binding */ createPoint),
+/* harmony export */   "createPointGeometryArcDimension": () => (/* binding */ createPointGeometryArcDimension),
+/* harmony export */   "createPointGeometryDimension": () => (/* binding */ createPointGeometryDimension),
+/* harmony export */   "isConnected": () => (/* binding */ isConnected)
+/* harmony export */ });
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three/examples/jsm/renderers/CSS2DRenderer */ "./node_modules/three/examples/jsm/renderers/CSS2DRenderer.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../material */ "./src/doc/material/index.js");
+/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../snap */ "./src/doc/utils/snap.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+
+
+
+
+
+function isConnected(sameNormals, mesh, point) {
+  var dif = _toConsumableArray(sameNormals);
+
+  dif.splice(dif.indexOf(mesh), 1);
+  if (dif.length == sameNormals.length) return false;
+  var connect = [];
+
+  for (var j = 0; j < dif.length; j++) {
+    var disEnd1 = point.position.distanceTo(dif[j].userData.Location.Start.position);
+    var disEnd2 = point.position.distanceTo(dif[j].userData.Location.End.position);
+
+    if ((0,_snap__WEBPACK_IMPORTED_MODULE_3__.areEqual)(disEnd1, 0.0, 1e-6) || (0,_snap__WEBPACK_IMPORTED_MODULE_3__.areEqual)(disEnd2, 0.0, 1e-6)) {
+      connect.push(dif[j]);
+    }
+  }
+
+  return connect.length == 1;
+}
+function createPoint(p, css) {
+  var div = document.createElement("div");
+  div.className = css;
+  var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_1__.CSS2DObject(div); // label.position.set(p.x, p.y, p.z);
+
+  var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.SphereGeometry(_enum__WEBPACK_IMPORTED_MODULE_0__.DiaP / 2, 32, 16);
+  var point = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_2__.customMaterial.pointNormal);
+  point.position.set(p.x, p.y, p.z);
+  point.userData.Type = _enum__WEBPACK_IMPORTED_MODULE_0__.CustomType.point;
+
+  point.userData.visLabel = function (visible) {
+    if (visible) {
+      point.add(label);
+    } else {
+      label.removeFromParent();
+    }
+  };
+
+  point.userData.setPosition = function (pS) {
+    point.position.set(pS.x, pS.y, pS.z);
+  };
+
+  point.userData.visibility = function (scene, visible) {
+    point.userData.visLabel(visible);
+
+    if (visible) {
+      scene.add(point);
+    } else {
+      point.removeFromParent();
+    }
+  };
+
+  return point;
+}
+function createPointGeometryDimension(pS, pE, normal) {
+  var points = [];
+  var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
+  var nDir = dir.clone().negate();
+  var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+  var voS = pS.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM));
+  var voE = pE.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM));
+  var v1 = pS.clone().add(nDir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2));
+  var v2 = pS.clone().add(dir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2));
+  var v3 = v2.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_0__.EXTEND_DIM));
+  var v4 = v1.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_0__.EXTEND_DIM));
+  points.push(v1);
+  points.push(v2);
+  points.push(v3);
+  points.push(v1);
+  points.push(v3);
+  points.push(v4);
+  var v5 = pE.clone().add(nDir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2));
+  var v6 = pE.clone().add(dir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2));
+  var v7 = v6.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_0__.EXTEND_DIM));
+  var v8 = v5.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_0__.EXTEND_DIM));
+  points.push(v5);
+  points.push(v6);
+  points.push(v7);
+  points.push(v5);
+  points.push(v7);
+  points.push(v8);
+  var v9 = voS.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2)).add(nDir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.EXTEND_DIM));
+  var v10 = v9.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH));
+  var v11 = voE.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2)).add(dir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.EXTEND_DIM));
+  var v12 = v11.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH));
+  points.push(v9);
+  points.push(v10);
+  points.push(v12);
+  points.push(v9);
+  points.push(v12);
+  points.push(v11);
+  return points;
+}
+function createPointGeometryArcDimension(pS, pE, normal) {
+  var points = [];
+  var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
+  var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
+  var v1 = pS.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2));
+  var v2 = pS.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2));
+  var v3 = pE.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2));
+  var v4 = pE.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_0__.DIM_WIDTH / 2));
+  points.push(v1);
+  points.push(v2);
+  points.push(v3);
+  points.push(v1);
+  points.push(v3);
+  points.push(v4);
+  return points;
+}
+
+/***/ }),
+
+/***/ "./src/doc/utils/Location/index.js":
+/*!*****************************************!*\
+  !*** ./src/doc/utils/Location/index.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "LocationArc": () => (/* reexport safe */ _LocationArc__WEBPACK_IMPORTED_MODULE_0__.LocationArc),
+/* harmony export */   "LocationLine": () => (/* reexport safe */ _LocationLine__WEBPACK_IMPORTED_MODULE_1__.LocationLine),
+/* harmony export */   "createPoint": () => (/* reexport safe */ _LocationUtils__WEBPACK_IMPORTED_MODULE_2__.createPoint),
+/* harmony export */   "createPointGeometryArcDimension": () => (/* reexport safe */ _LocationUtils__WEBPACK_IMPORTED_MODULE_2__.createPointGeometryArcDimension),
+/* harmony export */   "createPointGeometryDimension": () => (/* reexport safe */ _LocationUtils__WEBPACK_IMPORTED_MODULE_2__.createPointGeometryDimension),
+/* harmony export */   "isConnected": () => (/* reexport safe */ _LocationUtils__WEBPACK_IMPORTED_MODULE_2__.isConnected)
+/* harmony export */ });
+/* harmony import */ var _LocationArc__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LocationArc */ "./src/doc/utils/Location/LocationArc.js");
+/* harmony import */ var _LocationLine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LocationLine */ "./src/doc/utils/Location/LocationLine.js");
+/* harmony import */ var _LocationUtils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./LocationUtils */ "./src/doc/utils/Location/LocationUtils.js");
+
+
+
+
+/***/ }),
+
+/***/ "./src/doc/utils/ProfileModel/InterSectCurve.js":
+/*!******************************************************!*\
+  !*** ./src/doc/utils/ProfileModel/InterSectCurve.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "INTERSECT_TYPE": () => (/* binding */ INTERSECT_TYPE),
+/* harmony export */   "getDirection2Point": () => (/* binding */ getDirection2Point),
+/* harmony export */   "getDirectionLine": () => (/* binding */ getDirectionLine),
+/* harmony export */   "getIntersectPointCurve": () => (/* binding */ getIntersectPointCurve),
+/* harmony export */   "getIntersectTypeCurve": () => (/* binding */ getIntersectTypeCurve),
+/* harmony export */   "getIntersectTypeLineAndArc": () => (/* binding */ getIntersectTypeLineAndArc),
+/* harmony export */   "getIntersectTypeLines": () => (/* binding */ getIntersectTypeLines)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../snap */ "./src/doc/utils/snap.js");
+
+
+
+var INTERSECT_TYPE = {
+  dispose: "DISPOSE",
+  parallel: "PARALLEL",
+  equal: "EQUAL",
+  noneIntersect: "NONE_INTERSECT",
+  intersect: "INTERSECT"
+};
+function getIntersectTypeCurve(curve1, curve2) {
+  if (!curve1.userData.Type || !curve2.userData.Type) return INTERSECT_TYPE.dispose;
+  if (!curve1.userData.Location || !curve2.userData.Location) return INTERSECT_TYPE.dispose;
+  if (!(0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqualVector)(curve1.userData.Location.Normal, curve2.userData.Location.Normal)) return INTERSECT_TYPE.dispose;
+
+  if (curve1.userData.Type == _enum__WEBPACK_IMPORTED_MODULE_0__.CustomType.line) {
+    if (curve2.userData.Type == _enum__WEBPACK_IMPORTED_MODULE_0__.CustomType.line) {
+      return getIntersectTypeLines(curve1.userData.Location.Curves, curve2.userData.Location.Curves);
+    } else {
+      //curve1 line, curve 2 arc
+      return getIntersectTypeLineAndArc(curve1.userData.Location.Curves, curve2.userData.Location.Curves);
+    }
+  } else {
+    if (curve2.userData.Type == _enum__WEBPACK_IMPORTED_MODULE_0__.CustomType.line) {
+      //curve2 line, curve1 are
+      return getIntersectTypeLineAndArc(curve2.userData.Location.Curves, curve1.userData.Location.Curves);
+    } else {
+      // both arc
+      return getIntersectTypeArcAndArc(curve1.userData.Location.Curves, curve2.userData.Location.Curves);
+    }
+  }
+} // l1 = curve1.userData.Location.Curves
+// l2 = curve2.userData.Location.Curves
+
+function getDirectionLine(line) {
+  return new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(line.v2.x - line.v1.x, line.v2.y - line.v1.y, line.v2.z - line.v1.z).normalize();
+}
+function getDirection2Point(p1, p2) {
+  return new three__WEBPACK_IMPORTED_MODULE_2__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
+}
+function getIntersectTypeLines(l1, l2) {
+  var v11 = l1.v1; //get start
+
+  var v12 = l1.v2; //get end
+
+  var v21 = l2.v1; //get start
+
+  var v22 = l2.v2; //get end
+
+  var dir1 = getDirectionLine(l1);
+  var dir2 = getDirectionLine(l2);
+  var angle = dir1.angleTo(dir2);
+
+  if ((0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(angle, 0, 1e-6) || (0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(angle, Math.PI, 1e-6)) {
+    if ((0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(v11.distanceTo(v21), 0, 1e-6) || (0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(v11.distanceTo(v22), 0, 1e-6) || (0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(v21.distanceTo(v12), 0, 1e-6) || (0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(v22.distanceTo(v12), 0, 1e-6)) {
+      return INTERSECT_TYPE.equal;
+    } else {
+      return INTERSECT_TYPE.parallel;
+    }
+  } else {
+    // get project point from v11 to (v21,v22)
+    var v11Prov2 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getProjectPointFrom3Point)(v21, v22, v11); // get project point from v12 to (v21,v22)
+
+    var v12Prov2 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getProjectPointFrom3Point)(v21, v22, v12); // get direction (v11Prov2 && v11)
+
+    var dirV11Prov2TpV11 = getDirection2Point(v11Prov2, v11); // get direction (v12Prov2 && v12)
+
+    var dirV12Prov2TpV12 = getDirection2Point(v12Prov2, v12);
+    var booleanSameWayL1ToL2 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(dirV11Prov2TpV11.angleTo(dirV12Prov2TpV12), 0, 1e-6); // get project point from v21 to (v11,v22)
+
+    var v21Prov1 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getProjectPointFrom3Point)(v11, v12, v21); // get project point from v22 to (v11,v22)
+
+    var v22Prov1 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getProjectPointFrom3Point)(v11, v12, v22); // get direction (v21Prov2 && v21)
+
+    var dirV21Prov2TpV21 = getDirection2Point(v21Prov1, v21); // get direction (v12Prov2 && v12)
+
+    var dirV22Prov2TpV22 = getDirection2Point(v22Prov1, v22);
+    var booleanSameWayL2ToL1 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(dirV21Prov2TpV21.angleTo(dirV22Prov2TpV22), 0, 1e-6);
+
+    if (!booleanSameWayL1ToL2 && !booleanSameWayL2ToL1) {
+      return INTERSECT_TYPE.intersect;
+    } else {
+      return INTERSECT_TYPE.noneIntersect;
+    }
+  }
+} // line = curve1.userData.Location.Curves
+// arc = curve2.userData.Location.Curves
+
+function getIntersectTypeLineAndArc(line, arc) {
+  var curvePaths = arc.curves;
+
+  for (var i = 0; i < curvePaths.length; i++) {
+    var intersect = getIntersectTypeLines(line, curvePaths[i]);
+    if (intersect != INTERSECT_TYPE.noneIntersect) return INTERSECT_TYPE.intersect;
+  }
+
+  return INTERSECT_TYPE.noneIntersect;
+}
+
+function getIntersectTypeArcAndArc(arc1, arc2) {
+  var curve1Paths = arc1.curves;
+  var curve2Paths = arc2.curves;
+
+  for (var i = 0; i < curve1Paths.length; i++) {
+    var line = curve1Paths[i];
+    return getIntersectTypeLineAndArc(line, curve2Paths);
+  }
+
+  return INTERSECT_TYPE.noneIntersect;
+}
+
+function getIntersectPointCurve(curve1, curve2) {}
+
+/***/ }),
+
+/***/ "./src/doc/utils/ProfileModel/ProfileModel.js":
+/*!****************************************************!*\
+  !*** ./src/doc/utils/ProfileModel/ProfileModel.js ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ProfileModel": () => (/* binding */ ProfileModel)
+/* harmony export */ });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../snap */ "./src/doc/utils/snap.js");
+/* harmony import */ var _InterSectCurve__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./InterSectCurve */ "./src/doc/utils/ProfileModel/InterSectCurve.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+
+
 var ProfileModel = /*#__PURE__*/function () {
   function ProfileModel() {
     _classCallCheck(this, ProfileModel);
@@ -5689,11 +7203,11 @@ var ProfileModel = /*#__PURE__*/function () {
 
       for (var i = 0; i < listProfile.length; i++) {
         if (listProfile[i].userData.Location.Curves) {
-          if (listProfile[i].userData.Type == _enum__WEBPACK_IMPORTED_MODULE_1__.CustomType.line) {
+          if (listProfile[i].userData.Type == _enum__WEBPACK_IMPORTED_MODULE_0__.CustomType.line) {
             curves.push(listProfile[i].userData.Location.Curves);
           }
 
-          if (listProfile[i].userData.Type == _enum__WEBPACK_IMPORTED_MODULE_1__.CustomType.arc) {
+          if (listProfile[i].userData.Type == _enum__WEBPACK_IMPORTED_MODULE_0__.CustomType.arc) {
             for (var j = 0; j < listProfile[i].userData.Location.Curves.curves.length; j++) {
               curves.push(listProfile[i].userData.Location.Curves.curves[j]);
             }
@@ -5716,131 +7230,126 @@ var ProfileModel = /*#__PURE__*/function () {
 
       points = points.filter(function (value, index, self) {
         return self.findIndex(function (p) {
-          return p.distanceTo(value) < _enum__WEBPACK_IMPORTED_MODULE_1__.ES;
+          return p.distanceTo(value) < _enum__WEBPACK_IMPORTED_MODULE_0__.ES;
         }) === index;
       });
       return points;
+    }
+  }, {
+    key: "getCenterOfListPoints",
+    value: function getCenterOfListPoints(listPoints) {
+      var x = listPoints.reduce(function (a, b) {
+        return a + b.x;
+      }, 0) / listPoints.length;
+      var y = listPoints.reduce(function (a, b) {
+        return a + b.y;
+      }, 0) / listPoints.length;
+      var z = listPoints.reduce(function (a, b) {
+        return a + b.z;
+      }, 0) / listPoints.length;
+      return new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(x, y, z);
+    }
+  }, {
+    key: "getClockWiseListPoints",
+    value: function getClockWiseListPoints(listPoints) {
+      var center = ProfileModel.getCenterOfListPoints(listPoints);
+      var plane = new three__WEBPACK_IMPORTED_MODULE_3__.Plane(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0), 0);
+      plane = plane.setFromCoplanarPoints(listPoints[0], listPoints[1], listPoints[2]);
+      var local = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getLocalVectorOnFace)(plane.normal);
+
+      var newListPoints = _toConsumableArray(listPoints);
+
+      var angles = newListPoints.map(function (point) {
+        var dis = point.distanceTo(center);
+        var dir = (0,_InterSectCurve__WEBPACK_IMPORTED_MODULE_2__.getDirection2Point)(center, point);
+        var z = dis * Math.cos(dir.angleTo(local.z));
+        var x = dis * Math.cos(dir.angleTo(local.x));
+        var angle = Math.atan2(z, x) * 180 / Math.PI; // return { x, y, z, angle: (Math.atan2(z - center.y, x - center.x) * 180) / Math.PI };
+
+        return {
+          point: point,
+          angle: angle
+        };
+      });
+      var pointsSorted = angles.sort(function (a, b) {
+        return a.angle - b.angle;
+      });
+      return pointsSorted.map(function (point) {
+        return point.point;
+      });
+    }
+  }, {
+    key: "conditionOnsideListPointsAnd2Point",
+    value: function conditionOnsideListPointsAnd2Point(list, p1, p2) {
+      var pro0 = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getProjectPointFrom3Point)(p1, p2, list[0]);
+      var dir0 = (0,_InterSectCurve__WEBPACK_IMPORTED_MODULE_2__.getDirection2Point)(list[0], pro0);
+
+      for (var i = 1; i < list.length; i++) {
+        var pro = (0,_snap__WEBPACK_IMPORTED_MODULE_1__.getProjectPointFrom3Point)(p1, p2, list[i]);
+        var dir = (0,_InterSectCurve__WEBPACK_IMPORTED_MODULE_2__.getDirection2Point)(list[i], pro);
+        if (!(0,_snap__WEBPACK_IMPORTED_MODULE_1__.areEqual)(dir.angleTo(dir0), 0, 1e-6)) return false;
+      }
+
+      return true;
+    }
+  }, {
+    key: "provePolygon",
+    value: function provePolygon(clockWiseListPoints) {
+      var _loop = function _loop(i) {
+        if (i === clockWiseListPoints.length - 1) {
+          list = _toConsumableArray(clockWiseListPoints).filter(function (p, index) {
+            return index !== i && index !== 0;
+          });
+          if (!ProfileModel.conditionOnsideListPointsAnd2Point(list, clockWiseListPoints[i], clockWiseListPoints[0])) return {
+            v: false
+          };
+        } else {
+          list = _toConsumableArray(clockWiseListPoints).filter(function (p, index) {
+            return index !== i && index !== i + 1;
+          });
+          if (!ProfileModel.conditionOnsideListPointsAnd2Point(list, clockWiseListPoints[i], clockWiseListPoints[i + 1])) return {
+            v: false
+          };
+        }
+      };
+
+      for (var i = 0; i < clockWiseListPoints.length; i++) {
+        var list;
+
+        var _ret = _loop(i);
+
+        if (_typeof(_ret) === "object") return _ret.v;
+      }
+
+      return true;
     }
   }]);
 
   return ProfileModel;
 }();
 
-function isConnected(sameNormals, mesh, point) {
-  var dif = _toConsumableArray(sameNormals);
+/***/ }),
 
-  dif.splice(dif.indexOf(mesh), 1);
-  if (dif.length == sameNormals.length) return false;
-  var connect = [];
+/***/ "./src/doc/utils/ProfileModel/index.js":
+/*!*********************************************!*\
+  !*** ./src/doc/utils/ProfileModel/index.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-  for (var j = 0; j < dif.length; j++) {
-    var disEnd1 = point.position.distanceTo(dif[j].userData.Location.Start.position);
-    var disEnd2 = point.position.distanceTo(dif[j].userData.Location.End.position);
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ProfileModel": () => (/* reexport safe */ _ProfileModel__WEBPACK_IMPORTED_MODULE_0__.ProfileModel)
+/* harmony export */ });
+/* harmony import */ var _ProfileModel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ProfileModel */ "./src/doc/utils/ProfileModel/ProfileModel.js");
 
-    if ((0,_snap__WEBPACK_IMPORTED_MODULE_2__.areEqual)(disEnd1, 0.0, 1e-6) || (0,_snap__WEBPACK_IMPORTED_MODULE_2__.areEqual)(disEnd2, 0.0, 1e-6)) {
-      connect.push(dif[j]);
-    }
-  }
-
-  return connect.length == 1;
-}
-
-function createPoint(p, css) {
-  var div = document.createElement("div");
-  div.className = css;
-  var label = new three_examples_jsm_renderers_CSS2DRenderer__WEBPACK_IMPORTED_MODULE_3__.CSS2DObject(div); // label.position.set(p.x, p.y, p.z);
-
-  var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.SphereGeometry(_enum__WEBPACK_IMPORTED_MODULE_1__.DiaP / 2, 32, 16);
-  var point = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.pointNormal);
-  point.position.set(p.x, p.y, p.z);
-  point.userData.Type = _enum__WEBPACK_IMPORTED_MODULE_1__.CustomType.point;
-
-  point.userData.visLabel = function (visible) {
-    if (visible) {
-      point.add(label);
-    } else {
-      label.removeFromParent();
-    }
-  };
-
-  point.userData.setPosition = function (pS) {
-    point.position.set(pS.x, pS.y, pS.z);
-  };
-
-  point.userData.visibility = function (scene, visible) {
-    point.userData.visLabel(visible);
-
-    if (visible) {
-      scene.add(point);
-    } else {
-      point.removeFromParent();
-    }
-  };
-
-  return point;
-}
-function createPointGeometryDimension(pS, pE, normal) {
-  var points = [];
-  var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
-  var nDir = dir.clone().negate();
-  var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
-  var voS = pS.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM));
-  var voE = pE.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM));
-  var v1 = pS.clone().add(nDir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2));
-  var v2 = pS.clone().add(dir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2));
-  var v3 = v2.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_1__.EXTEND_DIM));
-  var v4 = v1.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_1__.EXTEND_DIM));
-  points.push(v1);
-  points.push(v2);
-  points.push(v3);
-  points.push(v1);
-  points.push(v3);
-  points.push(v4);
-  var v5 = pE.clone().add(nDir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2));
-  var v6 = pE.clone().add(dir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2)).add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2));
-  var v7 = v6.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_1__.EXTEND_DIM));
-  var v8 = v5.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.OFFSET_DIM / 2 + _enum__WEBPACK_IMPORTED_MODULE_1__.EXTEND_DIM));
-  points.push(v5);
-  points.push(v6);
-  points.push(v7);
-  points.push(v5);
-  points.push(v7);
-  points.push(v8);
-  var v9 = voS.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2)).add(nDir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.EXTEND_DIM));
-  var v10 = v9.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH));
-  var v11 = voE.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2)).add(dir.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.EXTEND_DIM));
-  var v12 = v11.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH));
-  points.push(v9);
-  points.push(v10);
-  points.push(v12);
-  points.push(v9);
-  points.push(v12);
-  points.push(v11);
-  return points;
-}
-function createPointGeometryArcDimension(pS, pE, normal) {
-  var points = [];
-  var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pE.x - pS.x, pE.y - pS.y, pE.z - pS.z).normalize();
-  var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(normal, dir).normalize();
-  var v1 = pS.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2));
-  var v2 = pS.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2));
-  var v3 = pE.clone().add(per.clone().multiplyScalar(-_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2));
-  var v4 = pE.clone().add(per.clone().multiplyScalar(_enum__WEBPACK_IMPORTED_MODULE_1__.DIM_WIDTH / 2));
-  points.push(v1);
-  points.push(v2);
-  points.push(v3);
-  points.push(v1);
-  points.push(v3);
-  points.push(v4);
-  return points;
-}
 
 /***/ }),
 
-/***/ "./src/doc/modeling/cast.js":
-/*!**********************************!*\
-  !*** ./src/doc/modeling/cast.js ***!
-  \**********************************/
+/***/ "./src/doc/utils/cast.js":
+/*!*******************************!*\
+  !*** ./src/doc/utils/cast.js ***!
+  \*******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -5850,7 +7359,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "changeCursor": () => (/* binding */ changeCursor),
 /* harmony export */   "filterModel": () => (/* binding */ filterModel)
 /* harmony export */ });
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enum */ "./src/doc/utils/enum.js");
 
 var filterModel = {
   model: function model(scene) {
@@ -5903,1354 +7412,10 @@ function changeCursor() {
 
 /***/ }),
 
-/***/ "./src/doc/modeling/draft/drawPolyGon.js":
-/*!***********************************************!*\
-  !*** ./src/doc/modeling/draft/drawPolyGon.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawPolyGon": () => (/* binding */ drawPolyGon)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../material */ "./src/doc/material/index.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../snap */ "./src/doc/modeling/snap.js");
-/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return generator._invoke = function (innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; }(innerFn, self, context), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; this._invoke = function (method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); }; } function maybeInvokeDelegate(delegate, context) { var method = delegate.iterator[context.method]; if (undefined === method) { if (context.delegate = null, "throw" === context.method) { if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel; context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method"); } return ContinueSentinel; } var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) { if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; } return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, define(Gp, "constructor", GeneratorFunctionPrototype), define(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (object) { var keys = []; for (var key in object) { keys.push(key); } return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) { "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); } }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-
-
-
- // import { setPropertyPolyGon } from "../setProperty";
-
-
-
-function drawPolyGon(view, btn, callback) {
-  var count = 0;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_4__.Vector2();
-  var p0 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var points = [];
-  var plane;
-  var mesh = createPolyGonSlab(points, view);
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    btn.style.background = "none";
-    (0,_cast__WEBPACK_IMPORTED_MODULE_1__.changeCursor)()["default"](view.domElement);
-    mesh.removeFromParent();
-    mesh.userData.OutLine.removeFromParent();
-
-    if (keyCode == 27) {
-      callback(null);
-      return;
-    }
-
-    if (keyCode == 13) {
-      if (count <= 2) {
-        callback(null);
-        return;
-      } else {
-        points.push(p0);
-        var polyGon = createPolyGonSlab(points, view);
-        polyGon.geometry.computeBoundingBox();
-        polyGon.geometry.computeBoundingSphere();
-        polyGon.geometry.computeVertexNormals();
-        polyGon.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_5__.MeshBVH(polyGon.geometry);
-        callback(polyGon);
-      }
-    }
-  }
-
-  function onMouseDown(_x) {
-    return _onMouseDown.apply(this, arguments);
-  }
-
-  function _onMouseDown() {
-    _onMouseDown = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(e) {
-      var found, intersect, point;
-      return _regeneratorRuntime().wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              found = (0,_cast__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, view, _cast__WEBPACK_IMPORTED_MODULE_1__.filterModel.model(view.scene))[0];
-
-              if (count === 0) {
-                intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, found, null);
-                p0 = intersect.point;
-                plane = intersect.plane;
-                points.push(p0);
-              } else {
-                intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-                point = intersect.point;
-                points.push(point);
-              }
-
-              updatePolyGon(mesh, points);
-              count++;
-
-            case 4:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    }));
-    return _onMouseDown.apply(this, arguments);
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_1__.changeCursor)().crosshair(view.domElement);
-
-    if (count != 0) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p = intersect.point;
-      var newPoints = [].concat(points, [p, p0]);
-      updatePolyGon(mesh, newPoints);
-    }
-  }
-
-  draw();
-}
-
-function createPolyGonSlab(points, view) {
-  var positions = new Float32Array(_enum__WEBPACK_IMPORTED_MODULE_2__.MAX_POINTS * 3);
-
-  for (var i = 0; i < points.length - 1; i++) {
-    positions[i * 3] = points[i].x;
-    positions[i * 3 + 1] = points[i].y;
-    positions[i * 3 + 2] = points[i].z;
-  }
-
-  var geometry = new three__WEBPACK_IMPORTED_MODULE_4__.BufferGeometry();
-  geometry.setAttribute("position", new three__WEBPACK_IMPORTED_MODULE_4__.BufferAttribute(positions, 3));
-  geometry.setDrawRange(0, 3 * (points.length - 3));
-  var indices = [];
-
-  for (var _i = 0; _i < points.length - 3; _i++) {
-    indices.push(0);
-    indices.push(_i + 1);
-    indices.push(_i + 2);
-  }
-
-  geometry.setIndex(indices);
-  var mesh = new three__WEBPACK_IMPORTED_MODULE_4__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalModel);
-  var edges = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(geometry);
-  var line = new three__WEBPACK_IMPORTED_MODULE_4__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
-  view.scene.add(line);
-  view.scene.add(mesh);
-  setPropertyPolyGon(mesh, line);
-  return mesh;
-}
-
-function updatePolyGon(object, polyPoints) {
-  var corePositions = object.geometry.attributes.position.array;
-
-  for (var i = 0; i < polyPoints.length; i++) {
-    corePositions[i * 3] = polyPoints[i].x;
-    corePositions[i * 3 + 1] = polyPoints[i].y;
-    corePositions[i * 3 + 2] = polyPoints[i].z;
-  }
-
-  object.geometry.attributes.position.needsUpdate = true;
-  object.geometry.setDrawRange(0, 3 * (polyPoints.length - 2));
-  var indices = [];
-
-  for (var _i2 = 0; _i2 < polyPoints.length - 2; _i2++) {
-    indices.push(0);
-    indices.push(_i2 + 1);
-    indices.push(_i2 + 2);
-  }
-
-  object.geometry.setIndex(indices);
-  object.userData.OutLine.geometry = new three__WEBPACK_IMPORTED_MODULE_4__.EdgesGeometry(object.geometry);
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/draft/extrude.js":
-/*!*******************************************!*\
-  !*** ./src/doc/modeling/draft/extrude.js ***!
-  \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawExtrude": () => (/* binding */ drawExtrude)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../snap */ "./src/doc/modeling/snap.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../enum */ "./src/doc/modeling/enum.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-
-
-
-
-
-function drawExtrude(view, btn, callback) {
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2();
-  var extrude = false;
-  var plane = false;
-  var p0;
-  var pM;
-  var equalPoints = [];
-  var equalIndex = [];
-  var perPoints = [];
-  var perIndex = [];
-  var notEqualPoints = [];
-  var mesh;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("mousedown", onMouseDown, false);
-    view.domElement.addEventListener("mouseup", onMouseUp, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27 || keyCode == 13) {
-      finishCallBack();
-    }
-  }
-
-  function onMouseDown(e) {
-    var found = (0,_cast__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, view, _cast__WEBPACK_IMPORTED_MODULE_1__.filterModel.model(view.scene))[0];
-
-    if (found) {
-      if (!plane) plane = new three__WEBPACK_IMPORTED_MODULE_3__.Plane(new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 1, 0), 0);
-      plane = plane.setFromNormalAndCoplanarPoint(found.face.normal, found.point);
-      p0 = found.point;
-      var fromFace = (0,_snap__WEBPACK_IMPORTED_MODULE_0__.findPointFromFace)(found.object, plane);
-      equalPoints = fromFace.equalPoints;
-      equalIndex = fromFace.equalIndex;
-      perPoints = fromFace.perPoints;
-      perIndex = fromFace.perIndex;
-      notEqualPoints = fromFace.notEqualPoints;
-      mesh = found.object;
-      console.log(equalPoints);
-    } else {
-      plane = null;
-      equalPoints = [];
-      equalIndex = [];
-      perPoints = [];
-      perIndex = [];
-      notEqualPoints = [];
-      mesh = null;
-    }
-
-    extrude = true;
-  }
-
-  function onMouseUp(e) {
-    extrude = false;
-    plane = null;
-    p0 = null;
-    equalPoints = [];
-    equalIndex = [];
-    perPoints = [];
-    perIndex = [];
-    notEqualPoints = [];
-
-    if (mesh) {
-      mesh.userData.isExtrude = true;
-    }
-
-    view.controls.mouseButtons.LEFT = 0;
-  }
-
-  function onMouseMove(e) {
-    var found = (0,_cast__WEBPACK_IMPORTED_MODULE_1__.castElement)(e, view, _cast__WEBPACK_IMPORTED_MODULE_1__.filterModel.model(view.scene))[0];
-
-    if (found) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_1__.changeCursor)().extrude(view.domElement);
-    } else {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_1__.changeCursor)()["default"](view.domElement);
-    }
-
-    view.controls.enabled = plane == null;
-
-    if (extrude && plane) {
-      pM = (0,_snap__WEBPACK_IMPORTED_MODULE_0__.intersectPointOriginPlane)(e, mouse, view, plane, p0);
-      var dis = plane.distanceToPoint(pM);
-      staticExtrude(dis);
-    }
-  }
-
-  function staticExtrude(dis) {
-    if (equalPoints.length > 0 && mesh) {
-      if (!mesh.userData.isExtrude) {
-        var newEqualPoints = equalPoints.filter(function (value, index, self) {
-          return self.findIndex(function (m) {
-            return m.distanceTo(value) < _enum__WEBPACK_IMPORTED_MODULE_2__.ES;
-          }) === index;
-        });
-        var newPoints = offsetPointFromFace(newEqualPoints, dis, plane.normal, false);
-        mesh.geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(newPoints);
-      } else {
-        var newPoints = offsetPointFromFace(equalPoints, dis, plane.normal, true);
-
-        if (perPoints.length == equalPoints.length * 2) {
-          var newPerPoints = offsetPointFromFace(perPoints, dis, plane.normal, true);
-          updateVerticesExtrude(mesh, equalIndex, perIndex, newPoints, newPerPoints);
-        } else {
-          console.log(equalPoints.length);
-          var addNewPoints = getAddNewPoints(equalPoints, notEqualPoints, newPoints);
-          mesh.geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(addNewPoints);
-        }
-      }
-
-      mesh.geometry.computeBoundingBox();
-      mesh.geometry.computeBoundingSphere();
-      mesh.geometry.computeVertexNormals();
-      mesh.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__.MeshBVH(mesh.geometry);
-      mesh.userData.OutLine.geometry = new three__WEBPACK_IMPORTED_MODULE_3__.EdgesGeometry(mesh.geometry);
-    }
-  }
-
-  function finishCallBack() {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_1__.changeCursor)()["default"](view.domElement);
-    view.controls.enabled = true;
-    btn.style.background = "none";
-    view.domElement.removeEventListener("mousedown", onMouseDown);
-    view.domElement.removeEventListener("mouseup", onMouseUp);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback();
-  }
-
-  draw();
-}
-
-function getAddNewPoints(equalPoints, notEqualPoints, newPoints) {
-  var p0 = _toConsumableArray(equalPoints);
-
-  var pN = _toConsumableArray(newPoints);
-
-  p0 = p0.filter(function (value, index, self) {
-    return self.findIndex(function (m) {
-      return m.distanceTo(value) < _enum__WEBPACK_IMPORTED_MODULE_2__.ES;
-    }) === index;
-  });
-  pN = pN.filter(function (value, index, self) {
-    return self.findIndex(function (m) {
-      return m.distanceTo(value) < _enum__WEBPACK_IMPORTED_MODULE_2__.ES;
-    }) === index;
-  });
-
-  var ps = _toConsumableArray(notEqualPoints);
-
-  for (var i = 0; i < p0.length; i++) {
-    if (i == p0.length - 1) {
-      ps.push(p0[i]);
-      ps.push(p0[0]);
-      ps.push(pN[0]);
-      ps.push(p0[i]);
-      ps.push(pN[0]);
-      ps.push(pN[i]);
-    } else {
-      ps.push(p0[i]);
-      ps.push(p0[i + 1]);
-      ps.push(pN[i + 1]);
-      ps.push(p0[i]);
-      ps.push(pN[i + 1]);
-      ps.push(pN[i]);
-    }
-  }
-
-  return ps;
-}
-
-function offsetPointFromFace(points, dis, normal, isExtrude) {
-  var ps = [];
-  var newPs = [];
-
-  for (var i = 0; i < points.length; i++) {
-    newPs.push(points[i].clone().add(normal.clone().multiplyScalar(dis)));
-  }
-
-  if (isExtrude) {
-    return newPs;
-  } else {
-    for (var _i = 0; _i < points.length - 2; _i++) {
-      ps.push(points[0]);
-      ps.push(points[_i + 1]);
-      ps.push(points[_i + 2]);
-    }
-
-    for (var _i2 = 0; _i2 < newPs.length - 2; _i2++) {
-      ps.push(newPs[0]);
-      ps.push(newPs[_i2 + 1]);
-      ps.push(newPs[_i2 + 2]);
-    }
-
-    for (var _i3 = 0; _i3 < points.length; _i3++) {
-      if (_i3 == points.length - 1) {
-        ps.push(points[_i3]);
-        ps.push(points[0]);
-        ps.push(newPs[0]);
-        ps.push(points[_i3]);
-        ps.push(newPs[0]);
-        ps.push(newPs[_i3]);
-      } else {
-        ps.push(points[_i3]);
-        ps.push(points[_i3 + 1]);
-        ps.push(newPs[_i3 + 1]);
-        ps.push(points[_i3]);
-        ps.push(newPs[_i3 + 1]);
-        ps.push(newPs[_i3]);
-      }
-    }
-  }
-
-  return ps;
-}
-
-function updateVerticesExtrude(mesh, equalIndex, perIndex, newPoints, newPerPoints) {
-  var pos0 = mesh.geometry.attributes.position;
-
-  for (var i = 0; i < equalIndex.length; i++) {
-    pos0.setX(equalIndex[i], newPoints[i].x);
-    pos0.setY(equalIndex[i], newPoints[i].y);
-    pos0.setZ(equalIndex[i], newPoints[i].z);
-  }
-
-  for (var _i4 = 0; _i4 < perIndex.length; _i4++) {
-    pos0.setX(perIndex[_i4], newPerPoints[_i4].x);
-    pos0.setY(perIndex[_i4], newPerPoints[_i4].y);
-    pos0.setZ(perIndex[_i4], newPerPoints[_i4].z);
-  }
-
-  mesh.geometry.attributes.position.needsUpdate = true;
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/drawArc.js":
-/*!*************************************!*\
-  !*** ./src/doc/modeling/drawArc.js ***!
-  \*************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawArc": () => (/* binding */ drawArc)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-
-
-
-
-
-function drawArc(view, unit, btn, workPlane, callback) {
-  var plane = workPlane.plane;
-  var factor = unit.factor;
-  var count = 0;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_4__.Vector2();
-  var p1 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p2 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p3 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var arc, snap;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27) {
-      count = 0;
-
-      if (arc) {
-        arc.removeFromParent();
-      }
-
-      finishCallBack([]);
-    }
-  }
-
-  function onMouseDown(e) {
-    if (count == 0) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p1 = intersect.point;
-      if (snap) p1 = snap;
-    }
-
-    if (count == 1) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-    }
-
-    if (count == 2) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p3 = intersect.point;
-      if (snap) p3 = snap;
-      var pro = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getProjectPointFrom3Point)(p1, p2, p3);
-      var d0 = p1.distanceTo(p2);
-      var d1 = p3.distanceTo(pro);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(plane.normal, dir).normalize();
-      var v0 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pro.x - p3.x, pro.y - p3.y, pro.z - p3.z).normalize();
-      var mid = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getMiddlePoint)(p1, p2);
-      var d2 = Math.sqrt(d1 * d1 + d0 * d0 / 4);
-      var d3 = d2 * d2 / (2 * d1) - d1;
-      var p0, angleArc;
-
-      if (d1 > d0 / 2) {
-        p0 = mid.add(v0.clone().multiplyScalar(-Math.abs(d3)));
-        angleArc = 2 * Math.PI - 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
-      } else {
-        p0 = mid.add(v0.clone().multiplyScalar(Math.abs(d3)));
-        angleArc = 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
-      }
-
-      var pS = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.areEqual)(v0.angleTo(per), 0.0, 1e-6) ? p1 : p2;
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.initArc(view, factor, p0, pS, plane.normal, arc, angleArc);
-    }
-
-    count++;
-
-    if (count == 3) {
-      finishCallBack([arc]);
-    }
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
-    var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-    var p = intersect.point;
-    snap = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.snapPoint)(workPlane, view, p);
-
-    if (count == 1) {
-      p2 = intersect.point;
-      var dis = p1.distanceTo(p2);
-
-      if (view.isOrthoLine) {
-        var local = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getLocalVectorOnFace)(plane.normal);
-        var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
-        var angleZ = dir.angleTo(local.z);
-        var angleX = dir.angleTo(local.x);
-
-        if (angleZ < Math.PI / 4 || angleZ > Math.PI * 3 / 4) {
-          p2 = p1.clone().add(local.z.normalize().multiplyScalar(Math.cos(angleZ) * dis));
-        } else {
-          p2 = p1.clone().add(local.x.normalize().multiplyScalar(Math.cos(angleX) * dis));
-        }
-      }
-
-      if (snap) p2 = snap;
-
-      if (!arc) {
-        arc = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(p1, p2);
-        view.scene.add(arc);
-      } else {
-        _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.updateTempLine(p1, p2, arc);
-      }
-    }
-
-    if (count == 2) {
-      p3 = intersect.point;
-      if (snap) p3 = snap;
-      var pro = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getProjectPointFrom3Point)(p1, p2, p3);
-      var d0 = p1.distanceTo(p2);
-      var d1 = p3.distanceTo(pro);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
-      var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(plane.normal, dir).normalize();
-
-      if (d1 > d0 * 0.1) {
-        var v0 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(pro.x - p3.x, pro.y - p3.y, pro.z - p3.z).normalize();
-        var mid = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getMiddlePoint)(p1, p2);
-        var d2 = Math.sqrt(d1 * d1 + d0 * d0 / 4);
-        var d3 = d2 * d2 / (2 * d1) - d1;
-        var p0, angleArc;
-
-        if (d1 > d0 / 2) {
-          p0 = mid.add(v0.clone().multiplyScalar(-Math.abs(d3)));
-          angleArc = 2 * Math.PI - 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
-        } else {
-          p0 = mid.add(v0.clone().multiplyScalar(Math.abs(d3)));
-          angleArc = 2 * Math.atan(d0 * 0.5 / Math.abs(d3));
-        }
-
-        var pS = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.areEqual)(v0.angleTo(per), 0.0, 1e-6) ? p1 : p2;
-        _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.updateTempArc(p0, pS, plane.normal, arc, angleArc);
-      }
-    }
-
-    if (count == 3) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-      view.domElement.removeEventListener("mousemove", onMouseMove);
-    }
-  }
-
-  function finishCallBack(list) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback(list);
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/drawCircle.js":
-/*!****************************************!*\
-  !*** ./src/doc/modeling/drawCircle.js ***!
-  \****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawCircle": () => (/* binding */ drawCircle)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-
-
-
-
-
-function drawCircle(view, unit, btn, workPlane, callback) {
-  var plane = workPlane.plane;
-  var factor = unit.factor;
-  var count = 2;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_4__.Vector2();
-  var p1 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p2 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p3 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var arc1, arc2, snap;
-  var angleArc = Math.PI;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27) {
-      count = 0;
-
-      if (arc1 && arc2) {
-        arc1.removeFromParent();
-        arc2.removeFromParent();
-      }
-
-      finishCallBack([]);
-    }
-  }
-
-  function onMouseDown(e) {
-    if (count == 2) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p1 = intersect.point;
-      if (snap) p1 = snap;
-    }
-
-    if (count == 1) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-      var dis = p1.distanceTo(p2);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
-      p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
-    }
-
-    count--;
-
-    if (count == 0) {
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.initArc(view, factor, p1, p2, plane.normal, arc1, angleArc);
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.initArc(view, factor, p1, p3, plane.normal, arc2, angleArc);
-      finishCallBack([arc1, arc2]);
-    }
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
-    var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-    var p = intersect.point;
-    snap = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.snapPoint)(workPlane, view, p);
-
-    if (count == 1) {
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-      var dis = p1.distanceTo(p2);
-      var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
-      p3 = p1.clone().add(dir.clone().multiplyScalar(-dis));
-
-      if (dis > _enum__WEBPACK_IMPORTED_MODULE_1__.MIN_DIS) {
-        if (!arc1 && !arc2) {
-          arc1 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.createTempArc(p1, p2, plane.normal, angleArc);
-          arc2 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.createTempArc(p1, p3, plane.normal, angleArc);
-          view.scene.add(arc1);
-          view.scene.add(arc2);
-        } else {
-          _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.updateTempArc(p1, p2, plane.normal, arc1, angleArc);
-          _Location__WEBPACK_IMPORTED_MODULE_2__.LocationArc.updateTempArc(p1, p3, plane.normal, arc2, angleArc);
-        }
-      }
-    }
-
-    if (count == 0) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-      view.domElement.removeEventListener("mousemove", onMouseMove);
-    }
-  }
-
-  function finishCallBack(list) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback(list);
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/drawLine.js":
-/*!**************************************!*\
-  !*** ./src/doc/modeling/drawLine.js ***!
-  \**************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawLine": () => (/* binding */ drawLine)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-
-
-
-
-function drawLine(view, unit, btn, workPlane, callback) {
-  var plane = workPlane.plane;
-  var factor = unit.factor;
-  var count = 2;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2();
-  var p1 = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3();
-  var p2 = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3();
-  var line, snap;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27) {
-      count = 0;
-
-      if (line) {
-        line.removeFromParent();
-      }
-
-      finishCallBack([]);
-    }
-  }
-
-  function onMouseDown(e) {
-    if (count == 2) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.intersectPointPlane)(e, mouse, view, null, plane);
-      p1 = intersect.point;
-      if (snap) p1 = snap;
-    }
-
-    if (count == 1) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.intersectPointPlane)(e, mouse, view, null, plane);
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-    }
-
-    count--;
-
-    if (count == 0) {
-      _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
-      finishCallBack([line]);
-    }
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
-    var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.intersectPointPlane)(e, mouse, view, null, plane);
-    var p = intersect.point;
-    snap = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.snapPoint)(workPlane, view, p);
-
-    if (count == 1) {
-      p2 = intersect.point;
-      var dis = p1.distanceTo(p2);
-
-      if (view.isOrthoLine) {
-        var local = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.getLocalVectorOnFace)(plane.normal);
-        var dir = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
-        var angleZ = dir.angleTo(local.z);
-        var angleX = dir.angleTo(local.x);
-
-        if (angleZ < Math.PI / 4 || angleZ > Math.PI * 3 / 4) {
-          p2 = p1.clone().add(local.z.normalize().multiplyScalar(Math.cos(angleZ) * dis));
-        } else {
-          p2 = p1.clone().add(local.x.normalize().multiplyScalar(Math.cos(angleX) * dis));
-        }
-      }
-
-      if (snap) p2 = snap;
-
-      if (!line) {
-        line = _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.createTempLine(p1, p2);
-        view.scene.add(line);
-      } else {
-        _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.updateTempLine(p1, p2, line);
-      }
-    }
-
-    if (count == 0) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-      view.domElement.removeEventListener("mousemove", onMouseMove);
-    }
-  }
-
-  function finishCallBack(list) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback(list);
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/drawMultiLine.js":
-/*!*******************************************!*\
-  !*** ./src/doc/modeling/drawMultiLine.js ***!
-  \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawMultiLine": () => (/* binding */ drawMultiLine)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-
-
-
-
-function drawMultiLine(view, unit, btn, workPlane, callback) {
-  var plane = workPlane.plane;
-  var factor = unit.factor;
-  var count = 0;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_3__.Vector2();
-  var p1 = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
-  var p2 = new three__WEBPACK_IMPORTED_MODULE_3__.Vector3(0, 0, 0);
-  var line, tempLine, snap;
-  var list = [];
-  var generate = false;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27 || keyCode == 13) {
-      if (tempLine) {
-        tempLine.removeFromParent();
-      }
-
-      finishCallBack();
-    }
-  }
-
-  function onMouseDown(e) {
-    if (count == 0) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.intersectPointPlane)(e, mouse, view, null, plane);
-      p1 = intersect.point;
-      if (snap) p1 = snap;
-    } else {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.intersectPointPlane)(e, mouse, view, null, plane);
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-
-      if (!line) {
-        line = _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.createTempLine(p1, p2);
-        view.scene.add(line);
-      }
-
-      _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.initLine(view, factor, p1, p2, plane.normal, line);
-      list.push(line);
-      p1 = p2;
-      line = null;
-    }
-
-    count++;
-    generate = true;
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
-    var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.intersectPointPlane)(e, mouse, view, null, plane);
-    var p = intersect.point;
-    snap = (0,_snap__WEBPACK_IMPORTED_MODULE_2__.snapPoint)(workPlane, view, p);
-    p2 = intersect.point;
-    if (snap) p2 = snap;
-
-    if (generate) {
-      if (!tempLine) {
-        tempLine = _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.createTempLine(p1, p2);
-        view.scene.add(tempLine);
-      } else {
-        _Location__WEBPACK_IMPORTED_MODULE_1__.LocationLine.updateTempLine(p1, p2, tempLine);
-      }
-    }
-  }
-
-  function finishCallBack() {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback(list);
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/drawPolygon.js":
-/*!*****************************************!*\
-  !*** ./src/doc/modeling/drawPolygon.js ***!
-  \*****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawPolygon": () => (/* binding */ drawPolygon)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-
-
-
-
-
-function drawPolygon(view, unit, btn, workPlane, callback) {
-  var plane = workPlane.plane;
-  var label = unit.label,
-      factor = unit.factor;
-  var count = 2;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_4__.Vector2();
-  var p1 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p2 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var poly = [],
-      snap,
-      edge = 3;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27) {
-      count = 0;
-      poly.forEach(function (p) {
-        return p.removeFromParent();
-      });
-      poly = [];
-      finishCallBack(poly);
-    }
-  }
-
-  function onMouseDown(e) {
-    if (count == 2) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p1 = intersect.point;
-      if (snap) p1 = snap;
-      edge = window.prompt("Enter number of edge", edge);
-      if (isNaN(parseInt(edge)) || parseInt(edge) <= 2) edge = 3;
-    }
-
-    if (count == 1) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-      var dis = p1.distanceTo(p2);
-      var points = generatePoints(dis);
-
-      for (var i = 0; i < points.length; i++) {
-        var v1, v2;
-
-        if (i == points.length - 1) {
-          v1 = points[i];
-          v2 = points[0];
-        } else {
-          v1 = points[i];
-          v2 = points[i + 1];
-        }
-
-        _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v1, v2, plane.normal, poly[i]);
-      }
-    }
-
-    count--;
-
-    if (count == 0) {
-      finishCallBack(poly);
-    }
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
-    var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-    var p = intersect.point;
-    snap = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.snapPoint)(workPlane, view, p);
-
-    if (count == 1) {
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-      var dis = p1.distanceTo(p2);
-
-      if (dis > _enum__WEBPACK_IMPORTED_MODULE_1__.MIN_DIS) {
-        var points = generatePoints(dis);
-
-        if (poly.length === 0) {
-          for (var i = 0; i < points.length; i++) {
-            var v1, v2;
-
-            if (i == points.length - 1) {
-              v1 = points[i];
-              v2 = points[0];
-            } else {
-              v1 = points[i];
-              v2 = points[i + 1];
-            }
-
-            var l = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v1, v2);
-            view.scene.add(l);
-            poly.push(l);
-          }
-        } else {
-          for (var _i = 0; _i < points.length; _i++) {
-            var v1, v2;
-
-            if (_i == points.length - 1) {
-              v1 = points[_i];
-              v2 = points[0];
-            } else {
-              v1 = points[_i];
-              v2 = points[_i + 1];
-            }
-
-            _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.updateTempLine(v1, v2, poly[_i]);
-          }
-        }
-      }
-    }
-
-    if (count == 0) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-      view.domElement.removeEventListener("mousemove", onMouseMove);
-    }
-  }
-
-  function finishCallBack(list) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback(list);
-  }
-
-  function generatePoints(dis) {
-    var dir = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
-    var per = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3(0, 0, 0).crossVectors(plane.normal, dir).normalize();
-    var points = [];
-
-    for (var i = 0; i < edge; i++) {
-      var angle = i * 2 * Math.PI / edge;
-      var sin = Math.sin(angle);
-      var cos = Math.cos(angle);
-      points.push(p1.clone().add(dir.clone().multiplyScalar(cos * dis)).add(per.clone().multiplyScalar(sin * dis)));
-    }
-
-    return points;
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/drawRect.js":
-/*!**************************************!*\
-  !*** ./src/doc/modeling/drawRect.js ***!
-  \**************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "drawRect": () => (/* binding */ drawRect)
-/* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-
-
-
-
-
-function drawRect(view, unit, btn, workPlane, callback) {
-  var plane = workPlane.plane;
-  var label = unit.label,
-      factor = unit.factor;
-  var count = 2;
-  var mouse = new three__WEBPACK_IMPORTED_MODULE_4__.Vector2();
-  var p1 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var p2 = new three__WEBPACK_IMPORTED_MODULE_4__.Vector3();
-  var l1, l2, l3, l4, snap;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27) {
-      count = 0;
-
-      if (l1 && l2 && l3 && l4) {
-        l1.removeFromParent();
-        l2.removeFromParent();
-        l3.removeFromParent();
-        l4.removeFromParent();
-      }
-
-      finishCallBack([]);
-    }
-  }
-
-  function onMouseDown(e) {
-    if (count == 2) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p1 = intersect.point;
-      if (snap) p1 = snap;
-      var length = window.prompt("Enter Length", label);
-
-      if (!isNaN(parseFloat(length * 1.0)) && length) {
-        var width = window.prompt("Enter Width", label);
-
-        if (!isNaN(parseFloat(width * 1.0))) {
-          var local = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getLocalVectorOnFace)(plane.normal);
-          var v1 = p1.clone();
-          var v2 = p1.clone().add(local.z.clone().multiplyScalar(width * factor));
-          var v3 = v2.clone().add(local.x.clone().multiplyScalar(length * factor));
-          var v4 = p1.clone().add(local.x.clone().multiplyScalar(length * factor));
-
-          if (!l1 && !l2 && !l3 && !l4) {
-            l1 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v1, v2);
-            l2 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v2, v3);
-            l3 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v3, v4);
-            l4 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v4, v1);
-            view.scene.add(l1);
-            view.scene.add(l2);
-            view.scene.add(l3);
-            view.scene.add(l4);
-            _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
-            _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
-            _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
-            _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
-          }
-
-          finishCallBack([l1, l2, l3, l4]);
-        }
-      }
-    }
-
-    if (count == 1) {
-      var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-    }
-
-    count--;
-
-    if (count == 0) {
-      var local = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getLocalVectorOnFace)(plane.normal);
-      var v1 = p1.clone();
-      var v2 = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getProjectPointFromVector)(p1, p2, local.z);
-      var v3 = p2.clone();
-      var v4 = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getProjectPointFromVector)(p1, p2, local.x);
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v1, v2, plane.normal, l1);
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v2, v3, plane.normal, l2);
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v3, v4, plane.normal, l3);
-      _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.initLine(view, factor, v4, v1, plane.normal, l4);
-      finishCallBack([l1, l2, l3, l4]);
-    }
-  }
-
-  function onMouseMove(e) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().crosshair(view.domElement);
-    var intersect = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.intersectPointPlane)(e, mouse, view, null, plane);
-    var p = intersect.point;
-    snap = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.snapPoint)(workPlane, view, p);
-
-    if (count == 1) {
-      p2 = intersect.point;
-      if (snap) p2 = snap;
-      var dis = p1.distanceTo(p2);
-
-      if (dis > _enum__WEBPACK_IMPORTED_MODULE_1__.MIN_DIS) {
-        var local = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getLocalVectorOnFace)(plane.normal);
-        var v1 = p1.clone();
-        var v2 = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getProjectPointFromVector)(p1, p2, local.z);
-        var v3 = p2.clone();
-        var v4 = (0,_snap__WEBPACK_IMPORTED_MODULE_3__.getProjectPointFromVector)(p1, p2, local.x);
-
-        if (!l1 && !l2 && !l3 && !l4) {
-          l1 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v1, v2);
-          l2 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v2, v3);
-          l3 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v3, v4);
-          l4 = _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.createTempLine(v4, v1);
-          view.scene.add(l1);
-          view.scene.add(l2);
-          view.scene.add(l3);
-          view.scene.add(l4);
-        } else {
-          _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.updateTempLine(v1, v2, l1);
-          _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.updateTempLine(v2, v3, l2);
-          _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.updateTempLine(v3, v4, l3);
-          _Location__WEBPACK_IMPORTED_MODULE_2__.LocationLine.updateTempLine(v4, v1, l4);
-        }
-      }
-    }
-
-    if (count == 0) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-      view.domElement.removeEventListener("mousemove", onMouseMove);
-    }
-  }
-
-  function finishCallBack(list) {
-    (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)()["default"](view.domElement);
-    snap = workPlane.planeMesh.userData.Grid.refreshSnap();
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback(list);
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/enum.js":
-/*!**********************************!*\
-  !*** ./src/doc/modeling/enum.js ***!
-  \**********************************/
+/***/ "./src/doc/utils/enum.js":
+/*!*******************************!*\
+  !*** ./src/doc/utils/enum.js ***!
+  \*******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7271,6 +7436,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "OFFSET_DIM": () => (/* binding */ OFFSET_DIM),
 /* harmony export */   "SNAP": () => (/* binding */ SNAP),
 /* harmony export */   "SNAP_ANGLE": () => (/* binding */ SNAP_ANGLE),
+/* harmony export */   "extrudeProfileSetting": () => (/* binding */ extrudeProfileSetting),
 /* harmony export */   "extrudeSetting": () => (/* binding */ extrudeSetting),
 /* harmony export */   "initShape": () => (/* binding */ initShape)
 /* harmony export */ });
@@ -7294,6 +7460,13 @@ var extrudeSetting = function extrudeSetting(curve) {
   return {
     extrudePath: curve,
     steps: curve.getPoints().length
+  };
+};
+var extrudeProfileSetting = function extrudeProfileSetting(curve) {
+  return {
+    extrudePath: curve,
+    steps: curve.getPoints().length,
+    bevelEnabled: false
   };
 };
 var CSS = {
@@ -7343,196 +7516,70 @@ var INTERSECT_TYPE = {
 
 /***/ }),
 
-/***/ "./src/doc/modeling/extrudeProfile.js":
-/*!********************************************!*\
-  !*** ./src/doc/modeling/extrudeProfile.js ***!
-  \********************************************/
+/***/ "./src/doc/utils/index.js":
+/*!********************************!*\
+  !*** ./src/doc/utils/index.js ***!
+  \********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "extrudeProfile": () => (/* binding */ extrudeProfile),
-/* harmony export */   "meshProfile": () => (/* binding */ meshProfile)
+/* harmony export */   "CATEGORY": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.CATEGORY),
+/* harmony export */   "CSS": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.CSS),
+/* harmony export */   "CustomType": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.CustomType),
+/* harmony export */   "DIM_WIDTH": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.DIM_WIDTH),
+/* harmony export */   "DiaP": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.DiaP),
+/* harmony export */   "ES": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.ES),
+/* harmony export */   "EXTEND_DIM": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.EXTEND_DIM),
+/* harmony export */   "INTERSECT_TYPE": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.INTERSECT_TYPE),
+/* harmony export */   "LINE_WIDTH": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.LINE_WIDTH),
+/* harmony export */   "LocationArc": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_0__.LocationArc),
+/* harmony export */   "LocationLine": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_0__.LocationLine),
+/* harmony export */   "MAX_CIRCLE": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.MAX_CIRCLE),
+/* harmony export */   "MAX_POINTS": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.MAX_POINTS),
+/* harmony export */   "MIN_DIS": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.MIN_DIS),
+/* harmony export */   "OFFSET_DIM": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.OFFSET_DIM),
+/* harmony export */   "ProfileModel": () => (/* reexport safe */ _ProfileModel__WEBPACK_IMPORTED_MODULE_1__.ProfileModel),
+/* harmony export */   "SNAP": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.SNAP),
+/* harmony export */   "SNAP_ANGLE": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.SNAP_ANGLE),
+/* harmony export */   "areEqual": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.areEqual),
+/* harmony export */   "areEqualVector": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.areEqualVector),
+/* harmony export */   "castElement": () => (/* reexport safe */ _cast__WEBPACK_IMPORTED_MODULE_2__.castElement),
+/* harmony export */   "changeCursor": () => (/* reexport safe */ _cast__WEBPACK_IMPORTED_MODULE_2__.changeCursor),
+/* harmony export */   "createPoint": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_0__.createPoint),
+/* harmony export */   "createPointGeometryArcDimension": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_0__.createPointGeometryArcDimension),
+/* harmony export */   "createPointGeometryDimension": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_0__.createPointGeometryDimension),
+/* harmony export */   "extrudeProfileSetting": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.extrudeProfileSetting),
+/* harmony export */   "extrudeSetting": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.extrudeSetting),
+/* harmony export */   "filterModel": () => (/* reexport safe */ _cast__WEBPACK_IMPORTED_MODULE_2__.filterModel),
+/* harmony export */   "findFacePoints": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.findFacePoints),
+/* harmony export */   "findPointFromFace": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.findPointFromFace),
+/* harmony export */   "getAllPointSnap": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getAllPointSnap),
+/* harmony export */   "getIntersectLines": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getIntersectLines),
+/* harmony export */   "getIntersectTypeLines": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getIntersectTypeLines),
+/* harmony export */   "getLocalVectorOnFace": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getLocalVectorOnFace),
+/* harmony export */   "getMiddlePoint": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getMiddlePoint),
+/* harmony export */   "getOldPoints": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getOldPoints),
+/* harmony export */   "getProjectPointFrom3Point": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getProjectPointFrom3Point),
+/* harmony export */   "getProjectPointFromVector": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.getProjectPointFromVector),
+/* harmony export */   "highlightModel": () => (/* reexport safe */ _selectModel__WEBPACK_IMPORTED_MODULE_4__.highlightModel),
+/* harmony export */   "initShape": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_3__.initShape),
+/* harmony export */   "intersectPlaneElevation": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.intersectPlaneElevation),
+/* harmony export */   "intersectPointOriginPlane": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.intersectPointOriginPlane),
+/* harmony export */   "intersectPointPlane": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.intersectPointPlane),
+/* harmony export */   "isConnected": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_0__.isConnected),
+/* harmony export */   "pickModel": () => (/* reexport safe */ _selectModel__WEBPACK_IMPORTED_MODULE_4__.pickModel),
+/* harmony export */   "setDefaultModel": () => (/* reexport safe */ _setProperty__WEBPACK_IMPORTED_MODULE_5__.setDefaultModel),
+/* harmony export */   "snapPoint": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_6__.snapPoint)
 /* harmony export */ });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three-mesh-bvh */ "./node_modules/three-mesh-bvh/src/core/MeshBVH.js");
-/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../material */ "./src/doc/material/index.js");
-/* harmony import */ var _model_ModelType__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../model/ModelType */ "./src/doc/model/ModelType.js");
-/* harmony import */ var _setProperty__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./setProperty */ "./src/doc/modeling/setProperty.js");
-
-
-
-
-
-function meshProfile(points, scene) {
-  var geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(getMeshPoints(points));
-  var mesh = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(geometry, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalModel);
-  var edges = new three__WEBPACK_IMPORTED_MODULE_3__.EdgesGeometry(geometry);
-  var line = new three__WEBPACK_IMPORTED_MODULE_3__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
-  mesh.geometry.computeBoundingBox();
-  mesh.geometry.computeBoundingSphere();
-  mesh.geometry.computeVertexNormals();
-  mesh.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__.MeshBVH(mesh.geometry);
-  scene.add(line);
-  mesh.userData.OutLine = line;
-  scene.add(mesh);
-  return mesh;
-}
-function extrudeProfile(points, offsetPs, profile, meshProfile, material, normalVector, scene) {
-  var geometry = new three__WEBPACK_IMPORTED_MODULE_3__.BufferGeometry().setFromPoints(getExtrudePoints(points, offsetPs));
-  var mesh = new three__WEBPACK_IMPORTED_MODULE_3__.Mesh(geometry, material.material);
-  var edges = new three__WEBPACK_IMPORTED_MODULE_3__.EdgesGeometry(geometry);
-  var line = new three__WEBPACK_IMPORTED_MODULE_3__.LineSegments(edges, _material__WEBPACK_IMPORTED_MODULE_0__.customMaterial.normalLine);
-  mesh.geometry.computeBoundingBox();
-  mesh.geometry.computeBoundingSphere();
-  mesh.geometry.computeVertexNormals();
-  mesh.geometry.boundsTree = new three_mesh_bvh__WEBPACK_IMPORTED_MODULE_4__.MeshBVH(mesh.geometry);
-  scene.add(line);
-  scene.add(mesh);
-  (0,_setProperty__WEBPACK_IMPORTED_MODULE_2__.setDefaultModel)(mesh, line, profile, meshProfile, material, normalVector, _model_ModelType__WEBPACK_IMPORTED_MODULE_1__.typeModel.extrude, null);
-  return mesh;
-}
-
-function getMeshPoints(points) {
-  var ps = [];
-
-  for (var i = 0; i < points.length - 2; i++) {
-    ps.push(points[0]);
-    ps.push(points[i + 1]);
-    ps.push(points[i + 2]);
-  }
-
-  return ps;
-}
-
-function getExtrudePoints(points, offsetPs) {
-  var ps = [];
-
-  for (var i = 0; i < points.length - 2; i++) {
-    ps.push(points[0]);
-    ps.push(points[i + 1]);
-    ps.push(points[i + 2]);
-  }
-
-  for (var _i = 0; _i < offsetPs.length - 2; _i++) {
-    ps.push(offsetPs[0]);
-    ps.push(offsetPs[_i + 1]);
-    ps.push(offsetPs[_i + 2]);
-  }
-
-  for (var _i2 = 0; _i2 < points.length; _i2++) {
-    if (_i2 == points.length - 1) {
-      ps.push(points[_i2]);
-      ps.push(points[0]);
-      ps.push(offsetPs[0]);
-      ps.push(points[_i2]);
-      ps.push(offsetPs[0]);
-      ps.push(offsetPs[_i2]);
-    } else {
-      ps.push(points[_i2]);
-      ps.push(points[_i2 + 1]);
-      ps.push(offsetPs[_i2 + 1]);
-      ps.push(points[_i2]);
-      ps.push(offsetPs[_i2 + 1]);
-      ps.push(offsetPs[_i2]);
-    }
-  }
-
-  return ps;
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/index.js":
-/*!***********************************!*\
-  !*** ./src/doc/modeling/index.js ***!
-  \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "CATEGORY": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.CATEGORY),
-/* harmony export */   "CSS": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.CSS),
-/* harmony export */   "CustomType": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.CustomType),
-/* harmony export */   "DIM_WIDTH": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.DIM_WIDTH),
-/* harmony export */   "DiaP": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.DiaP),
-/* harmony export */   "ES": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.ES),
-/* harmony export */   "EXTEND_DIM": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.EXTEND_DIM),
-/* harmony export */   "INTERSECT_TYPE": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.INTERSECT_TYPE),
-/* harmony export */   "LINE_WIDTH": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.LINE_WIDTH),
-/* harmony export */   "LocationArc": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.LocationArc),
-/* harmony export */   "LocationLine": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.LocationLine),
-/* harmony export */   "LocationPoint": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.LocationPoint),
-/* harmony export */   "MAX_CIRCLE": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.MAX_CIRCLE),
-/* harmony export */   "MAX_POINTS": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.MAX_POINTS),
-/* harmony export */   "MIN_DIS": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.MIN_DIS),
-/* harmony export */   "OFFSET_DIM": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.OFFSET_DIM),
-/* harmony export */   "ProfileModel": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.ProfileModel),
-/* harmony export */   "SNAP": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.SNAP),
-/* harmony export */   "SNAP_ANGLE": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.SNAP_ANGLE),
-/* harmony export */   "TrimElement": () => (/* reexport safe */ _modify__WEBPACK_IMPORTED_MODULE_7__.TrimElement),
-/* harmony export */   "areEqual": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.areEqual),
-/* harmony export */   "areEqualVector": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.areEqualVector),
-/* harmony export */   "castElement": () => (/* reexport safe */ _cast__WEBPACK_IMPORTED_MODULE_9__.castElement),
-/* harmony export */   "changeCursor": () => (/* reexport safe */ _cast__WEBPACK_IMPORTED_MODULE_9__.changeCursor),
-/* harmony export */   "copyElement": () => (/* reexport safe */ _modify__WEBPACK_IMPORTED_MODULE_7__.copyElement),
-/* harmony export */   "createPoint": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.createPoint),
-/* harmony export */   "createPointGeometryArcDimension": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.createPointGeometryArcDimension),
-/* harmony export */   "createPointGeometryDimension": () => (/* reexport safe */ _Location__WEBPACK_IMPORTED_MODULE_13__.createPointGeometryDimension),
-/* harmony export */   "drawArc": () => (/* reexport safe */ _drawArc__WEBPACK_IMPORTED_MODULE_6__.drawArc),
-/* harmony export */   "drawCircle": () => (/* reexport safe */ _drawCircle__WEBPACK_IMPORTED_MODULE_2__.drawCircle),
-/* harmony export */   "drawExtrude": () => (/* reexport safe */ _draft_extrude__WEBPACK_IMPORTED_MODULE_8__.drawExtrude),
-/* harmony export */   "drawLine": () => (/* reexport safe */ _drawLine__WEBPACK_IMPORTED_MODULE_3__.drawLine),
-/* harmony export */   "drawMultiLine": () => (/* reexport safe */ _drawMultiLine__WEBPACK_IMPORTED_MODULE_4__.drawMultiLine),
-/* harmony export */   "drawPolyGon": () => (/* reexport safe */ _draft_drawPolyGon__WEBPACK_IMPORTED_MODULE_0__.drawPolyGon),
-/* harmony export */   "drawPolygon": () => (/* reexport safe */ _drawPolygon__WEBPACK_IMPORTED_MODULE_5__.drawPolygon),
-/* harmony export */   "drawRect": () => (/* reexport safe */ _drawRect__WEBPACK_IMPORTED_MODULE_1__.drawRect),
-/* harmony export */   "extrudeProfile": () => (/* reexport safe */ _extrudeProfile__WEBPACK_IMPORTED_MODULE_14__.extrudeProfile),
-/* harmony export */   "extrudeSetting": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.extrudeSetting),
-/* harmony export */   "filterModel": () => (/* reexport safe */ _cast__WEBPACK_IMPORTED_MODULE_9__.filterModel),
-/* harmony export */   "findFacePoints": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.findFacePoints),
-/* harmony export */   "findPointFromFace": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.findPointFromFace),
-/* harmony export */   "getAllPointSnap": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getAllPointSnap),
-/* harmony export */   "getIntersectLines": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getIntersectLines),
-/* harmony export */   "getIntersectTypeLines": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getIntersectTypeLines),
-/* harmony export */   "getLocalVectorOnFace": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getLocalVectorOnFace),
-/* harmony export */   "getMiddlePoint": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getMiddlePoint),
-/* harmony export */   "getOldPoints": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getOldPoints),
-/* harmony export */   "getProjectPointFrom3Point": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getProjectPointFrom3Point),
-/* harmony export */   "getProjectPointFromVector": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.getProjectPointFromVector),
-/* harmony export */   "initShape": () => (/* reexport safe */ _enum__WEBPACK_IMPORTED_MODULE_10__.initShape),
-/* harmony export */   "intersectPlaneElevation": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.intersectPlaneElevation),
-/* harmony export */   "intersectPointOriginPlane": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.intersectPointOriginPlane),
-/* harmony export */   "intersectPointPlane": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.intersectPointPlane),
-/* harmony export */   "meshProfile": () => (/* reexport safe */ _extrudeProfile__WEBPACK_IMPORTED_MODULE_14__.meshProfile),
-/* harmony export */   "setDefaultModel": () => (/* reexport safe */ _setProperty__WEBPACK_IMPORTED_MODULE_11__.setDefaultModel),
-/* harmony export */   "snapPoint": () => (/* reexport safe */ _snap__WEBPACK_IMPORTED_MODULE_12__.snapPoint)
-/* harmony export */ });
-/* harmony import */ var _draft_drawPolyGon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./draft/drawPolyGon */ "./src/doc/modeling/draft/drawPolyGon.js");
-/* harmony import */ var _drawRect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./drawRect */ "./src/doc/modeling/drawRect.js");
-/* harmony import */ var _drawCircle__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./drawCircle */ "./src/doc/modeling/drawCircle.js");
-/* harmony import */ var _drawLine__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./drawLine */ "./src/doc/modeling/drawLine.js");
-/* harmony import */ var _drawMultiLine__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./drawMultiLine */ "./src/doc/modeling/drawMultiLine.js");
-/* harmony import */ var _drawPolygon__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./drawPolygon */ "./src/doc/modeling/drawPolygon.js");
-/* harmony import */ var _drawArc__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./drawArc */ "./src/doc/modeling/drawArc.js");
-/* harmony import */ var _modify__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./modify */ "./src/doc/modeling/modify.js");
-/* harmony import */ var _draft_extrude__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./draft/extrude */ "./src/doc/modeling/draft/extrude.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _setProperty__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./setProperty */ "./src/doc/modeling/setProperty.js");
-/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./snap */ "./src/doc/modeling/snap.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
-/* harmony import */ var _extrudeProfile__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./extrudeProfile */ "./src/doc/modeling/extrudeProfile.js");
-
-
-
-
-
-
-
-
+/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Location */ "./src/doc/utils/Location/index.js");
+/* harmony import */ var _ProfileModel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ProfileModel */ "./src/doc/utils/ProfileModel/index.js");
+/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cast */ "./src/doc/utils/cast.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var _selectModel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./selectModel */ "./src/doc/utils/selectModel.js");
+/* harmony import */ var _setProperty__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./setProperty */ "./src/doc/utils/setProperty.js");
+/* harmony import */ var _snap__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./snap */ "./src/doc/utils/snap.js");
 
 
 
@@ -7543,139 +7590,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/doc/modeling/modify.js":
-/*!************************************!*\
-  !*** ./src/doc/modeling/modify.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "TrimElement": () => (/* binding */ TrimElement),
-/* harmony export */   "copyElement": () => (/* binding */ copyElement)
-/* harmony export */ });
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-
-function copyElement(view, btn, callback) {
-  var div;
-  var element;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27 || keyCode == 13) {
-      finishCallBack();
-    }
-  }
-
-  function onMouseDown(e) {
-    var found = (0,_cast__WEBPACK_IMPORTED_MODULE_0__.castElement)(e, view, _cast__WEBPACK_IMPORTED_MODULE_0__.filterModel.model(view.scene))[0];
-    element = found ? found.object : null;
-  }
-
-  function onMouseMove(e) {
-    if (!div) {
-      div = document.createElement("div");
-      div.className = "card mouseModify";
-      div.textContent = "Select element";
-      div.style.top = e.clientY + "px";
-      div.style.left = e.clientX + "px";
-      document.body.appendChild(div);
-    } else {
-      div.style.top = e.clientY + 5 + "px";
-      div.style.left = e.clientX + 5 + "px";
-    }
-
-    if (element) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().move(view.domElement);
-    }
-  }
-
-  function finishCallBack() {
-    if (div) {
-      div.remove();
-    }
-
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback();
-  }
-
-  draw();
-}
-function TrimElement(view, btn, callback) {
-  var div;
-  var element;
-
-  function draw() {
-    btn.style.background = "#aaaaa9";
-    view.domElement.addEventListener("click", onMouseDown, false);
-    view.domElement.addEventListener("mousemove", onMouseMove, false);
-    window.addEventListener("keydown", onkeydown, false);
-  }
-
-  function onkeydown(event) {
-    var keyCode = event.keyCode;
-
-    if (keyCode == 27 || keyCode == 13) {
-      finishCallBack();
-    }
-  }
-
-  function onMouseDown(e) {
-    var found = (0,_cast__WEBPACK_IMPORTED_MODULE_0__.castElement)(e, view, _cast__WEBPACK_IMPORTED_MODULE_0__.filterModel.model(view.scene))[0];
-    element = found ? found.object : null;
-  }
-
-  function onMouseMove(e) {
-    if (!div) {
-      div = document.createElement("div");
-      div.className = "card mouseModify";
-      div.textContent = "Select element";
-      div.style.top = e.clientY + "px";
-      div.style.left = e.clientX + "px";
-      document.body.appendChild(div);
-    } else {
-      div.style.top = e.clientY + 5 + "px";
-      div.style.left = e.clientX + 5 + "px";
-    }
-
-    if (element) {
-      (0,_cast__WEBPACK_IMPORTED_MODULE_0__.changeCursor)().move(view.domElement);
-    }
-  }
-
-  function finishCallBack() {
-    if (div) {
-      div.remove();
-    }
-
-    btn.style.background = "none";
-    view.domElement.removeEventListener("click", onMouseDown);
-    view.domElement.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("keydown", onkeydown);
-    callback();
-  }
-
-  draw();
-}
-
-/***/ }),
-
-/***/ "./src/doc/modeling/selectModel.js":
-/*!*****************************************!*\
-  !*** ./src/doc/modeling/selectModel.js ***!
-  \*****************************************/
+/***/ "./src/doc/utils/selectModel.js":
+/*!**************************************!*\
+  !*** ./src/doc/utils/selectModel.js ***!
+  \**************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7685,8 +7603,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "pickModel": () => (/* binding */ pickModel)
 /* harmony export */ });
 /* harmony import */ var _model_ModelType__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../model/ModelType */ "./src/doc/model/ModelType.js");
-/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cast */ "./src/doc/modeling/cast.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
+/* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cast */ "./src/doc/utils/cast.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./enum */ "./src/doc/utils/enum.js");
 
 
 
@@ -7751,10 +7669,10 @@ function pickModel(event, view) {
 
 /***/ }),
 
-/***/ "./src/doc/modeling/setProperty.js":
-/*!*****************************************!*\
-  !*** ./src/doc/modeling/setProperty.js ***!
-  \*****************************************/
+/***/ "./src/doc/utils/setProperty.js":
+/*!**************************************!*\
+  !*** ./src/doc/utils/setProperty.js ***!
+  \**************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7764,8 +7682,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 /* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../material */ "./src/doc/material/index.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
-/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Location */ "./src/doc/modeling/Location.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enum */ "./src/doc/utils/enum.js");
+/* harmony import */ var _Location__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Location */ "./src/doc/utils/Location/index.js");
 
 
 
@@ -7963,10 +7881,10 @@ function getBounding(geometry) {
 
 /***/ }),
 
-/***/ "./src/doc/modeling/snap.js":
-/*!**********************************!*\
-  !*** ./src/doc/modeling/snap.js ***!
-  \**********************************/
+/***/ "./src/doc/utils/snap.js":
+/*!*******************************!*\
+  !*** ./src/doc/utils/snap.js ***!
+  \*******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7990,7 +7908,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "snapPoint": () => (/* binding */ snapPoint)
 /* harmony export */ });
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enum */ "./src/doc/modeling/enum.js");
+/* harmony import */ var _enum__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enum */ "./src/doc/utils/enum.js");
 
 
 function intersectPlaneElevation(event, mouse, view, elevation) {
@@ -8057,8 +7975,8 @@ function getLocalVectorOnFace(normal) {
       z: new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 1)
     };
   } else {
-    var z = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(normal, new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 1, 0));
-    var x = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(normal, z);
+    var z = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(normal, new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 1, 0)).normalize();
+    var x = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(0, 0, 0).crossVectors(normal, z).normalize();
     return {
       x: x,
       z: z
@@ -8070,7 +7988,8 @@ function getProjectPointFromVector(p1, p2, v) {
   var v0 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
   var dis1 = dis * Math.cos(v0.angleTo(v));
   return p1.clone().add(new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(v.x * dis1, v.y * dis1, v.z * dis1));
-}
+} //  get project point from p2 to vector p1&p2
+
 function getProjectPointFrom3Point(p1, p2, p3) {
   var v1 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
   var v2 = new three__WEBPACK_IMPORTED_MODULE_1__.Vector3(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z).normalize();
@@ -8252,7 +8171,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var three_examples_jsm_controls_OrbitControls__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three/examples/jsm/controls/OrbitControls */ "./node_modules/three/examples/jsm/controls/OrbitControls.js");
 /* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../material */ "./src/doc/material/index.js");
 /* harmony import */ var _CubeControl__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CubeControl */ "./src/doc/view/CubeControl.js");
-/* harmony import */ var _modeling__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../modeling */ "./src/doc/modeling/index.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./../utils */ "./src/doc/utils/index.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -8525,11 +8444,11 @@ var BaseView = /*#__PURE__*/function () {
       var _this = this;
 
       var lines = _this.scene.children.filter(function (c) {
-        return _modeling__WEBPACK_IMPORTED_MODULE_5__.CustomType.isLine(c) && c.userData.Location.Dimension;
+        return _utils__WEBPACK_IMPORTED_MODULE_5__.CustomType.isLine(c) && c.userData.Location.Dimension;
       });
 
       var arcs = _this.scene.children.filter(function (c) {
-        return _modeling__WEBPACK_IMPORTED_MODULE_5__.CustomType.isArc(c) && c.userData.Location.Dimension;
+        return _utils__WEBPACK_IMPORTED_MODULE_5__.CustomType.isArc(c) && c.userData.Location.Dimension;
       });
 
       lines.forEach(function (c) {
@@ -8546,11 +8465,11 @@ var BaseView = /*#__PURE__*/function () {
       var _this = this;
 
       var lines = _this.scene.children.filter(function (c) {
-        return _modeling__WEBPACK_IMPORTED_MODULE_5__.CustomType.isLine(c) && c.userData.Location.Dimension;
+        return _utils__WEBPACK_IMPORTED_MODULE_5__.CustomType.isLine(c) && c.userData.Location.Dimension;
       });
 
       var arcs = _this.scene.children.filter(function (c) {
-        return _modeling__WEBPACK_IMPORTED_MODULE_5__.CustomType.isArc(c) && c.userData.Location.Dimension;
+        return _utils__WEBPACK_IMPORTED_MODULE_5__.CustomType.isArc(c) && c.userData.Location.Dimension;
       });
 
       lines.forEach(function (c) {
