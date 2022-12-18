@@ -86,13 +86,12 @@ export const ToolProvider = (props) => {
 				refreshModelingType(dispatch);
 			}
 		} else {
-			if (deepExtrude <= 0) {
+			if (deepExtrude == 0) {
 				alert("Deep is invalid, please try again");
 				return;
 			}
 			if (modelType) {
-				modelType.createExtrude(profile, deepExtrude, documentModel.workPlane.plane, listMaterial[0]);
-				modelType.dispose();
+				modelType.createExtrude(profile, deepExtrude, documentModel.workPlane.plane, listMaterial[0].material);
 				setListModel([...documentModel.models]);
 			}
 			setModelType(null);
@@ -120,13 +119,13 @@ export const ToolProvider = (props) => {
 	};
 	const handleFinishProfile = () => {
 		if (modelType) {
-			modelType.canCreateProfile((result, profile) => {
-				if (!result) {
-					alert("Can not create a profile");
-				} else {
+			modelType.canCreateProfile((result, profile, message) => {
+				if (result) {
 					setShowProfile(false);
 					setProfile(profile);
 					refreshModelingType(dispatch);
+				} else {
+					alert(message);
 				}
 			});
 		}

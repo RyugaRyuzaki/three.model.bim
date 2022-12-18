@@ -34,13 +34,13 @@ export function getIntersectTypeCurve(curve1, curve2) {
 }
 // l1 = curve1.userData.Location.Curves
 // l2 = curve2.userData.Location.Curves
-function getDirectionLine(line) {
+export function getDirectionLine(line) {
 	return new Vector3(line.v2.x - line.v1.x, line.v2.y - line.v1.y, line.v2.z - line.v1.z).normalize();
 }
-function getDirection2Point(p1, p2) {
+export function getDirection2Point(p1, p2) {
 	return new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
 }
-function getIntersectTypeLines(l1, l2) {
+export function getIntersectTypeLines(l1, l2) {
 	var v11 = l1.v1; //get start
 	var v12 = l1.v2; //get end
 	var v21 = l2.v1; //get start
@@ -90,7 +90,7 @@ function getIntersectTypeLines(l1, l2) {
 }
 // line = curve1.userData.Location.Curves
 // arc = curve2.userData.Location.Curves
-function getIntersectTypeLineAndArc(line, arc) {
+export function getIntersectTypeLineAndArc(line, arc) {
 	var curvePaths = arc.curves;
 	for (let i = 0; i < curvePaths.length; i++) {
 		var intersect = getIntersectTypeLines(line, curvePaths[i]);

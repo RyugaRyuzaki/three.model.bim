@@ -69,8 +69,8 @@ export function getLocalVectorOnFace(normal) {
 			z: new Vector3(0, 0, 1),
 		};
 	} else {
-		var z = new Vector3(0, 0, 0).crossVectors(normal, new Vector3(0, 1, 0));
-		var x = new Vector3(0, 0, 0).crossVectors(normal, z);
+		var z = new Vector3(0, 0, 0).crossVectors(normal, new Vector3(0, 1, 0)).normalize();
+		var x = new Vector3(0, 0, 0).crossVectors(normal, z).normalize();
 		return {
 			x: x,
 			z: z,

@@ -26,6 +26,13 @@ export const extrudeSetting = (curve) => {
 		steps: curve.getPoints().length,
 	};
 };
+export const extrudeProfileSetting = (curve) => {
+	return {
+		extrudePath: curve,
+		steps: curve.getPoints().length,
+		bevelEnabled: false,
+	};
+};
 export const CSS = {
 	intersect: "intersect",
 	dot: "dot",

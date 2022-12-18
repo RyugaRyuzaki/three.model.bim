@@ -85,7 +85,6 @@ export class ModelTypeClass {
 		var _this = this;
 		drawArc(_this.view, _this.unit, btn, workPlane, (list) => {
 			_this.listProfile = _this.listProfile.concat(list);
-			console.log(list);
 			callback();
 		});
 	}
@@ -93,7 +92,6 @@ export class ModelTypeClass {
 		var _this = this;
 		drawLine(_this.view, _this.unit, btn, workPlane, (list) => {
 			_this.listProfile = _this.listProfile.concat(list);
-			console.log(list);
 			callback();
 		});
 	}
@@ -126,38 +124,36 @@ export class ModelTypeClass {
 					});
 					tween.start();
 				}
-				callback(data.result, null);
+				callback(data.result, null, "Profile is not continue");
 			} else {
-				console.log(_this.listProfile);
 				_this.listPointProfile = ProfileModel.getListPointsProfile(_this.listProfile);
-				_this.meshProfile = meshProfile(_this.listPointProfile, _this.view.scene);
-				callback(data.result, _this.listProfile);
+				//clockwise
+				_this.listPointProfile = ProfileModel.getClockWiseListPoints(_this.listPointProfile);
+				if (!ProfileModel.provePolygon(_this.listPointProfile)) {
+					_this.listPointProfile = [];
+					callback(false, null, "Profile is not Polygon");
+				} else {
+					_this.meshProfile = meshProfile(_this.listPointProfile, _this.view.scene);
+					callback(
+						data.result,
+						{
+							listPointProfile: _this.listPointProfile,
+							listProfile: _this.listProfile,
+							meshProfile: _this.meshProfile,
+						},
+						"OK"
+					);
+				}
+				// polygon
 			}
 		});
 	}
 
 	createExtrude(profile, deepExtrude, plane, material) {
+		this.models.push(extrudeProfile(profile, deepExtrude, plane, material, this.view.scene));
 		this.dispose();
-		var offsetPs = [];
-		for (let i = 0; i < this.listPointProfile.length; i++) {
-			offsetPs.push(
-				this.listPointProfile[i]
-					.clone()
-					.add(plane.normal.clone().multiplyScalar(deepExtrude * this.unit.factor))
-			);
-		}
-		this.models.push(
-			extrudeProfile(
-				this.listPointProfile,
-				offsetPs,
-				profile,
-				this.meshProfile,
-				material,
-				plane.normal,
-				this.view.scene
-			)
-		);
 		this.disposeMeshProfile();
+		console.log(this.view.scene.children);
 	}
 
 	static modifyCopyElement(btn, view, callback) {
