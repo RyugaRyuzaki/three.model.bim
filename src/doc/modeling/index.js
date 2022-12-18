@@ -1,4 +1,3 @@
-export * from "./draft/drawPolyGon";
 export * from "./drawRect";
 export * from "./drawCircle";
 export * from "./drawLine";
@@ -6,10 +5,4 @@ export * from "./drawMultiLine";
 export * from "./drawPolygon";
 export * from "./drawArc";
 export * from "./modify";
-export * from "./draft/extrude";
-export * from "./cast";
-export * from "./enum";
-export * from "./setProperty";
-export * from "./snap";
-export * from "./Location";
 export * from "./extrudeProfile";

@@ -1,8 +1,5 @@
 import { Vector2, Vector3 } from "three";
-import { changeCursor } from "./cast";
-import { MIN_DIS } from "./enum";
-import { LocationLine } from "./Location";
-import { snapPoint, getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane } from "./snap";
+import { LocationLine, MIN_DIS, changeCursor, snapPoint, intersectPointPlane } from "../utils";
 
 export function drawPolygon(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;

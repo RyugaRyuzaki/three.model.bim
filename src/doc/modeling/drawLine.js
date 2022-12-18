@@ -1,7 +1,5 @@
 import { Vector2, Vector3 } from "three";
-import { changeCursor } from "./cast";
-import { LocationLine } from "./Location";
-import { getLocalVectorOnFace, intersectPointPlane, snapPoint } from "./snap";
+import { changeCursor, LocationLine, getLocalVectorOnFace, intersectPointPlane, snapPoint } from "../utils";
 
 export function drawLine(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;

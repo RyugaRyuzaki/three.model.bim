@@ -1,8 +1,8 @@
 import { BufferGeometry, EdgesGeometry, LineSegments, Mesh, Vector3 } from "three";
 import { MeshBVH } from "three-mesh-bvh";
 import { customMaterial } from "../material";
-import { typeModel } from "../model/ModelType";
-import { setDefaultModel } from "./setProperty";
+import { typeModel } from "../model";
+import { setDefaultModel } from "../utils";
 
 export function meshProfile(points, scene) {
 	var geometry = new BufferGeometry().setFromPoints(getMeshPoints(points));

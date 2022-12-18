@@ -7,10 +7,11 @@ import {
 	drawPolygon,
 	extrudeProfile,
 	copyElement,
-	ProfileModel,
 	meshProfile,
 } from "../modeling";
 import { Tween } from "@tweenjs/tween.js";
+import { ProfileModel } from "./../utils";
+
 export const typeModel = {
 	extrude: 1,
 	sweep: 2,
@@ -84,6 +85,7 @@ export class ModelTypeClass {
 		var _this = this;
 		drawArc(_this.view, _this.unit, btn, workPlane, (list) => {
 			_this.listProfile = _this.listProfile.concat(list);
+			console.log(list);
 			callback();
 		});
 	}
@@ -91,6 +93,7 @@ export class ModelTypeClass {
 		var _this = this;
 		drawLine(_this.view, _this.unit, btn, workPlane, (list) => {
 			_this.listProfile = _this.listProfile.concat(list);
+			console.log(list);
 			callback();
 		});
 	}
@@ -118,13 +121,14 @@ export class ModelTypeClass {
 				if (data.elements) {
 					var pos0 = _this.view.controls.target;
 					var pos1 = data.elements.userData.Location.Start.position;
-					const tween = new Tween({ pos: pos0 }).to({ pos: pos1 }, 200).onUpdate((coords) => {
+					const tween = new Tween({ pos: pos0 }).to({ pos: pos1 }, 500).onUpdate((coords) => {
 						_this.view.controls.target = coords.pos;
 					});
 					tween.start();
 				}
 				callback(data.result, null);
 			} else {
+				console.log(_this.listProfile);
 				_this.listPointProfile = ProfileModel.getListPointsProfile(_this.listProfile);
 				_this.meshProfile = meshProfile(_this.listPointProfile, _this.view.scene);
 				callback(data.result, _this.listProfile);

@@ -3,8 +3,8 @@ import { Scene } from "three";
 import { BaseView } from "./view";
 import { Tween } from "@tweenjs/tween.js";
 import { ModelTypeClass, typeModel, SettingModel, WorkPlane, UnitModel, ExportBimModel } from "./model";
-import { highlightModel, pickModel } from "./modeling/selectModel";
-import { CustomType } from "./modeling";
+import { highlightModel, pickModel } from "./utils";
+import { CustomType } from "./utils";
 import { ViewMaterial } from "./material";
 
 export class DocumentModel {

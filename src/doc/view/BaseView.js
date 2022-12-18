@@ -10,7 +10,6 @@ import {
 	Vector2,
 	Mesh,
 	SphereGeometry,
-	PlaneGeometry,
 	sRGBEncoding,
 	BufferGeometry,
 } from "three";
@@ -20,7 +19,7 @@ import * as TWEEN from "@tweenjs/tween.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { LightColor, CubeControlMaterial, customMaterial } from "../material";
 import { CubeControls } from "./CubeControl";
-import { CustomType } from "./../modeling";
+import { CustomType } from "./../utils";
 
 export class BaseView {
 	showDimension = false;

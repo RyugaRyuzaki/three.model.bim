@@ -19,8 +19,8 @@ import {
 	filterModel,
 	findFacePoints,
 	intersectPointPlane,
-} from "../modeling";
-import { createPoint } from "../modeling/Location";
+} from "../utils";
+import { createPoint } from "../utils";
 
 export class WorkPlane {
 	listWorkPlanes = [];

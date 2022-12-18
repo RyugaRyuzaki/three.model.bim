@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
-    "homepage": "https://OpenBimVietNam.github.io/three.model.bim/",
+    "homepage": "https://ryugaryuzaki.github.io/three.model.bim/",
     "scripts": {
         "build": "webpack",
         "dev": "webpack serve",

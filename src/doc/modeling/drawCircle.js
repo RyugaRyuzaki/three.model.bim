@@ -1,8 +1,6 @@
 import { Vector2, Vector3 } from "three";
-import { changeCursor } from "./cast";
-import { MIN_DIS } from "./enum";
-import { LocationArc } from "./Location";
-import { snapPoint, intersectPointPlane } from "./snap";
+
+import { changeCursor, MIN_DIS, LocationArc, snapPoint, intersectPointPlane } from "../utils";
 
 export function drawCircle(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;

@@ -1,8 +1,13 @@
 import { Vector2, Vector3 } from "three";
-import { changeCursor } from "./cast";
-import { MIN_DIS } from "./enum";
-import { LocationLine } from "./Location";
-import { snapPoint, getLocalVectorOnFace, getProjectPointFromVector, intersectPointPlane } from "./snap";
+import {
+	changeCursor,
+	MIN_DIS,
+	LocationLine,
+	snapPoint,
+	getLocalVectorOnFace,
+	getProjectPointFromVector,
+	intersectPointPlane,
+} from "../utils";
 
 export function drawRect(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;

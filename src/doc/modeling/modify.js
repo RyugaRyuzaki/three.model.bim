@@ -1,4 +1,4 @@
-import { castElement, changeCursor, filterModel } from "./cast";
+import { castElement, changeCursor, filterModel } from "../utils";
 export function copyElement(view, btn, callback) {
 	var div;
 	var element;

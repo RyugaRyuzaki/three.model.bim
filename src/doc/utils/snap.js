@@ -83,6 +83,7 @@ export function getProjectPointFromVector(p1, p2, v) {
 	var dis1 = dis * Math.cos(v0.angleTo(v));
 	return p1.clone().add(new Vector3(v.x * dis1, v.y * dis1, v.z * dis1));
 }
+//  get project point from p2 to vector p1&p2
 export function getProjectPointFrom3Point(p1, p2, p3) {
 	var v1 = new Vector3(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z).normalize();
 	var v2 = new Vector3(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z).normalize();

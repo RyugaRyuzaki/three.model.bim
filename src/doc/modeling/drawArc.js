@@ -1,8 +1,6 @@
 import { Vector2, Vector3 } from "three";
-import { changeCursor } from "./cast";
-import { MIN_DIS } from "./enum";
-import { LocationArc, LocationLine } from "./Location";
 import {
+	MIN_DIS,
 	snapPoint,
 	intersectPointPlane,
 	getLocalVectorOnFace,
@@ -10,7 +8,10 @@ import {
 	getMiddlePoint,
 	areEqualVector,
 	areEqual,
-} from "./snap";
+	changeCursor,
+	LocationArc,
+	LocationLine,
+} from "../utils";
 
 export function drawArc(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;

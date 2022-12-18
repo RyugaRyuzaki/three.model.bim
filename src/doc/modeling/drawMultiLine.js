@@ -1,7 +1,5 @@
 import { Vector2, Vector3 } from "three";
-import { changeCursor } from "./cast";
-import { LocationLine } from "./Location";
-import { snapPoint, intersectPointPlane } from "./snap";
+import { changeCursor, LocationLine, snapPoint, intersectPointPlane } from "../utils";
 
 export function drawMultiLine(view, unit, btn, workPlane, callback) {
 	const { plane } = workPlane;
